@@ -3,96 +3,108 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Mój Gadający Kotek V6</title>
+  <title>Nasz Słodki Kotek V7 🐾</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&display=swap');
-    :root { --primary: #00cec9; --bg: #81ecec; --panel: #ffffff; --text: #2d3436; }
-    body { font-family: 'Nunito', sans-serif; text-align: center; background-color: var(--bg); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: var(--text); user-select: none; }
+    :root { --primary: #0984e3; --bg: #dfe6e9; --panel: rgba(255, 255, 255, 0.95); --text: #2d3436; }
+    body { font-family: 'Nunito', sans-serif; text-align: center; background-color: var(--bg); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: var(--text); user-select: none; transition: background 0.5s ease;}
     
-    /* Top Bar & Leveling */
-    .top-bar { display: flex; justify-content: space-between; width: 95%; max-width: 450px; background: var(--panel); padding: 15px 20px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); margin-top: 5px; box-sizing: border-box; position: relative; z-index: 10;}
-    .coins-box { color: #f39c12; font-size: 1.4em; font-weight: 900;}
-    .lvl-box { color: #e84393; font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; }
-    
-    .name-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px;}
-    h1 { margin: 0; color: #0984e3; font-size: 2.2em; text-shadow: 2px 2px 0px white;}
-    .btn-edit { background: white; border: 2px solid #0984e3; border-radius: 50%; width: 35px; height: 35px; font-size: 1.2em; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.1s;}
-    .btn-edit:active { transform: scale(0.9); }
+    /* Dynamiczne Tła (Kupowane) */
+    body.bg-default { background: linear-gradient(135deg, #dfe6e9, #b2bec3); }
+    body.bg-room { background: linear-gradient(135deg, #ffeaa7, #fab1a0); }
+    body.bg-park { background: linear-gradient(135deg, #55efc4, #00b894); }
+    body.bg-space { background: linear-gradient(135deg, #192a56, #273c75); color: white; }
+    body.bg-space .panel { background: rgba(0, 0, 0, 0.7); color: white; box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);}
+    body.bg-space .bar-wrap { color: #dcdde1; }
 
-    /* SVG Cat Stage (3D Look) */
-    #cat-stage { width: 280px; height: 280px; margin: 15px 0; position: relative; border-radius: 50%; background: radial-gradient(circle, #74b9ff 0%, #0984e3 100%); box-shadow: inset 0 0 30px rgba(0,0,0,0.3), 0 10px 20px rgba(0,0,0,0.2); overflow: hidden; display: flex; align-items: center; justify-content: center; }
-    #animated-cat { width: 100%; height: 100%; animation: breathe 3s infinite ease-in-out; z-index: 2; }
+    /* Top Bar */
+    .top-bar { display: flex; justify-content: space-between; align-items: center; width: 95%; max-width: 450px; background: var(--panel); padding: 15px 20px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); margin-top: 5px; box-sizing: border-box; position: relative; z-index: 10; transition: all 0.5s;}
+    .lvl-box { font-size: 1.2em; font-weight: 900; display: flex; flex-direction: column; align-items: flex-start;}
+    .lvl-title { color: #e84393; font-size: 1.2em;}
+    .xp-text { font-size: 0.7em; color: #636e72; }
+    .coins-box { color: #f39c12; font-size: 1.6em; font-weight: 900; text-shadow: 1px 1px 0 rgba(0,0,0,0.1);}
     
-    @keyframes breathe { 0%, 100% { transform: scale(1) translateY(0); } 50% { transform: scale(1.02) translateY(-5px); } }
+    .name-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; background: var(--panel); padding: 5px 20px; border-radius: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
+    h1 { margin: 0; color: #0984e3; font-size: 2em; }
+    .btn-edit { background: none; border: none; font-size: 1.5em; cursor: pointer; transition: transform 0.1s;}
+    .btn-edit:active { transform: scale(0.8); }
+
+    /* ORGANICZNY KOTEK (Nie koła!) */
+    #cat-stage { width: 320px; height: 320px; margin: 10px 0; position: relative; display: flex; align-items: center; justify-content: center; }
+    #animated-cat { width: 100%; height: 100%; animation: breathe 3.5s infinite ease-in-out; z-index: 2; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.2)); }
+    
+    @keyframes breathe { 0%, 100% { transform: scale(1) translateY(0); } 50% { transform: scale(1.02) translateY(-8px); } }
     @keyframes blink { 0%, 4%, 100% { transform: scaleY(1); } 2% { transform: scaleY(0.1); } }
-    .eyes { animation: blink 4s infinite; transform-origin: 100px 90px; }
+    @keyframes tailWag { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-15deg); } }
+    .eyes { animation: blink 4s infinite; transform-origin: center; }
+    .tail { animation: tailWag 3s ease-in-out infinite; transform-origin: 65% 85%; }
     .happy-anim { animation: happy 0.5s ease; }
-    @keyframes happy { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+    @keyframes happy { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-30px); } }
 
     /* UI Panels */
-    .panel { width: 95%; max-width: 450px; background: var(--panel); padding: 15px; border-radius: 20px; box-shadow: 0 8px 15px rgba(0,0,0,0.05); margin-bottom: 15px; box-sizing: border-box; }
-    .bar-wrap { margin-bottom: 8px; text-align: left; font-size: 0.9em; font-weight: 900; color: #555; }
-    .bar-bg { background-color: #dfe6e9; border-radius: 12px; height: 22px; width: 100%; margin-top: 5px; overflow: hidden; box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);}
+    .panel { width: 95%; max-width: 450px; background: var(--panel); padding: 15px; border-radius: 20px; box-shadow: 0 8px 15px rgba(0,0,0,0.08); margin-bottom: 15px; box-sizing: border-box; backdrop-filter: blur(5px);}
+    .bar-wrap { margin-bottom: 5px; text-align: left; font-size: 0.9em; font-weight: 900; color: #555; }
+    .bar-bg { background-color: rgba(0,0,0,0.1); border-radius: 12px; height: 16px; width: 100%; margin-top: 5px; overflow: hidden; box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);}
     .bar-fill { height: 100%; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
     #bar-food { background: linear-gradient(90deg, #00b894, #55efc4); }
-    #bar-xp { background: linear-gradient(90deg, #6c5ce7, #a29bfe); }
+    #bar-xp { background: linear-gradient(90deg, #e84393, #fd79a8); }
 
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    button.btn-big { padding: 15px 5px; font-size: 1.1em; border: none; border-radius: 15px; cursor: pointer; color: white; font-weight: 900; font-family: 'Nunito', sans-serif; box-shadow: 0 6px 0 rgba(0,0,0,0.2); transition: all 0.1s; display: flex; flex-direction: column; align-items: center; justify-content: center; text-transform: uppercase;}
+    button.btn-big { padding: 15px 5px; font-size: 1.1em; border: none; border-radius: 15px; cursor: pointer; color: white; font-weight: 900; font-family: 'Nunito', sans-serif; box-shadow: 0 6px 0 rgba(0,0,0,0.2); transition: all 0.1s; display: flex; flex-direction: column; align-items: center; justify-content: center;}
     button.btn-big span.icon { font-size: 1.8em; margin-bottom: 5px; }
     button.btn-big:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 0 0 rgba(0,0,0,0.2); }
+    button:disabled { filter: grayscale(100%); opacity: 0.6; cursor: not-allowed; }
     
     .btn-pet { background-color: #ff7675; }
     .btn-feed { background-color: #00b894; }
-    .btn-game-flappy { background-color: #fdcb6e; color: #2d3436; }
-    .btn-game-memory { background-color: #a29bfe; }
+    .btn-game-flappy { background-color: #fdcb6e; color: #2d3436; width: 100%; margin-top: 10px;}
 
-    /* Shop System */
-    .shop-tabs { display: flex; gap: 5px; margin-bottom: 10px; }
-    .shop-tab { flex: 1; padding: 10px; font-size: 0.9em; background: #dfe6e9; font-weight: 900; border-radius: 12px; cursor: pointer; }
-    .shop-tab.active { background: #0984e3; color: white; }
+    /* Sklep System */
+    .shop-tabs { display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto;}
+    .shop-tab { flex: 1; padding: 10px; font-size: 0.9em; background: rgba(0,0,0,0.1); font-weight: 900; border-radius: 12px; cursor: pointer; white-space: nowrap; transition: 0.2s;}
+    .shop-tab.active { background: #0984e3; color: white; box-shadow: 0 4px 10px rgba(9, 132, 227, 0.4);}
     
-    .shop-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; max-height: 250px; overflow-y: auto; padding: 5px; }
-    .shop-item { background: #f8f9fa; border-radius: 15px; padding: 10px 5px; display: flex; flex-direction: column; align-items: center; border: 2px solid #eee; position: relative;}
+    .shop-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; max-height: 250px; overflow-y: auto; padding: 5px; }
+    .shop-item { background: rgba(255,255,255,0.8); border-radius: 15px; padding: 10px 5px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); color: #2d3436;}
+    body.bg-space .shop-item { background: rgba(255,255,255,0.1); color: white;}
     .shop-icon { width: 50px; height: 50px; margin-bottom: 5px; }
-    .shop-btn { width: 90%; padding: 8px 0; font-weight: 900; font-family: 'Nunito'; border-radius: 8px; border: none; cursor: pointer; margin-top: auto; color: white;}
+    .shop-btn { width: 95%; padding: 8px 0; font-weight: 900; font-family: 'Nunito'; border-radius: 8px; border: none; cursor: pointer; margin-top: auto; color: white; transition: 0.2s;}
     .shop-btn.buy { background-color: #00cec9; }
     .shop-btn.equip { background-color: #0984e3; }
-    .shop-btn.equipped { background-color: #b2bec3; }
+    .shop-btn.equipped { background-color: #b2bec3; box-shadow: inset 0 3px 5px rgba(0,0,0,0.1); }
 
-    /* Fullscreen Modals */
-    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(45, 52, 54, 0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; color: white; }
+    /* Modale */
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; color: white; }
     .modal-content { background: white; color: #2d3436; padding: 30px; border-radius: 25px; text-align: center; max-width: 350px; width: 85%; }
     .modal-content h2 { color: #e84393; font-size: 2em; margin-top: 0; }
-    .modal-btn { background: #0984e3; color: white; padding: 15px 30px; border-radius: 15px; font-size: 1.2em; font-weight: 900; border: none; margin-top: 20px; cursor: pointer; width: 100%;}
+    .modal-btn { background: #0984e3; color: white; padding: 15px 30px; border-radius: 15px; font-size: 1.2em; font-weight: 900; border: none; margin-top: 20px; cursor: pointer; width: 100%; box-shadow: 0 4px 0 #0764ab;}
+    .modal-btn:active { transform: translateY(4px); box-shadow: none; }
     
     /* Minigames */
-    canvas#flappy { background: #74b9ff; border-radius: 20px; border: 5px solid white; display: block; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5);}
-    .game-hud { position: absolute; top: 20px; font-size: 2em; font-weight: 900; color: white; text-shadow: 2px 2px 0 #000; }
-    
-    .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 90%; max-width: 400px; margin: 20px auto; }
-    .memory-card { background: #dfe6e9; border-radius: 10px; height: 80px; display: flex; align-items: center; justify-content: center; font-size: 2.5em; cursor: pointer; transition: transform 0.3s; transform-style: preserve-3d; }
-    .memory-card.flipped { background: white; transform: rotateY(180deg); }
-    .memory-card .content { transform: rotateY(180deg); display: none; }
-    .memory-card.flipped .content { display: block; }
+    canvas#flappy { background: linear-gradient(180deg, #74b9ff, #0984e3); border-radius: 20px; border: 5px solid white; display: block; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5);}
+    .game-hud { position: absolute; top: 30px; font-size: 2.5em; font-weight: 900; color: white; text-shadow: 2px 2px 0 #000; z-index: 10;}
   </style>
 </head>
-<body>
+<body class="bg-default">
 
   <div class="top-bar">
-    <div class="lvl-box">⭐ Lvl <span id="lvl-display">1</span></div>
+    <div class="lvl-box">
+      <span class="lvl-title">⭐ Poziom <span id="lvl-display">1</span></span>
+      <span class="xp-text">XP: <span id="xp-current">0</span> / <span id="xp-needed">50</span></span>
+      <div class="bar-bg" style="width: 120px; height: 8px; margin-top:2px;"><div id="bar-xp" class="bar-fill" style="width: 0%;"></div></div>
+    </div>
     <div class="coins-box"><span id="coins-display">0</span> 🪙</div>
   </div>
   
   <div class="name-container">
-    <h1 id="cat-name-display">Tom</h1>
+    <h1 id="cat-name-display">Puszek</h1>
     <button class="btn-edit" onclick="changeCatName()">✏️</button>
   </div>
   
   <div id="cat-stage">
     <svg id="animated-cat" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <radialGradient id="bodyGrad" cx="30%" cy="30%" r="70%">
+        <radialGradient id="bodyGrad" cx="35%" cy="35%" r="70%">
           <stop offset="0%" stop-color="#b2bec3" />
           <stop offset="100%" stop-color="#636e72" />
         </radialGradient>
@@ -100,121 +112,113 @@
           <stop offset="0%" stop-color="#ffffff" />
           <stop offset="100%" stop-color="#dfe6e9" />
         </radialGradient>
-        <radialGradient id="eyeGrad" cx="40%" cy="40%" r="60%">
-          <stop offset="0%" stop-color="#55efc4" />
-          <stop offset="100%" stop-color="#00b894" />
-        </radialGradient>
       </defs>
 
-      <path d="M 130 160 Q 180 180 180 120 Q 180 90 195 80" fill="none" stroke="url(#bodyGrad)" stroke-width="16" stroke-linecap="round"/>
+      <path class="tail" d="M 140 150 C 190 180 200 120 180 100 C 170 90 190 70 195 80" fill="none" stroke="url(#bodyGrad)" stroke-width="16" stroke-linecap="round"/>
       
-      <path d="M 60 180 Q 50 120 100 120 Q 150 120 140 180 Z" fill="url(#bodyGrad)" />
-      <ellipse cx="100" cy="165" rx="30" ry="20" fill="url(#bellyGrad)" />
+      <path d="M 100 80 C 40 80 40 180 100 180 C 160 180 160 80 100 80 Z" fill="url(#bodyGrad)" />
       
-      <path d="M 70 175 Q 75 195 90 190" fill="url(#bellyGrad)" stroke="#636e72" stroke-width="2"/>
-      <path d="M 130 175 Q 125 195 110 190" fill="url(#bellyGrad)" stroke="#636e72" stroke-width="2"/>
+      <path d="M 100 100 C 65 100 65 175 100 175 C 135 175 135 100 100 100 Z" fill="url(#bellyGrad)" />
+      
+      <path d="M 75 160 C 70 190 90 195 95 185 C 95 170 85 160 75 160 Z" fill="url(#bellyGrad)" stroke="#636e72" stroke-width="2"/>
+      <path d="M 125 160 C 130 190 110 195 105 185 C 105 170 115 160 125 160 Z" fill="url(#bellyGrad)" stroke="#636e72" stroke-width="2"/>
 
-      <g id="cloth-shirt_red" style="display: none;">
-        <path d="M 58 150 Q 50 120 100 120 Q 150 120 142 150 Q 100 160 58 150 Z" fill="#ff7675" />
+      <path d="M 50 145 C 35 165 50 185 65 180 C 60 160 55 150 50 145 Z" fill="url(#bodyGrad)"/>
+      <path d="M 150 145 C 165 165 150 185 135 180 C 140 160 145 150 150 145 Z" fill="url(#bodyGrad)"/>
+
+      <g id="cloth-hoodie_nike" style="display: none;">
+        <path d="M 55 100 C 40 130 50 175 100 175 C 150 175 160 130 145 100 Z" fill="#2d3436" />
+        <path d="M 85 100 C 85 85 115 85 115 100 Z" fill="#2d3436" /> <path d="M 85 145 C 80 150 75 145 75 140 C 75 135 90 135 115 130 C 95 140 90 140 85 145 Z" fill="white"/>
       </g>
-      <g id="cloth-shirt_blue" style="display: none;">
-        <path d="M 58 150 Q 50 120 100 120 Q 150 120 142 150 Q 100 160 58 150 Z" fill="#0984e3" />
-        <rect x="90" y="125" width="20" height="20" fill="#74b9ff" rx="4"/>
+      <g id="cloth-sweater_blue" style="display: none;">
+        <path d="M 55 100 C 40 130 50 175 100 175 C 150 175 160 130 145 100 Z" fill="#0984e3" />
+        <line x1="60" y1="120" x2="140" y2="120" stroke="#74b9ff" stroke-width="6" stroke-dasharray="8 4"/>
+        <line x1="55" y1="140" x2="145" y2="140" stroke="#74b9ff" stroke-width="6" stroke-dasharray="8 4"/>
+        <line x1="65" y1="160" x2="135" y2="160" stroke="#74b9ff" stroke-width="6" stroke-dasharray="8 4"/>
       </g>
 
-      <path d="M 50 100 L 35 30 L 90 55 Z" fill="url(#bodyGrad)" />
-      <path d="M 52 90 L 42 45 L 80 62 Z" fill="#ffcccc" />
-      <path d="M 150 100 L 165 30 L 110 55 Z" fill="url(#bodyGrad)" />
-      <path d="M 148 90 L 158 45 L 120 62 Z" fill="#ffcccc" />
+      <path d="M 60 80 L 40 25 C 40 25 70 30 85 60 Z" fill="url(#bodyGrad)" />
+      <path d="M 58 75 L 45 35 C 45 35 65 40 78 60 Z" fill="#ffcccc" />
+      <path d="M 140 80 L 160 25 C 160 25 130 30 115 60 Z" fill="url(#bodyGrad)" />
+      <path d="M 142 75 L 155 35 C 155 35 135 40 122 60 Z" fill="#ffcccc" />
       
-      <circle cx="100" cy="95" r="55" fill="url(#bodyGrad)" />
+      <path d="M 100 45 C 50 45 45 95 60 110 C 75 125 125 125 140 110 C 155 95 150 45 100 45 Z" fill="url(#bodyGrad)" />
       
-      <ellipse cx="100" cy="115" rx="28" ry="18" fill="url(#bellyGrad)" />
-      <path d="M 88 115 Q 100 128 112 115" fill="none" stroke="#2d3436" stroke-width="3" stroke-linecap="round"/>
-      <circle cx="100" cy="108" r="6" fill="#ff7675"/>
+      <ellipse cx="85" cy="100" rx="15" ry="12" fill="url(#bellyGrad)" />
+      <ellipse cx="115" cy="100" rx="15" ry="12" fill="url(#bellyGrad)" />
+      <path d="M 85 100 C 100 110 115 100" fill="none" stroke="#2d3436" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="100" cy="95" r="5" fill="#ff7675"/>
 
       <g class="eyes">
-        <circle cx="75" cy="85" r="16" fill="white"/>
-        <circle cx="75" cy="85" r="10" fill="url(#eyeGrad)"/>
-        <circle cx="78" cy="85" r="6" fill="#2d3436"/>
-        <circle cx="81" cy="82" r="2" fill="white"/>
+        <circle cx="75" cy="75" r="14" fill="#fdcb6e"/>
+        <circle cx="75" cy="75" r="10" fill="#2d3436"/>
+        <circle cx="72" cy="72" r="4" fill="white"/>
+        <circle cx="78" cy="78" r="1.5" fill="white"/>
         
-        <circle cx="125" cy="85" r="16" fill="white"/>
-        <circle cx="125" cy="85" r="10" fill="url(#eyeGrad)"/>
-        <circle cx="122" cy="85" r="6" fill="#2d3436"/>
-        <circle cx="119" cy="82" r="2" fill="white"/>
+        <circle cx="125" cy="75" r="14" fill="#fdcb6e"/>
+        <circle cx="125" cy="75" r="10" fill="#2d3436"/>
+        <circle cx="122" cy="72" r="4" fill="white"/>
+        <circle cx="128" cy="78" r="1.5" fill="white"/>
       </g>
 
-      <g id="cloth-glasses_cool" style="display: none;">
-        <rect x="55" y="70" width="40" height="25" rx="5" fill="#2d3436"/>
-        <rect x="105" y="70" width="40" height="25" rx="5" fill="#2d3436"/>
-        <line x1="95" y1="80" x2="105" y2="80" stroke="#2d3436" stroke-width="4"/>
+      <g id="cloth-glasses_pro" style="display: none;">
+        <path d="M 50 70 L 95 70 L 95 85 Q 72.5 95 50 85 Z" fill="rgba(0,0,0,0.7)" stroke="#2d3436" stroke-width="3"/>
+        <path d="M 105 70 L 150 70 L 150 85 Q 127.5 95 105 85 Z" fill="rgba(0,0,0,0.7)" stroke="#2d3436" stroke-width="3"/>
+        <line x1="95" y1="75" x2="105" y2="75" stroke="#2d3436" stroke-width="4"/>
       </g>
 
-      <g id="cloth-hat_cap" style="display: none;">
-        <path d="M 45 45 Q 100 -10 155 45 Z" fill="#d63031"/>
-        <path d="M 155 45 Q 190 40 190 55 Q 150 60 135 45" fill="#ff7675"/>
+      <g id="cloth-hat_nike" style="display: none;">
+        <path d="M 50 45 C 50 15 150 15 150 45 Z" fill="#0984e3"/>
+        <path d="M 140 40 C 180 35 180 50 145 45" fill="#74b9ff" stroke="#0984e3" stroke-width="2"/>
+        <path d="M 85 30 C 80 35 75 30 75 25 C 75 20 90 20 115 15 C 95 25 90 25 85 30 Z" fill="white"/>
       </g>
       <g id="cloth-hat_crown" style="display: none;">
-        <path d="M 60 45 L 50 -5 L 80 20 L 100 -15 L 120 20 L 150 -5 L 140 45 Z" fill="#f1c40f"/>
-        <circle cx="100" cy="20" r="5" fill="#e84393"/>
+        <path d="M 65 40 L 55 -5 L 85 15 L 100 -15 L 115 15 L 145 -5 L 135 40 Z" fill="#f1c40f"/>
+        <circle cx="55" cy="-5" r="5" fill="#e84393"/>
+        <circle cx="100" cy="-15" r="5" fill="#0984e3"/>
+        <circle cx="145" cy="-5" r="5" fill="#e84393"/>
       </g>
     </svg>
   </div>
   
   <div class="panel">
-    <div class="bar-wrap">Poziom XP
-      <div class="bar-bg"><div id="bar-xp" class="bar-fill" style="width: 0%;"></div></div>
-    </div>
-    <div class="bar-wrap" style="margin-top: 15px;">Energia Brzuszka 🍗
+    <div class="bar-wrap">🍗 Energia Brzuszka
       <div class="bar-bg"><div id="bar-food" class="bar-fill" style="width: 100%;"></div></div>
     </div>
   </div>
 
   <div class="panel">
     <div class="grid-2">
-      <button class="btn-big btn-pet" onclick="doAction('pet')"><span class="icon">🐾</span>Głaskaj</button>
-      <button class="btn-big btn-feed" onclick="doAction('feed')"><span class="icon">🐟</span>Nakarm (10🪙)</button>
+      <button class="btn-big btn-pet" onclick="doAction('pet')" id="btn-pet"><span class="icon">🐾</span>Zabawa<br><small>+10 XP</small></button>
+      <button class="btn-big btn-feed" onclick="doAction('feed')" id="btn-feed"><span class="icon">🐟</span>Nakarm<br><small>10 🪙 / +5 XP</small></button>
     </div>
-  </div>
-
-  <div class="panel">
-    <div style="font-weight: 900; color: #b2bec3; text-transform: uppercase; margin-bottom:10px;">Graj i Zarabiaj</div>
-    <div class="grid-2">
-      <button class="btn-big btn-game-flappy" onclick="openFlappy()"><span class="icon">🦅</span>Flappy Cat</button>
-      <button class="btn-big btn-game-memory" onclick="openMemory()"><span class="icon">🎴</span>Bystre Oko</button>
-    </div>
+    <button class="btn-big btn-game-flappy" onclick="openFlappy()"><span class="icon">🦅</span>Graj w Flappy Cat (Zarabiaj 🪙)</button>
   </div>
 
   <div class="panel">
     <div class="shop-tabs">
       <div class="shop-tab active" onclick="switchTab('hats')">Czapki</div>
-      <div class="shop-tab" onclick="switchTab('shirts')">Ubranka</div>
+      <div class="shop-tab" onclick="switchTab('clothes')">Bluzy</div>
       <div class="shop-tab" onclick="switchTab('glasses')">Okulary</div>
+      <div class="shop-tab" onclick="switchTab('bgs')">Tła</div>
     </div>
     <div class="shop-grid" id="shop-container"></div>
   </div>
 
   <div id="modal-levelup" class="modal">
     <div class="modal-content">
-      <h2>🎉 Nowy Poziom!</h2>
-      <div style="font-size: 4em; margin: 10px 0;">⭐<span id="lvl-up-num">2</span></div>
-      <p id="lvl-up-reward" style="font-size: 1.2em; font-weight: bold; color: #00b894;"></p>
-      <button class="modal-btn" onclick="document.getElementById('modal-levelup').style.display='none'">Odbierz</button>
+      <h2>🎉 Nowy Poziom! 🎉</h2>
+      <div style="font-size: 5em; margin: 10px 0; color: #fdcb6e;">⭐<span id="lvl-up-num">2</span></div>
+      <p id="lvl-up-reward" style="font-size: 1.3em; font-weight: bold; color: #00b894;"></p>
+      <button class="modal-btn" onclick="document.getElementById('modal-levelup').style.display='none'">Super!</button>
     </div>
   </div>
 
   <div id="modal-flappy" class="modal">
     <div class="game-hud" id="flappy-score">0</div>
-    <canvas id="flappy" width="300" height="400"></canvas>
-    <div style="margin-top: 15px; font-weight: bold;">Stuknij w ekran, by lecieć!</div>
-    <button class="modal-btn" style="width: auto; background: #d63031;" onclick="closeFlappy()">Zakończ Grę</button>
-  </div>
-
-  <div id="modal-memory" class="modal">
-    <h2 style="margin:0; color:#fdcb6e;">Znajdź Pary</h2>
-    <div class="memory-grid" id="memory-grid"></div>
-    <button class="modal-btn" style="width: auto; background: #d63031;" onclick="closeMemory()">Wyjdź</button>
+    <canvas id="flappy" width="320" height="450"></canvas>
+    <div style="margin-top: 15px; font-weight: bold; font-size:1.2em;">Klikaj, by lecieć!</div>
+    <button class="modal-btn" style="width: 90%; max-width: 320px; background: #d63031; box-shadow: 0 4px 0 #b02324;" onclick="closeFlappy()">Zakończ i Odbierz 🪙</button>
   </div>
 
   <script type="module">
@@ -232,39 +236,51 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const catDocRef = doc(db, "gra", "wspolny_kotek_v6"); // V6!
+    const catDocRef = doc(db, "gra", "wspolny_kotek_v7"); // V7 ULTIMATE!
 
-    // Baza Sklepu (Z SVG ikonami zamiast emoji!)
+    // Baza Sklepu z ikonami wektorowymi SVG
     const svgIcons = {
         none: `<svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="#ff7675" stroke-width="4"/><line x1="10" y1="10" x2="40" y2="40" stroke="#ff7675" stroke-width="4"/></svg>`,
-        cap: `<svg viewBox="0 0 50 50"><path d="M10 30 Q25 10 40 30 Z" fill="#d63031"/><path d="M40 30 Q45 35 35 30" stroke="#ff7675" stroke-width="4"/></svg>`,
+        hat_nike: `<svg viewBox="0 0 50 50"><path d="M10 30 Q25 10 40 30 Z" fill="#0984e3"/><path d="M35 30 Q45 28 45 35" stroke="#74b9ff" stroke-width="4" fill="none"/><path d="M 20 22 Q 18 25 15 22 Q 15 18 22 15 Q 18 20 20 22 Z" fill="white"/></svg>`,
         crown: `<svg viewBox="0 0 50 50"><path d="M10 40 L10 15 L20 25 L25 10 L30 25 L40 15 L40 40 Z" fill="#f1c40f"/></svg>`,
-        shirt_red: `<svg viewBox="0 0 50 50"><path d="M10 20 L25 10 L40 20 L35 45 L15 45 Z" fill="#ff7675"/></svg>`,
-        shirt_blue: `<svg viewBox="0 0 50 50"><path d="M10 20 L25 10 L40 20 L35 45 L15 45 Z" fill="#0984e3"/></svg>`,
-        glasses_cool: `<svg viewBox="0 0 50 50"><rect x="5" y="20" width="15" height="10" rx="2" fill="#2d3436"/><rect x="30" y="20" width="15" height="10" rx="2" fill="#2d3436"/><line x1="20" y1="25" x2="30" y2="25" stroke="#2d3436" stroke-width="2"/></svg>`
+        hoodie: `<svg viewBox="0 0 50 50"><path d="M 10 45 C 5 25 15 10 25 10 C 35 10 45 25 40 45 Z" fill="#2d3436"/><path d="M 22 25 Q 18 28 15 25 Q 15 22 25 20 Q 20 25 22 25 Z" fill="white"/></svg>`,
+        sweater: `<svg viewBox="0 0 50 50"><path d="M 10 45 C 5 25 15 10 25 10 C 35 10 45 25 40 45 Z" fill="#0984e3"/><line x1="10" y1="30" x2="40" y2="30" stroke="#74b9ff" stroke-width="3" stroke-dasharray="4 2"/></svg>`,
+        glasses_pro: `<svg viewBox="0 0 50 50"><rect x="5" y="20" width="15" height="10" fill="#2d3436"/><rect x="30" y="20" width="15" height="10" fill="#2d3436"/><line x1="20" y1="25" x2="30" y2="25" stroke="#2d3436" stroke-width="2"/></svg>`,
+        bg_room: `<svg viewBox="0 0 50 50"><rect x="5" y="5" width="40" height="40" fill="#ffeaa7"/><path d="M15 45 L15 30 L35 30 L35 45" fill="#fab1a0"/></svg>`,
+        bg_park: `<svg viewBox="0 0 50 50"><rect x="5" y="5" width="40" height="40" fill="#55efc4"/><circle cx="25" cy="20" r="10" fill="#00b894"/><rect x="23" y="30" width="4" height="15" fill="#8e44ad"/></svg>`,
+        bg_space: `<svg viewBox="0 0 50 50"><rect x="5" y="5" width="40" height="40" fill="#192a56"/><circle cx="15" cy="15" r="2" fill="white"/><circle cx="35" cy="25" r="1.5" fill="white"/><circle cx="20" cy="35" r="5" fill="#f1c40f"/></svg>`
     };
 
     const shopDB = {
       hats: [
         { id: 'none', name: 'Brak', price: 0, icon: svgIcons.none },
-        { id: 'cap', name: 'Czapka', price: 50, icon: svgIcons.cap },
-        { id: 'crown', name: 'Korona', price: 200, icon: svgIcons.crown }
+        { id: 'nike', name: 'Nike Cap', price: 50, icon: svgIcons.hat_nike },
+        { id: 'crown', name: 'Korona Króla', price: 150, icon: svgIcons.crown }
       ],
-      shirts: [
+      clothes: [
         { id: 'none', name: 'Brak', price: 0, icon: svgIcons.none },
-        { id: 'shirt_red', name: 'Czerwona', price: 60, icon: svgIcons.shirt_red },
-        { id: 'shirt_blue', name: 'Niebieska', price: 80, icon: svgIcons.shirt_blue }
+        { id: 'hoodie_nike', name: 'Nike Hoodie', price: 60, icon: svgIcons.hoodie },
+        { id: 'sweater_blue', name: 'Sweter', price: 80, icon: svgIcons.sweater }
       ],
       glasses: [
         { id: 'none', name: 'Brak', price: 0, icon: svgIcons.none },
-        { id: 'glasses_cool', name: 'RayBany', price: 100, icon: svgIcons.glasses_cool }
+        { id: 'pro', name: 'Pro Okulary', price: 40, icon: svgIcons.glasses_pro }
+      ],
+      bgs: [
+        { id: 'default', name: 'Puste Tło', price: 0, icon: svgIcons.none },
+        { id: 'room', name: 'Pokój', price: 100, icon: svgIcons.bg_room },
+        { id: 'park', name: 'Park', price: 80, icon: svgIcons.bg_park },
+        { id: 'space', name: 'Kosmos', price: 200, icon: svgIcons.bg_space }
       ]
     };
 
     let currentTab = 'hats';
-    let state = { catName: "Tom", level: 1, xp: 0, coins: 50, food: 100, inventory: ['hats_none', 'shirts_none', 'glasses_none'], equipped: { hats: 'none', shirts: 'none', glasses: 'none' } };
+    let state = { 
+        catName: "Puszek", level: 1, xp: 0, coins: 100, food: 100, 
+        inventory: ['hats_none', 'clothes_none', 'glasses_none', 'bgs_default'], 
+        equipped: { hats: 'none', clothes: 'none', glasses: 'none', bgs: 'default' } 
+    };
     
-    // Level System (Z każdym poziomem trzeba więcej XP)
     function getXpForNextLevel(lvl) { return lvl * 50; }
 
     // --- RENDER SKLEPU ---
@@ -284,40 +300,51 @@
         const isOwned = state.inventory.includes(globalId);
         const isEquipped = state.equipped[currentTab] === item.id;
         
-        let btnHTML = isEquipped ? `<button class="shop-btn equipped" disabled>Założone</button>` 
-                    : isOwned ? `<button class="shop-btn equip" onclick="equipItem('${currentTab}', '${item.id}')">Załóż</button>` 
-                    : `<button class="shop-btn buy" onclick="buyItem('${currentTab}', '${item.id}', ${item.price})" ${state.coins < item.price ? 'disabled' : ''}>${item.price}🪙</button>`;
+        let btnHTML = isEquipped ? `<button class="shop-btn equipped" disabled>Używane</button>` 
+                    : isOwned ? `<button class="shop-btn equip" onclick="equipItem('${currentTab}', '${item.id}')">Użyj</button>` 
+                    : `<button class="shop-btn buy" onclick="buyItem('${currentTab}', '${item.id}', ${item.price})" ${state.coins < item.price ? 'disabled' : ''}>Kup (${item.price}🪙)</button>`;
 
         container.innerHTML += `
           <div class="shop-item">
             <div class="shop-icon">${item.icon}</div>
-            <div style="font-size:0.8em; font-weight:bold; margin-bottom:5px;">${item.name}</div>
+            <div style="font-size:0.85em; font-weight:bold; margin-bottom:5px; text-align:center;">${item.name}</div>
             ${btnHTML}
           </div>
         `;
       });
     }
 
-    // --- SYNCHRONIZACJA Z FIREBASE ---
+    // --- SYNCHRONIZACJA Z BAZĄ ---
     onSnapshot(catDocRef, (docSnap) => {
       if (docSnap.exists()) {
         const oldLvl = state.level;
         state = docSnap.data();
         
-        // Aktualizacja UI
+        if(!state.inventory) state.inventory = ['hats_none', 'clothes_none', 'glasses_none', 'bgs_default'];
+        if(!state.equipped) state.equipped = { hats: 'none', clothes: 'none', glasses: 'none', bgs: 'default' };
+
         document.getElementById("cat-name-display").innerText = state.catName;
         document.getElementById("lvl-display").innerText = state.level;
         document.getElementById("coins-display").innerText = state.coins;
+        document.getElementById("xp-current").innerText = state.xp;
         
-        // Paski
-        document.getElementById("bar-food").style.width = state.food + "%";
         const xpNeeded = getXpForNextLevel(state.level);
+        document.getElementById("xp-needed").innerText = xpNeeded;
         document.getElementById("bar-xp").style.width = ((state.xp / xpNeeded) * 100) + "%";
+        document.getElementById("bar-food").style.width = state.food + "%";
+
+        // Blokada przycisków
+        document.getElementById("btn-feed").disabled = state.coins < 10 || state.food >= 100;
+        document.getElementById("btn-pet").disabled = state.food <= 10;
 
         // Level Up Wykrycie
         if(state.level > oldLvl && oldLvl !== undefined) {
             document.getElementById('lvl-up-num').innerText = state.level;
-            document.getElementById('lvl-up-reward').innerText = `+50 Monet! 🪙`;
+            let rewardMsg = "+50 Monet! 🪙";
+            if(state.level === 3) { rewardMsg = "Nowa Czapka w Sklepie! 🧢"; state.inventory.push("hats_nike"); }
+            if(state.level === 4) rewardMsg = "+100 Monet! 🪙";
+            
+            document.getElementById('lvl-up-reward').innerText = rewardMsg;
             document.getElementById('modal-levelup').style.display = 'flex';
         }
 
@@ -329,17 +356,23 @@
     });
 
     function applyEquipment() {
-        ['cloth-hat_cap', 'cloth-hat_crown', 'cloth-shirt_red', 'cloth-shirt_blue', 'cloth-glasses_cool'].forEach(id => {
+        // Tło
+        document.body.className = `bg-${state.equipped.bgs}`;
+
+        // Ukryj wszystkie wektory ubrań
+        ['cloth-hat_nike', 'cloth-hat_crown', 'cloth-hoodie_nike', 'cloth-sweater_blue', 'cloth-glasses_pro'].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.style.display = "none";
         });
+
+        // Pokazuj wybrane
         if(state.equipped.hats !== 'none') document.getElementById(`cloth-hat_${state.equipped.hats}`).style.display = "block";
-        if(state.equipped.shirts !== 'none') document.getElementById(`cloth-shirt_${state.equipped.shirts}`).style.display = "block";
+        if(state.equipped.clothes !== 'none') document.getElementById(`cloth-${state.equipped.clothes}`).style.display = "block";
         if(state.equipped.glasses !== 'none') document.getElementById(`cloth-glasses_${state.equipped.glasses}`).style.display = "block";
     }
 
     window.changeCatName = async function() {
-        const newName = prompt("Jak nowe imię dla kotka?", state.catName);
+        const newName = prompt("Zmień imię kotka:", state.catName);
         if(newName && newName.trim()) await updateDoc(catDocRef, { catName: newName.trim() });
     }
 
@@ -358,26 +391,27 @@
       let { xp, level, coins, food } = state;
 
       if (type === 'pet') {
-        if (food <= 0) return alert("Kotek opadł z sił!");
-        xp += 10; food -= 5;
+        if (food <= 10) return;
+        xp += 10; food -= 15;
         document.getElementById("animated-cat").classList.add("happy-anim");
         setTimeout(() => document.getElementById("animated-cat").classList.remove("happy-anim"), 500);
       } else if (type === 'feed') {
         if (coins < 10) return;
-        coins -= 10; food += 30;
+        coins -= 10; food += 40; xp += 5;
       }
 
-      // Check Level Up
+      // Awans
       let xpNeeded = getXpForNextLevel(level);
       if (xp >= xpNeeded) {
-        level++; xp = 0; coins += 50; // Nagroda za level
+        level++; xp = 0; 
+        coins += (level === 4) ? 100 : 50; 
       }
 
       food = Math.min(100, Math.max(0, food));
       await updateDoc(catDocRef, { xp, level, coins, food });
     }
 
-    // --- MINIGRA 1: FLAPPY CAT ---
+    // --- UŁATWIONY FLAPPY CAT (MINIGRA) ---
     let flappyFrame, flappyScore = 0, catY = 200, catV = 0, pipes = [], gameActive = false;
     const canvas = document.getElementById("flappy"), ctx = canvas.getContext("2d");
 
@@ -388,46 +422,65 @@
         flappyLoop();
     }
     
-    canvas.addEventListener('touchstart', jump);
-    canvas.addEventListener('mousedown', jump);
-    function jump(e) { e.preventDefault(); if(gameActive) catV = -6; }
+    // Sterowanie
+    document.getElementById('modal-flappy').addEventListener('touchstart', jump);
+    document.getElementById('modal-flappy').addEventListener('mousedown', jump);
+    function jump(e) { if(gameActive && e.target.tagName !== 'BUTTON') catV = -5; } // Mniejszy skok
+
+    function drawFlappyCat(x, y) {
+        // Narysujemy prostego kota w locie
+        ctx.fillStyle = "#b2bec3";
+        ctx.beginPath(); ctx.ellipse(x+20, y+15, 20, 15, 0, 0, Math.PI*2); ctx.fill(); // Ciało
+        ctx.beginPath(); ctx.arc(x+35, y+10, 12, 0, Math.PI*2); ctx.fill(); // Głowa
+        ctx.beginPath(); ctx.moveTo(x+30, y); ctx.lineTo(x+35, y-10); ctx.lineTo(x+40, y); ctx.fill(); // Ucho
+        ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(x+40, y+8, 4, 0, Math.PI*2); ctx.fill(); // Oko
+        ctx.fillStyle = "black"; ctx.beginPath(); ctx.arc(x+41, y+8, 1.5, 0, Math.PI*2); ctx.fill(); // Źrenica
+        ctx.strokeStyle = "#b2bec3"; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(x, y+15); ctx.lineTo(x-15, y+10); ctx.stroke(); // Ogon
+    }
 
     function flappyLoop() {
         if(!gameActive) return;
-        ctx.clearRect(0,0,300,400);
+        ctx.clearRect(0,0,320,450);
         
-        // Fizyka
-        catV += 0.3; catY += catV;
+        // Zmniejszona grawitacja dla ułatwienia
+        catV += 0.15; catY += catV; 
         
-        // Rysuj Kotka (Kwadrat)
-        ctx.fillStyle = "#ff7675";
-        ctx.fillRect(50, catY, 30, 30);
-        ctx.fillStyle = "white"; ctx.fillRect(65, catY+5, 10, 10); ctx.fillStyle = "black"; ctx.fillRect(70, catY+8, 4, 4);
+        drawFlappyCat(40, catY);
 
-        // Rury
-        if(frames % 90 === 0) {
+        // Generowanie rur rzadziej
+        if(frames % 120 === 0) {
             let topH = Math.random() * 200 + 50;
-            pipes.push({ x: 300, top: topH, passed: false });
+            pipes.push({ x: 320, top: topH, passed: false });
         }
         
         ctx.fillStyle = "#00b894";
         for(let i=0; i<pipes.length; i++) {
-            let p = pipes[i]; p.x -= 3;
-            ctx.fillRect(p.x, 0, 40, p.top);
-            ctx.fillRect(p.x, p.top + 100, 40, 400); // 100 to szpara
+            let p = pipes[i]; 
+            p.x -= 1.5; // Zmniejszona prędkość rur
+            
+            // Poszerzona szpara z 100 na 150px!
+            ctx.fillRect(p.x, 0, 50, p.top);
+            ctx.fillRect(p.x, p.top + 150, 50, 450); 
             
             // Kolizja
-            if(50 < p.x+40 && 80 > p.x && (catY < p.top || catY+30 > p.top+100) || catY > 400 || catY < 0) {
-                gameActive = false;
+            let catHitBox = { x: 45, y: catY+5, w: 25, h: 20 };
+            if(catHitBox.x + catHitBox.w > p.x && catHitBox.x < p.x + 50) {
+                if(catHitBox.y < p.top || catHitBox.y + catHitBox.h > p.top + 150) gameActive = false;
             }
-            // Punkt
-            if(p.x === 50) { flappyScore++; document.getElementById('flappy-score').innerText = flappyScore; }
+            if(catY > 430 || catY < -20) gameActive = false;
+            
+            // Punkt + 2 monety
+            if(!p.passed && p.x < 40) { 
+                flappyScore += 2; 
+                p.passed = true;
+                document.getElementById('flappy-score').innerText = flappyScore; 
+            }
         }
         frames++;
         if(gameActive) flappyFrame = requestAnimationFrame(flappyLoop);
         else {
-            ctx.fillStyle = "rgba(0,0,0,0.5)"; ctx.fillRect(0,0,300,400);
-            ctx.fillStyle = "white"; ctx.font = "30px Arial"; ctx.fillText("Koniec!", 100, 200);
+            ctx.fillStyle = "rgba(0,0,0,0.6)"; ctx.fillRect(0,0,320,450);
+            ctx.fillStyle = "white"; ctx.font = "bold 30px Nunito"; ctx.fillText("Koniec!", 110, 225);
         }
     }
     let frames = 0;
@@ -437,51 +490,6 @@
         document.getElementById('modal-flappy').style.display = 'none';
         if(flappyScore > 0) await updateDoc(catDocRef, { coins: state.coins + flappyScore });
     }
-
-    // --- MINIGRA 2: MEMORY ---
-    const emojis = ['🍎','🍎','🐶','🐶','🚀','🚀','⚽','⚽','💎','💎','🍕','🍕'];
-    let flipped = [], matched = 0, memoryScore = 0;
-    
-    window.openMemory = function() {
-        document.getElementById('modal-memory').style.display = 'flex';
-        const grid = document.getElementById('memory-grid');
-        grid.innerHTML = ''; flipped = []; matched = 0; memoryScore = 20; // Max nagroda to 20
-        
-        let shuffled = emojis.sort(() => 0.5 - Math.random());
-        shuffled.forEach((emoji, i) => {
-            let card = document.createElement('div');
-            card.className = 'memory-card'; card.dataset.val = emoji; card.dataset.idx = i;
-            card.innerHTML = `<div class="content">${emoji}</div>`;
-            card.onclick = () => flipCard(card);
-            grid.appendChild(card);
-        });
-    }
-
-    function flipCard(card) {
-        if(flipped.length >= 2 || card.classList.contains('flipped')) return;
-        card.classList.add('flipped');
-        flipped.push(card);
-        if(flipped.length === 2) {
-            setTimeout(() => {
-                if(flipped[0].dataset.val === flipped[1].dataset.val) {
-                    matched += 2;
-                    if(matched === emojis.length) finishMemory();
-                } else {
-                    flipped[0].classList.remove('flipped');
-                    flipped[1].classList.remove('flipped');
-                    memoryScore = Math.max(5, memoryScore - 2); // Kara za błąd
-                }
-                flipped = [];
-            }, 800);
-        }
-    }
-
-    async function finishMemory() {
-        alert(`Wygrana! Otrzymujesz ${memoryScore} 🪙`);
-        await updateDoc(catDocRef, { coins: state.coins + memoryScore });
-        closeMemory();
-    }
-    window.closeMemory = function() { document.getElementById('modal-memory').style.display = 'none'; }
   </script>
 </body>
 </html>
