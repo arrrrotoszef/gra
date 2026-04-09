@@ -1,132 +1,217 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Together Online ❤️</title>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<style>
-body { margin:0; font-family:Arial; background:#0f172a; color:white; text-align:center; }
-.container { padding:20px; }
-button { padding:15px; margin:10px; border:none; border-radius:10px; font-size:16px; }
-.choice { background:#334155; color:white; width:100%; }
-input { padding:10px; border-radius:10px; border:none; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Nasze Drzewko 💚</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      text-align: center;
+    }
+    .container {
+      background: white;
+      padding: 30px 20px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      width: 85%;
+      max-width: 400px;
+    }
+    h2 {
+      margin-top: 0;
+      color: #388e3c;
+    }
+    .tree {
+      font-size: 100px;
+      margin: 10px 0;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: inline-block;
+    }
+    .status {
+      font-weight: 600;
+      margin-bottom: 25px;
+      font-size: 1.1em;
+    }
+    .message-box {
+      background: #f1f8e9;
+      border-left: 5px solid #8bc34a;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 0 10px 10px 0;
+      color: #555;
+      text-align: left;
+    }
+    .message-text {
+      font-style: italic;
+      font-size: 1.1em;
+      display: block;
+      margin-top: 5px;
+      color: #333;
+    }
+    input[type="text"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    input[type="text"]:focus {
+      border-color: #8bc34a;
+    }
+    button {
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 25px;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+      transition: background-color 0.3s, transform 0.1s;
+    }
+    button:active {
+      transform: scale(0.95);
+      background-color: #43a047;
+    }
+    button:disabled {
+      background-color: #a5d6a7;
+      cursor: not-allowed;
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-  <h1>❤️ Together Online</h1>
 
-  <div id="menu">
-    <button onclick="createRoom()">Stwórz pokój</button>
-    <br>
-    <input id="roomInput" placeholder="Kod pokoju">
-    <button onclick="joinRoom()">Dołącz</button>
+  <div class="container">
+    <h2>Nasze Drzewko 💚</h2>
+    
+    <div class="tree" id="treeEmoji">🌱</div>
+    <div class="status" id="statusText">Łączenie z bazą...</div>
+
+    <div class="message-box">
+      <strong>Ostatnia wiadomość:</strong>
+      <span class="message-text" id="messageDisplay">Czekam na wiadomość...</span>
+    </div>
+
+    <input type="text" id="newMessage" placeholder="Napisz coś miłego (opcjonalnie)...">
+    <button id="waterBtn" disabled>Ładowanie... 💧</button>
   </div>
 
-  <div id="game" style="display:none">
-    <h2 id="roomCode"></h2>
-    <p id="question"></p>
-    <div id="choices"></div>
-    <h3 id="result"></h3>
-  </div>
-</div>
+  <script type="module">
+    // Importujemy moduły Firebase z oficjalnego CDN
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-<script>
-// 🔥 TU WSTAW SWOJE DANE Z FIREBASE
-const firebaseConfig = {
-  apiKey: "AIzaSyBkJqgyQaxgjAtbwnNEpc7fRcreiQwDet4Y",
-  authDomain: "graonline-99bbe.firebaseapp.com",
-  databaseURL: "https://graonline-99bbe-default-rtdb.europe-central1.firebasedatabase.app",
-  projectId: "graonline-99bbe",
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+    // Twoja konfiguracja Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBkJqgyQaxgjAtbwnNEpc7fRcreiQwDet4",
+      authDomain: "graonline-99bbe.firebaseapp.com",
+      projectId: "graonline-99bbe",
+      storageBucket: "graonline-99bbe.firebasestorage.app",
+      messagingSenderId: "528336041283",
+      appId: "1:528336041283:web:e3346bcd3aa5ac8413abf6",
+      measurementId: "G-YDVJRCW12T"
+    };
 
-let room = "";
-let player = "";
+    // Inicjalizacja Firebase i Firestore
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-const questions = [
-  { q: "Pizza czy burger?", a:["Pizza","Burger"] },
-  { q: "Film czy serial?", a:["Film","Serial"] },
-  { q: "Noc czy dzień?", a:["Noc","Dzień"] }
-];
+    // Referencja do dokumentu "shared" w kolekcji "tree"
+    const treeRef = doc(db, "tree", "shared");
 
-function createRoom() {
-  room = Math.floor(Math.random()*10000).toString();
-  player = "p1";
-  db.ref("rooms/"+room).set({});
-  start();
-}
+    // Pobieranie elementów z HTML
+    const treeEmoji = document.getElementById('treeEmoji');
+    const statusText = document.getElementById('statusText');
+    const messageDisplay = document.getElementById('messageDisplay');
+    const newMessageInput = document.getElementById('newMessage');
+    const waterBtn = document.getElementById('waterBtn');
 
-function joinRoom() {
-  room = document.getElementById("roomInput").value;
-  player = "p2";
-  start();
-}
+    let globalLastWatered = Date.now();
 
-function start() {
-  document.getElementById("menu").style.display="none";
-  document.getElementById("game").style.display="block";
-  document.getElementById("roomCode").innerText = "Pokój: "+room;
-  loadQuestion();
-}
+    // Funkcja obliczająca stan drzewka na podstawie upływu czasu
+    function updateTreeStatus() {
+      const now = Date.now();
+      const hoursPassed = (now - globalLastWatered) / (1000 * 60 * 60);
 
-function loadQuestion() {
-  const q = questions[Math.floor(Math.random()*questions.length)];
-  document.getElementById("question").innerText = q.q;
-
-  const div = document.getElementById("choices");
-  div.innerHTML = "";
-
-  q.a.forEach(ans => {
-    const btn = document.createElement("button");
-    btn.className = "choice";
-    btn.innerText = ans;
-    btn.onclick = () => sendAnswer(ans);
-    div.appendChild(btn);
-  });
-}
-
-function sendAnswer(ans) {
-  db.ref("rooms/"+room+"/"+player).set(ans);
-
-  db.ref("rooms/"+room).on("value", snap => {
-    const data = snap.val();
-function start() {
-  document.getElementById("menu").style.display="none";
-  document.getElementById("game").style.display="block";
-  document.getElementById("roomCode").innerText = "Pokój: "+room;
-
-  // Listener działa cały czas
-  db.ref("rooms/"+room).on("value", snap => {
-    const data = snap.val();
-    if(data && data.p1 && data.p2) {
-      if(data.p1 === data.p2) {
-        document.getElementById("result").innerText = "❤️ ZGODA!";
+      if (hoursPassed < 12) {
+        treeEmoji.innerText = "🌳";
+        statusText.innerText = "Drzewko jest szczęśliwe!";
+        statusText.style.color = "#2e7d32";
+      } else if (hoursPassed < 24) {
+        treeEmoji.innerText = "🌿";
+        statusText.innerText = "Drzewko chce pić...";
+        statusText.style.color = "#f57c00";
       } else {
-        document.getElementById("result").innerText = "😂 Różne odpowiedzi";
+        treeEmoji.innerText = "🥀";
+        statusText.innerText = "Drzewko usycha! Ratuj!";
+        statusText.style.color = "#d32f2f";
       }
-      // Reset tylko pól odpowiedzi, nie całego obiektu
-      setTimeout(()=>{
-        document.getElementById("result").innerText="";
-        loadQuestion();
-        db.ref("rooms/"+room).update({p1:null,p2:null});
-      },2000);
     }
-  });
 
-  loadQuestion();
-}
+    // Nasłuchiwanie na zmiany w bazie danych w czasie rzeczywistym
+    onSnapshot(treeRef, (docSnap) => {
+      waterBtn.disabled = false;
+      waterBtn.innerText = "Podlej drzewko 💧";
 
-function sendAnswer(ans) {
-  db.ref("rooms/"+room+"/"+player).set(ans);
-}
-    }
-  });
-}
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        messageDisplay.innerText = data.message || "Brak wiadomości.";
+        globalLastWatered = data.lastWatered || Date.now();
+        updateTreeStatus();
+      } else {
+        // Jeśli to pierwsze uruchomienie, stwórzmy dokument w bazie
+        setDoc(treeRef, {
+          message: "Witaj w naszej grze! Podlej mnie 😊",
+          lastWatered: Date.now()
+        });
+      }
+    }, (error) => {
+      console.error("Błąd Firebase:", error);
+      statusText.innerText = "Błąd połączenia. Sprawdź reguły bazy danych!";
+      statusText.style.color = "red";
+    });
 
-</script>
+    // Akcja podlewania (zapis do bazy)
+    waterBtn.addEventListener('click', async () => {
+      const msg = newMessageInput.value;
+      // Jeśli pole tekstowe jest puste, zachowaj starą wiadomość
+      const finalMessage = msg.trim() !== "" ? msg : messageDisplay.innerText;
+
+      waterBtn.disabled = true;
+      waterBtn.innerText = "Podlewanie...";
+
+      // Ustawienie uroczej animacji na kliknięcie
+      treeEmoji.style.transform = "scale(1.3) rotate(5deg)";
+      setTimeout(() => { treeEmoji.style.transform = "scale(1) rotate(0deg)"; }, 300);
+
+      try {
+        await setDoc(treeRef, {
+          message: finalMessage,
+          lastWatered: Date.now()
+        });
+        newMessageInput.value = ""; // Wyczyść pole po wysłaniu
+      } catch (error) {
+        console.error("Nie udało się podlać:", error);
+        alert("Błąd! Nie zapisało się. Prawdopodobnie brak uprawnień Firestore.");
+      }
+    });
+
+    // Odświeżaj stan drzewka wizualnie co 1 minutę (bez nabijania odczytów w bazie)
+    setInterval(updateTreeStatus, 60000);
+  </script>
 </body>
 </html>
