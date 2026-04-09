@@ -3,186 +3,179 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Nasz Własny Pengu ❤️</title>
+  <title>Nasz Wymuskany Pengu V3 ❤️</title>
   <style>
     :root {
       --primary: #ff758c;
-      --bg-top: #a1c4fd;
-      --bg-bottom: #c2e9fb;
+      --glass-bg: rgba(255, 255, 255, 0.2);
+      --glass-border: rgba(255, 255, 255, 0.4);
     }
-    * { box-sizing: border-box; user-select: none; }
+    * { box-sizing: border-box; user-select: none; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     body { 
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column;
-      background: linear-gradient(to bottom, #dbe9f4 0%, #e8f2f6 60%, #c49a6c 60%, #a67c52 100%); /* Pokój z podłogą */
-      color: #333; transition: filter 2s;
+      background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+      color: #fff; transition: background 1s; position: relative;
     }
-    body.night-mode { filter: brightness(0.4); }
+    body.night { background: linear-gradient(135deg, #141e30 0%, #243b55 100%); }
 
-    /* Pasek górny */
-    .top-bar {
-      display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;
-      background: rgba(255,255,255,0.9); box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-bottom-radius: 20px; z-index: 10;
+    /* Efekt padającego śniegu/serc w tle */
+    .particles { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden;}
+    .particle { position: absolute; color: rgba(255,255,255,0.4); font-size: 12px; animation: fall linear infinite; }
+    @keyframes fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(360deg); opacity: 0.2; } }
+
+    /* Glassmorphism panele */
+    .glass {
+      background: var(--glass-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
     }
-    .name-tag { font-size: 22px; font-weight: bold; color: #ff758c; text-shadow: 1px 1px 0px #fff; }
-    .coin-badge { background: #ffd700; padding: 6px 15px; border-radius: 20px; color: #8b6508; font-weight: bold;}
 
-    /* Paski postępu */
-    .stats { padding: 10px 20px; display: flex; flex-direction: column; gap: 8px; z-index: 10; }
-    .stat-row { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: bold; }
-    .bar-bg { flex-grow: 1; height: 12px; background: rgba(0,0,0,0.2); border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.5); }
-    .bar-fill { height: 100%; border-radius: 10px; transition: width 0.3s; }
-    #bar-hunger { background: linear-gradient(90deg, #ff9a9e, #fecfef); }
-    #bar-hygiene { background: linear-gradient(90deg, #84fab0, #8fd3f4); }
-    #bar-energy { background: linear-gradient(90deg, #f6d365, #fda085); }
+    /* Top Bar */
+    .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; z-index: 10; margin-bottom: 10px;}
+    .profile { display: flex; flex-direction: column; }
+    .my-name { font-size: 12px; opacity: 0.8; }
+    .pet-name { font-size: 24px; font-weight: 800; text-shadow: 1px 1px 5px rgba(0,0,0,0.2); }
+    .currency { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: bold; background: rgba(0,0,0,0.2); padding: 5px 15px; border-radius: 20px; }
 
-    /* Ekran Gry (Pingwin) */
-    .game-area { flex-grow: 1; position: relative; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 50px; z-index: 5;}
-    #pet-svg { width: 250px; height: 300px; filter: drop-shadow(0px 15px 10px rgba(0,0,0,0.3)); transition: transform 0.2s; }
-    .bouncing { animation: bounce 0.5s infinite alternate; }
-    @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-20px) scale(1.02); } }
+    /* Stats */
+    .stats { padding: 0 20px; display: flex; flex-direction: column; gap: 8px; z-index: 10; }
+    .stat-row { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; }
+    .bar-bg { flex-grow: 1; height: 10px; background: rgba(0,0,0,0.2); border-radius: 10px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 10px; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 
-    /* Mydło i Bąbelki */
-    #soap {
-      position: absolute; width: 60px; height: 40px; background: #ffb6c1; border-radius: 20px;
-      border: 3px solid #ff69b4; box-shadow: inset -5px -5px 10px rgba(0,0,0,0.2);
-      display: none; z-index: 50; touch-action: none; cursor: grab;
-    }
-    .bubble {
-      position: absolute; border-radius: 50%; background: rgba(255,255,255,0.8); border: 1px solid #fff;
-      pointer-events: none; animation: floatUp 1s ease-out forwards;
-    }
-    @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-50px) scale(1.5); opacity: 0; } }
+    /* Główna sekcja ze zwierzakiem */
+    .game-area { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; z-index: 5; }
+    #pet-svg { width: 280px; height: 320px; filter: drop-shadow(0px 20px 15px rgba(0,0,0,0.4)); transition: transform 0.2s; }
+    .action-anim { animation: hop 0.4s ease; }
+    @keyframes hop { 0%, 100% { transform: scale(1) translateY(0); } 50% { transform: scale(1.05) translateY(-30px); } }
 
-    /* Dock na dole */
-    .action-bar {
-      background: rgba(255,255,255,0.95); padding: 15px; display: flex; justify-content: space-around;
-      box-shadow: 0 -5px 20px rgba(0,0,0,0.15); border-top-left-radius: 30px; border-top-right-radius: 30px; z-index: 10;
-    }
-    .btn { display: flex; flex-direction: column; align-items: center; gap: 5px; background: none; border: none; font-weight: bold; color: #555; cursor: pointer; transition: transform 0.1s;}
+    /* Dock dolny */
+    .action-bar { display: flex; justify-content: space-around; padding: 15px 10px 25px 10px; border-top-left-radius: 30px; border-top-right-radius: 30px; z-index: 10; }
+    .btn { display: flex; flex-direction: column; align-items: center; gap: 5px; background: none; border: none; font-weight: bold; color: #fff; cursor: pointer; transition: transform 0.1s;}
     .btn:active { transform: scale(0.9); }
-    .btn-icon { font-size: 26px; background: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 2px solid #eee;}
+    .btn-icon { font-size: 24px; background: rgba(255,255,255,0.3); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.5);}
 
-    /* Modale */
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-    .modal-content { background: white; padding: 25px; border-radius: 25px; text-align: center; width: 85%; max-width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-    .modal button { margin: 8px; padding: 12px 20px; border: none; border-radius: 15px; background: var(--primary); color: white; font-weight: bold; font-size: 16px; width: 90%; cursor: pointer; box-shadow: 0 4px 6px rgba(255,117,140,0.4);}
-    .wardrobe-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
-    .wardrobe-item input { transform: scale(1.5); }
+    /* Czat UI */
+    #chat-panel { position: fixed; bottom: 100px; right: 20px; width: calc(100% - 40px); height: 350px; border-radius: 20px; display: none; flex-direction: column; z-index: 100; overflow: hidden; background: rgba(25, 25, 25, 0.85); border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 20px 40px rgba(0,0,0,0.5);}
+    .chat-header { padding: 15px; background: rgba(0,0,0,0.3); font-weight: bold; display: flex; justify-content: space-between;}
+    .chat-messages { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+    .msg { background: rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 15px; font-size: 14px; width: fit-content; max-width: 80%;}
+    .msg.mine { background: var(--primary); align-self: flex-end; }
+    .msg-author { font-size: 10px; opacity: 0.7; margin-bottom: 3px;}
+    .chat-input { display: flex; padding: 10px; background: rgba(0,0,0,0.3); }
+    .chat-input input { flex-grow: 1; padding: 10px; border-radius: 20px; border: none; background: rgba(255,255,255,0.9); outline: none; }
+    .chat-input button { background: var(--primary); color: white; border: none; padding: 0 20px; margin-left: 10px; border-radius: 20px; font-weight: bold; }
 
-    /* Minigra */
-    #minigame { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 200; overflow: hidden; }
-    .fish-drop { position: absolute; font-size: 40px; pointer-events: auto; cursor: pointer; }
-    #score-display { position: absolute; top: 20px; left: 20px; color: white; font-size: 24px; font-weight: bold; }
+    /* Modale (Szafa / Lootbox) */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 150; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+    .modal-content { background: rgba(40, 40, 40, 0.9); padding: 25px; border-radius: 25px; text-align: center; width: 90%; max-width: 340px; border: 1px solid rgba(255,255,255,0.2); }
+    .modal h3 { margin-top: 0; color: #ff758c; }
+    .modal button { margin-top: 15px; padding: 15px; border: none; border-radius: 15px; background: var(--primary); color: white; font-weight: bold; font-size: 16px; width: 100%; cursor: pointer; }
+    .lootbox { background: linear-gradient(45deg, #ffd700, #ff8c00); padding: 20px; border-radius: 20px; font-size: 20px; font-weight: bold; margin-bottom: 15px; cursor: pointer; animation: pulse 2s infinite;}
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+    .wardrobe-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+    .w-item { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 15px; opacity: 0.5; transition: 0.2s;}
+    .w-item.unlocked { opacity: 1; border: 1px solid #ffd700; cursor: pointer; }
+    .w-item.equipped { background: var(--primary); border: none; }
   </style>
 </head>
 <body>
 
-  <div class="top-bar">
-    <div class="name-tag" id="pet-name">Nasz Pet</div>
-    <div class="coin-badge"><span id="coins">0</span> 💰</div>
+  <div class="particles" id="particles"></div>
+
+  <div class="top-bar glass">
+    <div class="profile">
+      <span class="my-name" id="player-display">Gracz: ???</span>
+      <span class="pet-name" id="pet-name">Pengu</span>
+    </div>
+    <div class="currency"><span id="coins">0</span> 💰</div>
   </div>
 
-  <div class="stats">
-    <div class="stat-row">🍎 <div class="bar-bg"><div id="bar-hunger" class="bar-fill" style="width: 50%;"></div></div></div>
-    <div class="stat-row">🛁 <div class="bar-bg"><div id="bar-hygiene" class="bar-fill" style="width: 50%;"></div></div></div>
-    <div class="stat-row">⚡ <div class="bar-bg"><div id="bar-energy" class="bar-fill" style="width: 50%;"></div></div></div>
+  <div class="stats glass" style="margin: 0 20px; padding: 15px; border-radius: 20px;">
+    <div class="stat-row">🍎 <div class="bar-bg"><div id="bar-hunger" class="bar-fill" style="background:#ff9a9e; width: 50%;"></div></div></div>
+    <div class="stat-row">🛁 <div class="bar-bg"><div id="bar-hygiene" class="bar-fill" style="background:#84fab0; width: 50%;"></div></div></div>
+    <div class="stat-row">⚡ <div class="bar-bg"><div id="bar-energy" class="bar-fill" style="background:#f6d365; width: 50%;"></div></div></div>
   </div>
 
-  <div class="game-area" id="game-area">
+  <div class="game-area">
     <svg id="pet-svg" viewBox="0 0 200 250">
-      <path d="M50,100 C50,20 150,20 150,100 L160,210 C160,240 40,240 40,210 Z" fill="#2c3e50"/>
-      <path d="M70,110 C70,60 130,60 130,110 L140,200 C140,220 60,220 60,200 Z" fill="#ffffff"/>
-      
+      <path d="M50,100 C50,20 150,20 150,100 L160,210 C160,240 40,240 40,210 Z" fill="#1c2833"/>
+      <path d="M70,110 C70,60 130,60 130,110 L140,200 C140,220 60,220 60,200 Z" fill="#ecf0f1"/>
       <g id="eyes-open">
-        <circle cx="85" cy="90" r="7" fill="#000"/>
-        <circle cx="87" cy="88" r="2" fill="#fff"/> <circle cx="115" cy="90" r="7" fill="#000"/>
-        <circle cx="117" cy="88" r="2" fill="#fff"/>
+        <circle cx="85" cy="90" r="8" fill="#000"/><circle cx="87" cy="87" r="3" fill="#fff"/>
+        <circle cx="115" cy="90" r="8" fill="#000"/><circle cx="117" cy="87" r="3" fill="#fff"/>
       </g>
       <g id="eyes-closed" style="display:none;">
-        <path d="M78,90 Q85,95 92,90" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"/>
-        <path d="M108,90 Q115,95 122,90" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+        <path d="M75,90 Q85,95 95,90" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round"/>
+        <path d="M105,90 Q115,95 125,90" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round"/>
+      </g>
+      <path d="M90,105 L110,105 L100,120 Z" fill="#f39c12"/>
+      <path d="M45,120 C25,140 20,180 35,170 Z" fill="#1c2833"/>
+      <path d="M155,120 C175,140 180,180 165,170 Z" fill="#1c2833"/>
+      <ellipse cx="75" cy="225" rx="18" ry="8" fill="#e67e22"/>
+      <ellipse cx="125" cy="225" rx="18" ry="8" fill="#e67e22"/>
+
+      <g id="cloth-tshirt" style="display:none;">
+        <path d="M65,110 L135,110 L145,200 C145,210 55,210 55,200 Z" fill="#3498db"/>
+        <path d="M55,120 L35,150 L45,160 L62,140 Z" fill="#2980b9"/>
+        <path d="M145,120 L165,150 L155,160 L138,140 Z" fill="#2980b9"/>
+        <text x="100" y="160" font-family="Arial" font-size="20" font-weight="bold" fill="white" text-anchor="middle">I ❤️ U</text>
       </g>
 
-      <path d="M90,105 L110,105 L100,120 Z" fill="#f1c40f"/>
-      
-      <path d="M45,120 C25,140 20,180 35,170 Z" fill="#2c3e50"/>
-      <path d="M155,120 C175,140 180,180 165,170 Z" fill="#2c3e50"/>
-      
-      <ellipse cx="75" cy="225" rx="18" ry="8" fill="#f39c12"/>
-      <ellipse cx="125" cy="225" rx="18" ry="8" fill="#f39c12"/>
-
-      <g id="dirt-layer" opacity="0">
-        <circle cx="95" cy="150" r="18" fill="#654321" opacity="0.6"/>
-        <circle cx="75" cy="180" r="12" fill="#654321" opacity="0.5"/>
-        <circle cx="125" cy="140" r="14" fill="#654321" opacity="0.7"/>
-        <circle cx="115" cy="190" r="10" fill="#654321" opacity="0.4"/>
-        <circle cx="60" cy="130" r="8" fill="#654321" opacity="0.5"/>
+      <g id="cloth-hoodie" style="display:none;">
+        <path d="M50,70 C50,30 150,30 150,70 L140,110 L60,110 Z" fill="#d35400"/>
+        <path d="M60,100 L140,100 L145,205 C145,215 55,215 55,205 Z" fill="#e67e22"/>
+        <path d="M55,110 L30,160 L45,170 L60,140 Z" fill="#e67e22"/>
+        <path d="M145,110 L170,160 L155,170 L140,140 Z" fill="#e67e22"/>
+        <path d="M85,110 L80,140" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+        <path d="M115,110 L120,140" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+        <path d="M70,170 L130,170 L140,200 L60,200 Z" fill="#d35400" opacity="0.6"/>
       </g>
 
-      <g id="cloth-glasses" style="display:none;">
-        <rect x="65" y="83" width="70" height="4" fill="#000"/>
-        <circle cx="85" cy="90" r="14" fill="rgba(0,150,255,0.2)" stroke="#000" stroke-width="4"/>
-        <circle cx="115" cy="90" r="14" fill="rgba(0,150,255,0.2)" stroke="#000" stroke-width="4"/>
-      </g>
-      <g id="cloth-bow" style="display:none;">
-        <path d="M90,125 L110,125 L115,140 L100,135 L85,140 Z" fill="#e74c3c"/>
-        <circle cx="100" cy="132" r="4" fill="#c0392b"/>
-      </g>
-      <g id="cloth-hat" style="display:none;">
-        <rect x="65" y="55" width="70" height="8" fill="#111" rx="4"/>
-        <rect x="75" y="10" width="50" height="45" fill="#222"/>
-        <rect x="75" y="45" width="50" height="5" fill="#e74c3c"/>
-      </g>
-
-      <g id="bed-blanket" style="display:none;">
-        <path d="M30,160 Q100,130 170,160 L180,240 L20,240 Z" fill="#8e44ad"/>
-        <path d="M60,180 L65,190 L55,190 Z" fill="#f1c40f"/>
-        <path d="M120,200 L125,210 L115,210 Z" fill="#f1c40f"/>
-        <path d="M90,220 L95,230 L85,230 Z" fill="#f1c40f"/>
+      <g id="cloth-headphones" style="display:none;">
+        <path d="M40,90 C40,20 160,20 160,90" fill="none" stroke="#bdc3c7" stroke-width="8"/>
+        <rect x="30" y="75" width="15" height="35" rx="5" fill="#e74c3c"/>
+        <rect x="155" y="75" width="15" height="35" rx="5" fill="#e74c3c"/>
+        <path d="M40,100 L20,120 L25,125" fill="none" stroke="#34495e" stroke-width="4"/>
+        <circle cx="25" cy="125" r="5" fill="#2ecc71"/>
       </g>
     </svg>
-
-    <div id="soap"></div>
   </div>
 
-  <div class="action-bar">
-    <button class="btn" id="btn-game"><div class="btn-icon">🎮</div>Graj</button>
+  <div class="action-bar glass">
+    <button class="btn" id="btn-chat"><div class="btn-icon">💬</div>Czat</button>
     <button class="btn" id="btn-feed"><div class="btn-icon">🐟</div>Jedz</button>
-    <button class="btn" id="btn-bathe"><div class="btn-icon">🧼</div>Myj</button>
-    <button class="btn" id="btn-sleep"><div class="btn-icon">🛏️</div>Lulu</button>
-    <button class="btn" id="btn-wardrobe"><div class="btn-icon">🎩</div>Szafa</button>
+    <button class="btn" id="btn-sleep"><div class="btn-icon">🛏️</div>Sen</button>
+    <button class="btn" id="btn-shop"><div class="btn-icon">🎁</div>Sklep</button>
   </div>
 
-  <div class="modal" id="wardrobe-modal">
-    <div class="modal-content">
-      <h3 style="margin-top:0;">Garderoba</h3>
-      <div class="wardrobe-item"><span>Cylinder🎩</span><input type="checkbox" id="check-hat"></div>
-      <div class="wardrobe-item"><span>Okulary🕶️</span><input type="checkbox" id="check-glasses"></div>
-      <div class="wardrobe-item"><span>Mucha 🎀</span><input type="checkbox" id="check-bow"></div>
-      <button id="btn-close-wardrobe" style="margin-top: 15px;">Zapisz i Zamknij</button>
+  <div id="chat-panel">
+    <div class="chat-header"><span>Czat z Kochanie ❤️</span><button id="close-chat" style="background:none; border:none; color:white; font-size:18px; cursor:pointer;">✖</button></div>
+    <div class="chat-messages" id="chat-msgs"></div>
+    <div class="chat-input">
+      <input type="text" id="chat-text" placeholder="Napisz coś...">
+      <button id="chat-send">Wyślij</button>
     </div>
   </div>
 
-  <div class="modal" id="sleep-modal">
+  <div class="modal" id="shop-modal">
     <div class="modal-content">
-      <h3 style="margin-top:0;">Gasimy światło?</h3>
-      <button id="sleep-1">Drzemka (1h)</button>
-      <button id="sleep-8">Cała noc (8h)</button>
-      <button id="sleep-cancel" style="background:#aaa;">Anuluj</button>
+      <h3>Szafa i Sklep</h3>
+      <div class="lootbox" id="buy-lootbox">Kup Lootbox (100 💰)</div>
+      <p style="font-size:12px; opacity:0.8;">Twoje rzeczy (kliknij by ubrać):</p>
+      <div class="wardrobe-grid">
+        <div class="w-item unlocked equipped" id="item-none">Golas 🐧</div>
+        <div class="w-item" id="item-tshirt">T-Shirt ❤️</div>
+        <div class="w-item" id="item-hoodie">Bluza 🧥</div>
+        <div class="w-item" id="item-headphones">Słuchawki 🎧</div>
+      </div>
+      <button id="close-shop">Zamknij</button>
     </div>
-  </div>
-
-  <div id="minigame">
-    <div id="score-display">Ryby: <span id="mg-score">0</span></div>
-    <h2 id="mg-start-text" style="color:white; text-align:center; margin-top:50%; font-size:30px;">Złap 10 ryb!<br><br>Kliknij by zacząć</h2>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, doc, onSnapshot, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, setDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    // Twoja konfiguracja
     const firebaseConfig = {
       apiKey: "AIzaSyD8qaNZKjmenGo0MxL4dI7MYb2khcHSUes",
       authDomain: "graznatalia-e1b58.firebaseapp.com",
@@ -194,207 +187,142 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const petRef = doc(db, "gameData", "ourProPengu");
+    
+    // Używamy jednego głównego dokumentu, aby uniknąć problemów z indeksami
+    const gameRef = doc(db, "gameData", "penguV3");
+    
+    // --- SYSTEM GRACZA (Lokalny) ---
+    let myName = localStorage.getItem("penguPlayerName");
+    if(!myName) {
+      myName = prompt("Witaj w Pengu V3! Jak masz na imię? (np. Kuba / Natalia)") || "Gracz";
+      localStorage.setItem("penguPlayerName", myName);
+    }
+    document.getElementById("player-display").innerText = "Ty: " + myName;
+
+    // Tło cząsteczkowe
+    const particles = document.getElementById('particles');
+    for(let i=0; i<30; i++) {
+      let p = document.createElement('div'); p.className = 'particle'; p.innerText = '❄️';
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.animationDuration = (Math.random() * 3 + 2) + 's';
+      p.style.animationDelay = Math.random() * 2 + 's';
+      particles.appendChild(p);
+    }
+
+    // --- STAN GRY ---
+    let dbData = {
+      petName: "Nasz Pengu", coins: 150, hunger: 50, hygiene: 50, energy: 50,
+      equipped: "none", unlocked: ["none"], sleepUntil: 0,
+      chat: []
+    };
 
     const ui = {
-      name: document.getElementById('pet-name'), coins: document.getElementById('coins'),
-      hunger: document.getElementById('bar-hunger'), hygiene: document.getElementById('bar-hygiene'), energy: document.getElementById('bar-energy'),
-      svg: document.getElementById('pet-svg'), dirt: document.getElementById('dirt-layer'),
-      eyesOpen: document.getElementById('eyes-open'), eyesClosed: document.getElementById('eyes-closed'), blanket: document.getElementById('bed-blanket'),
-      cHat: document.getElementById('cloth-hat'), cGlass: document.getElementById('cloth-glasses'), cBow: document.getElementById('cloth-bow')
+      petName: document.getElementById('pet-name'), coins: document.getElementById('coins'),
+      h: document.getElementById('bar-hunger'), hy: document.getElementById('bar-hygiene'), e: document.getElementById('bar-energy'),
+      svg: document.getElementById('pet-svg'), eyesOpen: document.getElementById('eyes-open'), eyesClosed: document.getElementById('eyes-closed'),
+      clothes: { tshirt: document.getElementById('cloth-tshirt'), hoodie: document.getElementById('cloth-hoodie'), headphones: document.getElementById('cloth-headphones') }
     };
 
-    let data = {
-      name: "", coins: 0, hunger: 50, hygiene: 50, energy: 50,
-      clothes: { hat: false, glasses: false, bow: false },
-      sleepUntil: 0
-    };
-
-    onSnapshot(petRef, (docSnap) => {
-      if (docSnap.exists()) {
-        data = docSnap.data();
-        checkName();
-        render();
+    onSnapshot(gameRef, (docSnap) => {
+      if(docSnap.exists()) {
+        dbData = docSnap.data();
+        updateUI();
+        renderChat();
       } else {
-        setDoc(petRef, data);
+        setDoc(gameRef, dbData);
       }
     });
 
-    async function checkName() {
-      if (!data.name) {
-        let n = prompt("To Wasze nowe zwierzątko! Jak je nazwiecie?");
-        if (n) await updateDoc(petRef, { name: n });
-      }
-      ui.name.innerText = data.name || "Nasz Pet";
-    }
-
-    function render() {
-      ui.coins.innerText = data.coins;
-      ui.hunger.style.width = `${data.hunger}%`; ui.hygiene.style.width = `${data.hygiene}%`; ui.energy.style.width = `${data.energy}%`;
+    function updateUI() {
+      ui.coins.innerText = dbData.coins;
+      ui.h.style.width = `${dbData.hunger}%`; ui.hy.style.width = `${dbData.hygiene}%`; ui.e.style.width = `${dbData.energy}%`;
       
-      // Render ubrań
-      ui.cHat.style.display = data.clothes.hat ? "block" : "none";
-      ui.cGlass.style.display = data.clothes.glasses ? "block" : "none";
-      ui.cBow.style.display = data.clothes.bow ? "block" : "none";
-
-      // Render brudu (pojawia się gdy higiena < 50)
-      if(data.hygiene < 50) {
-        ui.dirt.setAttribute("opacity", (50 - data.hygiene) / 50);
+      // Spanie
+      if(Date.now() < dbData.sleepUntil) {
+        document.body.classList.add('night'); ui.eyesOpen.style.display = 'none'; ui.eyesClosed.style.display = 'block';
       } else {
-        ui.dirt.setAttribute("opacity", 0);
+        document.body.classList.remove('night'); ui.eyesOpen.style.display = 'block'; ui.eyesClosed.style.display = 'none';
       }
 
-      // Render spania
-      const isSleeping = Date.now() < data.sleepUntil;
-      if (isSleeping) {
-        document.body.classList.add('night-mode');
-        ui.eyesOpen.style.display = "none"; ui.eyesClosed.style.display = "block";
-        ui.blanket.style.display = "block";
-      } else {
-        document.body.classList.remove('night-mode');
-        ui.eyesOpen.style.display = "block"; ui.eyesClosed.style.display = "none";
-        ui.blanket.style.display = "none";
+      // Ubrania
+      Object.keys(ui.clothes).forEach(k => ui.clothes[k].style.display = 'none');
+      if(dbData.equipped !== 'none' && ui.clothes[dbData.equipped]) {
+        ui.clothes[dbData.equipped].style.display = 'block';
       }
-    }
 
-    // --- LOGIKA AKCJI ---
-    async function addStat(stat, val) {
-      if(Date.now() < data.sleepUntil) return alert("Ciii, " + data.name + " teraz śpi!");
-      let newVal = Math.min(100, data[stat] + val);
-      await updateDoc(petRef, { [stat]: newVal });
-    }
-
-    document.getElementById('btn-feed').onclick = () => {
-      ui.svg.classList.add('bouncing');
-      setTimeout(() => ui.svg.classList.remove('bouncing'), 500);
-      addStat('hunger', 20);
-    };
-
-    // --- ZAAWANSOWANE MYCIE (Mydło Drag & Drop) ---
-    const soap = document.getElementById('soap');
-    let isWashing = false; let washPoints = 0;
-
-    document.getElementById('btn-bathe').onclick = () => {
-      if(Date.now() < data.sleepUntil) return alert("Śpi!");
-      soap.style.display = 'block';
-      soap.style.left = '50%'; soap.style.top = '20%';
-      alert("Przeciągnij mydło i pocieraj pingwina, żeby go umyć!");
-    };
-
-    function moveSoap(e) {
-      if(!isWashing) return;
-      e.preventDefault();
-      let touch = e.touches ? e.touches[0] : e;
-      soap.style.left = (touch.clientX - 30) + 'px';
-      soap.style.top = (touch.clientY - 20) + 'px';
-      
-      // Detekcja kolizji z pingwinem (środek ekranu)
-      let rect = ui.svg.getBoundingClientRect();
-      if(touch.clientX > rect.left && touch.clientX < rect.right && touch.clientY > rect.top && touch.clientY < rect.bottom) {
-        washPoints++;
-        // Tworzenie bąbelka
-        if(washPoints % 3 === 0) {
-          let b = document.createElement('div'); b.className = 'bubble';
-          let size = Math.random() * 20 + 10;
-          b.style.width = size+'px'; b.style.height = size+'px';
-          b.style.left = touch.clientX + 'px'; b.style.top = touch.clientY + 'px';
-          document.body.appendChild(b);
-          setTimeout(() => b.remove(), 1000);
+      // Aktualizacja sklepu
+      ['none', 'tshirt', 'hoodie', 'headphones'].forEach(item => {
+        let el = document.getElementById('item-' + item);
+        if(el) {
+          el.className = 'w-item' + (dbData.unlocked.includes(item) ? ' unlocked' : '') + (dbData.equipped === item ? ' equipped' : '');
+          el.onclick = () => { if(dbData.unlocked.includes(item)) updateDoc(gameRef, { equipped: item }); };
         }
-        // Wysyłanie do bazy co 10 potarć
-        if(washPoints > 10) {
-          washPoints = 0;
-          if(data.hygiene < 100) updateDoc(petRef, { hygiene: Math.min(100, data.hygiene + 5) });
-          if(data.hygiene >= 95) { soap.style.display = 'none'; isWashing = false; }
-        }
-      }
+      });
     }
-    soap.addEventListener('touchstart', () => { isWashing = true; }, {passive: false});
-    document.addEventListener('touchmove', moveSoap, {passive: false});
-    document.addEventListener('touchend', () => { isWashing = false; });
-    
-    // Myszka dla PC
-    soap.addEventListener('mousedown', () => { isWashing = true; });
-    document.addEventListener('mousemove', moveSoap);
-    document.addEventListener('mouseup', () => { isWashing = false; });
 
-    // --- SPANIE ---
-    const modalSleep = document.getElementById('sleep-modal');
+    // --- AKCJE ---
+    async function doAction(stat, val, anim) {
+      if(Date.now() < dbData.sleepUntil) return alert("Pingwin śpi!");
+      ui.svg.classList.add(anim); setTimeout(() => ui.svg.classList.remove(anim), 400);
+      await updateDoc(gameRef, { [stat]: Math.min(100, dbData[stat] + val), coins: dbData.coins + 5 });
+    }
+    document.getElementById('btn-feed').onclick = () => doAction('hunger', 20, 'action-anim');
     document.getElementById('btn-sleep').onclick = () => {
-      if(Date.now() < data.sleepUntil) return alert("Już śpi!");
-      modalSleep.style.display = 'flex';
+      if(Date.now() < dbData.sleepUntil) return alert("Już śpi!");
+      updateDoc(gameRef, { sleepUntil: Date.now() + 10000, energy: 100 }); // Na razie krótki sen (10 sek) do testów
     };
-    document.getElementById('sleep-cancel').onclick = () => modalSleep.style.display = 'none';
-    const sleep = async (h) => {
-      modalSleep.style.display = 'none';
-      await updateDoc(petRef, { sleepUntil: Date.now() + (h*3600000), energy: 100 });
-    };
-    document.getElementById('sleep-1').onclick = () => sleep(1);
-    document.getElementById('sleep-8').onclick = () => sleep(8);
 
-    // --- SZAFA ---
-    const modalWardrobe = document.getElementById('wardrobe-modal');
-    document.getElementById('btn-wardrobe').onclick = () => {
-      document.getElementById('check-hat').checked = data.clothes.hat;
-      document.getElementById('check-glasses').checked = data.clothes.glasses;
-      document.getElementById('check-bow').checked = data.clothes.bow;
-      modalWardrobe.style.display = 'flex';
-    };
-    document.getElementById('btn-close-wardrobe').onclick = async () => {
-      modalWardrobe.style.display = 'none';
-      await updateDoc(petRef, {
-        clothes: {
-          hat: document.getElementById('check-hat').checked,
-          glasses: document.getElementById('check-glasses').checked,
-          bow: document.getElementById('check-bow').checked
-        }
+    // --- SKLEP I LOOTBOXY ---
+    document.getElementById('btn-shop').onclick = () => document.getElementById('shop-modal').style.display = 'flex';
+    document.getElementById('close-shop').onclick = () => document.getElementById('shop-modal').style.display = 'none';
+    
+    document.getElementById('buy-lootbox').onclick = async () => {
+      if(dbData.coins < 100) return alert("Za mało monet! Karm pingwina, żeby zarobić.");
+      
+      const items = ['tshirt', 'hoodie', 'headphones'];
+      const lockedItems = items.filter(i => !dbData.unlocked.includes(i));
+      
+      if(lockedItems.length === 0) return alert("Masz już wszystkie ubrania!");
+      
+      const wonItem = lockedItems[Math.floor(Math.random() * lockedItems.length)];
+      alert("🎉 Wygrywasz: " + wonItem.toUpperCase() + "!");
+      
+      await updateDoc(gameRef, {
+        coins: dbData.coins - 100,
+        unlocked: arrayUnion(wonItem),
+        equipped: wonItem
       });
     };
 
-    // --- MINIGRA ZŁAP RYBY ---
-    const mg = document.getElementById('minigame');
-    let mgScore = 0; let mgInterval;
-    document.getElementById('btn-game').onclick = () => {
-      if(Date.now() < data.sleepUntil) return alert("Śpi!");
-      mg.style.display = 'block'; mgScore = 0; document.getElementById('mg-score').innerText = mgScore;
-      document.getElementById('mg-start-text').style.display = 'block';
-    };
-    document.getElementById('mg-start-text').onclick = function() {
-      this.style.display = 'none';
-      mgInterval = setInterval(() => {
-        let f = document.createElement('div'); f.innerText = '🐟'; f.className = 'fish-drop';
-        f.style.left = Math.random() * 80 + 10 + '%'; f.style.top = '-50px';
-        mg.appendChild(f);
-        let pos = -50;
-        let fall = setInterval(() => {
-          pos += 5; f.style.top = pos + 'px';
-          if(pos > window.innerHeight) { clearInterval(fall); f.remove(); }
-        }, 30);
-        f.ontouchstart = f.onmousedown = async () => {
-          clearInterval(fall); f.remove(); mgScore++; document.getElementById('mg-score').innerText = mgScore;
-          if(mgScore >= 10) {
-            clearInterval(mgInterval); mg.style.display = 'none';
-            alert("Udało się! Wygrywasz 20 Monet!");
-            await updateDoc(petRef, { coins: data.coins + 20, energy: Math.max(0, data.energy - 10) });
-            // Usuń resztę ryb
-            document.querySelectorAll('.fish-drop').forEach(el => el.remove());
-          }
-        };
-      }, 800);
-    };
+    // --- CZAT ---
+    const chatPanel = document.getElementById('chat-panel');
+    const chatMsgs = document.getElementById('chat-msgs');
+    const chatInput = document.getElementById('chat-text');
 
-    // --- SYSTEM OPADANIA STATYSTYK ---
-    setInterval(() => {
-      if(Date.now() > data.sleepUntil) {
-        if(data.hunger > 0 || data.hygiene > 0 || data.energy > 0) {
-           updateDoc(petRef, {
-             hunger: Math.max(0, data.hunger - 1),
-             hygiene: Math.max(0, data.hygiene - 1),
-             energy: Math.max(0, data.energy - 1)
-           });
-        }
-      }
-    }, 60000); // Co 1 minutę
+    document.getElementById('btn-chat').onclick = () => {
+      chatPanel.style.display = chatPanel.style.display === 'flex' ? 'none' : 'flex';
+      chatMsgs.scrollTop = chatMsgs.scrollHeight;
+    };
+    document.getElementById('close-chat').onclick = () => chatPanel.style.display = 'none';
+
+    function renderChat() {
+      chatMsgs.innerHTML = '';
+      (dbData.chat || []).forEach(m => {
+        let d = document.createElement('div');
+        d.className = 'msg ' + (m.author === myName ? 'mine' : '');
+        d.innerHTML = `<div class="msg-author">${m.author}</div>${m.text}`;
+        chatMsgs.appendChild(d);
+      });
+      chatMsgs.scrollTop = chatMsgs.scrollHeight;
+    }
+
+    document.getElementById('chat-send').onclick = async () => {
+      if(!chatInput.value.trim()) return;
+      let newChat = [...(dbData.chat || []), { author: myName, text: chatInput.value, time: Date.now() }];
+      if(newChat.length > 30) newChat = newChat.slice(-30); // Trzymamy tylko ostatnie 30 wiadomości
+      await updateDoc(gameRef, { chat: newChat });
+      chatInput.value = '';
+    };
 
   </script>
 </body>
