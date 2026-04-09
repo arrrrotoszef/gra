@@ -3,119 +3,186 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Nasz Wymuskany Pengu ❤️</title>
+  <title>Nasz Własny Pengu ❤️</title>
   <style>
     :root {
       --primary: #ff758c;
-      --bg: #fdfbfb;
-      --panel: rgba(255, 255, 255, 0.95);
+      --bg-top: #a1c4fd;
+      --bg-bottom: #c2e9fb;
     }
+    * { box-sizing: border-box; user-select: none; }
     body { 
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0; height: 100vh; 
-      background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
-      display: flex; flex-direction: column; color: #333; overflow: hidden;
+      margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column;
+      background: linear-gradient(to bottom, #dbe9f4 0%, #e8f2f6 60%, #c49a6c 60%, #a67c52 100%); /* Pokój z podłogą */
+      color: #333; transition: filter 2s;
     }
-    /* Pasek górny (Level, Monety) */
+    body.night-mode { filter: brightness(0.4); }
+
+    /* Pasek górny */
     .top-bar {
-      display: flex; justify-content: space-between; padding: 15px 20px;
-      background: var(--panel); box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      border-bottom-radius: 15px; font-weight: bold; z-index: 10;
+      display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;
+      background: rgba(255,255,255,0.9); box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-bottom-radius: 20px; z-index: 10;
     }
-    .level-badge { background: #ffdf00; padding: 5px 15px; border-radius: 20px; color: #b8860b; }
-    .coin-badge { background: #ffd700; padding: 5px 15px; border-radius: 20px; color: #8b6508; }
-    
-    /* Statystyki */
-    .stats { padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-    .stat-row { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: bold; }
-    .bar-bg { flex-grow: 1; height: 12px; background: rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; }
+    .name-tag { font-size: 22px; font-weight: bold; color: #ff758c; text-shadow: 1px 1px 0px #fff; }
+    .coin-badge { background: #ffd700; padding: 6px 15px; border-radius: 20px; color: #8b6508; font-weight: bold;}
+
+    /* Paski postępu */
+    .stats { padding: 10px 20px; display: flex; flex-direction: column; gap: 8px; z-index: 10; }
+    .stat-row { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: bold; }
+    .bar-bg { flex-grow: 1; height: 12px; background: rgba(0,0,0,0.2); border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.5); }
     .bar-fill { height: 100%; border-radius: 10px; transition: width 0.3s; }
-    #bar-hunger { background: #ff9a9e; } #bar-hygiene { background: #a1c4fd; } #bar-energy { background: #f6d365; }
-    #bar-xp { background: #96e6a1; }
+    #bar-hunger { background: linear-gradient(90deg, #ff9a9e, #fecfef); }
+    #bar-hygiene { background: linear-gradient(90deg, #84fab0, #8fd3f4); }
+    #bar-energy { background: linear-gradient(90deg, #f6d365, #fda085); }
 
-    /* Strefa zwierzaka */
-    .pet-area { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; }
-    .pet-container { position: relative; font-size: 140px; transition: all 0.3s; }
-    .pet { filter: drop-shadow(0 10px 15px rgba(0,0,0,0.15)); }
-    .hat { position: absolute; top: -40px; left: 50%; transform: translateX(-50%); font-size: 80px; z-index: 2; }
-    .status-overlay { position: absolute; top: 20px; right: -20px; font-size: 40px; font-weight: bold; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-    
-    /* Animacje */
-    @keyframes hop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-30px); } }
-    @keyframes wash { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-15deg); } 75% { transform: rotate(15deg); } }
-    .anim-hop { animation: hop 0.5s ease; }
-    .anim-wash { animation: wash 0.8s ease; }
-    .sleeping { opacity: 0.6; filter: grayscale(50%); }
+    /* Ekran Gry (Pingwin) */
+    .game-area { flex-grow: 1; position: relative; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 50px; z-index: 5;}
+    #pet-svg { width: 250px; height: 300px; filter: drop-shadow(0px 15px 10px rgba(0,0,0,0.3)); transition: transform 0.2s; }
+    .bouncing { animation: bounce 0.5s infinite alternate; }
+    @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-20px) scale(1.02); } }
 
-    /* Przyciski na dole */
+    /* Mydło i Bąbelki */
+    #soap {
+      position: absolute; width: 60px; height: 40px; background: #ffb6c1; border-radius: 20px;
+      border: 3px solid #ff69b4; box-shadow: inset -5px -5px 10px rgba(0,0,0,0.2);
+      display: none; z-index: 50; touch-action: none; cursor: grab;
+    }
+    .bubble {
+      position: absolute; border-radius: 50%; background: rgba(255,255,255,0.8); border: 1px solid #fff;
+      pointer-events: none; animation: floatUp 1s ease-out forwards;
+    }
+    @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-50px) scale(1.5); opacity: 0; } }
+
+    /* Dock na dole */
     .action-bar {
-      background: var(--panel); padding: 15px; display: flex; justify-content: space-around;
-      box-shadow: 0 -2px 15px rgba(0,0,0,0.1); border-top-left-radius: 25px; border-top-right-radius: 25px;
+      background: rgba(255,255,255,0.95); padding: 15px; display: flex; justify-content: space-around;
+      box-shadow: 0 -5px 20px rgba(0,0,0,0.15); border-top-left-radius: 30px; border-top-right-radius: 30px; z-index: 10;
     }
-    .btn {
-      display: flex; flex-direction: column; align-items: center; gap: 5px; background: none; border: none; font-weight: bold; cursor: pointer; color: #555;
-    }
-    .btn-icon { font-size: 24px; background: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    
-    /* Okienka Pop-up (Modal) */
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
-    .modal-content { background: white; padding: 20px; border-radius: 20px; text-align: center; width: 80%; max-width: 300px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-    .modal button { margin: 5px; padding: 10px 20px; border: none; border-radius: 10px; background: var(--primary); color: white; font-weight: bold; cursor: pointer; }
-    
+    .btn { display: flex; flex-direction: column; align-items: center; gap: 5px; background: none; border: none; font-weight: bold; color: #555; cursor: pointer; transition: transform 0.1s;}
+    .btn:active { transform: scale(0.9); }
+    .btn-icon { font-size: 26px; background: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 2px solid #eee;}
+
+    /* Modale */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+    .modal-content { background: white; padding: 25px; border-radius: 25px; text-align: center; width: 85%; max-width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+    .modal button { margin: 8px; padding: 12px 20px; border: none; border-radius: 15px; background: var(--primary); color: white; font-weight: bold; font-size: 16px; width: 90%; cursor: pointer; box-shadow: 0 4px 6px rgba(255,117,140,0.4);}
+    .wardrobe-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
+    .wardrobe-item input { transform: scale(1.5); }
+
     /* Minigra */
-    #minigame-area { display: none; position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 50; }
-    #target { position: absolute; font-size: 40px; cursor: pointer; user-select: none; }
+    #minigame { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 200; overflow: hidden; }
+    .fish-drop { position: absolute; font-size: 40px; pointer-events: auto; cursor: pointer; }
+    #score-display { position: absolute; top: 20px; left: 20px; color: white; font-size: 24px; font-weight: bold; }
   </style>
 </head>
 <body>
 
   <div class="top-bar">
-    <div class="level-badge">Lvl <span id="lvl">1</span></div>
+    <div class="name-tag" id="pet-name">Nasz Pet</div>
     <div class="coin-badge"><span id="coins">0</span> 💰</div>
   </div>
 
   <div class="stats">
-    <div class="stat-row">XP <div class="bar-bg"><div id="bar-xp" class="bar-fill" style="width: 0%;"></div></div></div>
     <div class="stat-row">🍎 <div class="bar-bg"><div id="bar-hunger" class="bar-fill" style="width: 50%;"></div></div></div>
     <div class="stat-row">🛁 <div class="bar-bg"><div id="bar-hygiene" class="bar-fill" style="width: 50%;"></div></div></div>
     <div class="stat-row">⚡ <div class="bar-bg"><div id="bar-energy" class="bar-fill" style="width: 50%;"></div></div></div>
   </div>
 
-  <div class="pet-area">
-    <div class="pet-container" id="pet-container">
-      <div id="hat" class="hat"></div>
-      <div id="pet" class="pet">🐧</div>
-      <div id="status" class="status-overlay"></div>
-    </div>
+  <div class="game-area" id="game-area">
+    <svg id="pet-svg" viewBox="0 0 200 250">
+      <path d="M50,100 C50,20 150,20 150,100 L160,210 C160,240 40,240 40,210 Z" fill="#2c3e50"/>
+      <path d="M70,110 C70,60 130,60 130,110 L140,200 C140,220 60,220 60,200 Z" fill="#ffffff"/>
+      
+      <g id="eyes-open">
+        <circle cx="85" cy="90" r="7" fill="#000"/>
+        <circle cx="87" cy="88" r="2" fill="#fff"/> <circle cx="115" cy="90" r="7" fill="#000"/>
+        <circle cx="117" cy="88" r="2" fill="#fff"/>
+      </g>
+      <g id="eyes-closed" style="display:none;">
+        <path d="M78,90 Q85,95 92,90" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+        <path d="M108,90 Q115,95 122,90" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+      </g>
+
+      <path d="M90,105 L110,105 L100,120 Z" fill="#f1c40f"/>
+      
+      <path d="M45,120 C25,140 20,180 35,170 Z" fill="#2c3e50"/>
+      <path d="M155,120 C175,140 180,180 165,170 Z" fill="#2c3e50"/>
+      
+      <ellipse cx="75" cy="225" rx="18" ry="8" fill="#f39c12"/>
+      <ellipse cx="125" cy="225" rx="18" ry="8" fill="#f39c12"/>
+
+      <g id="dirt-layer" opacity="0">
+        <circle cx="95" cy="150" r="18" fill="#654321" opacity="0.6"/>
+        <circle cx="75" cy="180" r="12" fill="#654321" opacity="0.5"/>
+        <circle cx="125" cy="140" r="14" fill="#654321" opacity="0.7"/>
+        <circle cx="115" cy="190" r="10" fill="#654321" opacity="0.4"/>
+        <circle cx="60" cy="130" r="8" fill="#654321" opacity="0.5"/>
+      </g>
+
+      <g id="cloth-glasses" style="display:none;">
+        <rect x="65" y="83" width="70" height="4" fill="#000"/>
+        <circle cx="85" cy="90" r="14" fill="rgba(0,150,255,0.2)" stroke="#000" stroke-width="4"/>
+        <circle cx="115" cy="90" r="14" fill="rgba(0,150,255,0.2)" stroke="#000" stroke-width="4"/>
+      </g>
+      <g id="cloth-bow" style="display:none;">
+        <path d="M90,125 L110,125 L115,140 L100,135 L85,140 Z" fill="#e74c3c"/>
+        <circle cx="100" cy="132" r="4" fill="#c0392b"/>
+      </g>
+      <g id="cloth-hat" style="display:none;">
+        <rect x="65" y="55" width="70" height="8" fill="#111" rx="4"/>
+        <rect x="75" y="10" width="50" height="45" fill="#222"/>
+        <rect x="75" y="45" width="50" height="5" fill="#e74c3c"/>
+      </g>
+
+      <g id="bed-blanket" style="display:none;">
+        <path d="M30,160 Q100,130 170,160 L180,240 L20,240 Z" fill="#8e44ad"/>
+        <path d="M60,180 L65,190 L55,190 Z" fill="#f1c40f"/>
+        <path d="M120,200 L125,210 L115,210 Z" fill="#f1c40f"/>
+        <path d="M90,220 L95,230 L85,230 Z" fill="#f1c40f"/>
+      </g>
+    </svg>
+
+    <div id="soap"></div>
   </div>
 
   <div class="action-bar">
-    <button class="btn" onclick="openMinigame()"><div class="btn-icon">🎮</div>Graj</button>
-    <button class="btn" id="btn-feed"><div class="btn-icon">🍎</div>Jedz</button>
-    <button class="btn" id="btn-bathe"><div class="btn-icon">🛁</div>Myj</button>
-    <button class="btn" id="btn-sleep"><div class="btn-icon">💤</div>Lulu</button>
+    <button class="btn" id="btn-game"><div class="btn-icon">🎮</div>Graj</button>
+    <button class="btn" id="btn-feed"><div class="btn-icon">🐟</div>Jedz</button>
+    <button class="btn" id="btn-bathe"><div class="btn-icon">🧼</div>Myj</button>
+    <button class="btn" id="btn-sleep"><div class="btn-icon">🛏️</div>Lulu</button>
     <button class="btn" id="btn-wardrobe"><div class="btn-icon">🎩</div>Szafa</button>
+  </div>
+
+  <div class="modal" id="wardrobe-modal">
+    <div class="modal-content">
+      <h3 style="margin-top:0;">Garderoba</h3>
+      <div class="wardrobe-item"><span>Cylinder🎩</span><input type="checkbox" id="check-hat"></div>
+      <div class="wardrobe-item"><span>Okulary🕶️</span><input type="checkbox" id="check-glasses"></div>
+      <div class="wardrobe-item"><span>Mucha 🎀</span><input type="checkbox" id="check-bow"></div>
+      <button id="btn-close-wardrobe" style="margin-top: 15px;">Zapisz i Zamknij</button>
+    </div>
   </div>
 
   <div class="modal" id="sleep-modal">
     <div class="modal-content">
-      <h3>Na ile usypiamy?</h3>
-      <button onclick="sleepFor(1)">1 Godzina</button>
-      <button onclick="sleepFor(4)">4 Godziny</button>
-      <button onclick="sleepFor(8)">8 Godzin (Cała noc)</button>
-      <button onclick="document.getElementById('sleep-modal').style.display='none'" style="background:#aaa;">Anuluj</button>
+      <h3 style="margin-top:0;">Gasimy światło?</h3>
+      <button id="sleep-1">Drzemka (1h)</button>
+      <button id="sleep-8">Cała noc (8h)</button>
+      <button id="sleep-cancel" style="background:#aaa;">Anuluj</button>
     </div>
   </div>
 
-  <div id="minigame-area">
-    <h2 style="color:white; text-align:center; margin-top:50px;">Złap 5 rybek!</h2>
-    <div id="target">🐟</div>
+  <div id="minigame">
+    <div id="score-display">Ryby: <span id="mg-score">0</span></div>
+    <h2 id="mg-start-text" style="color:white; text-align:center; margin-top:50%; font-size:30px;">Złap 10 ryb!<br><br>Kliknij by zacząć</h2>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, doc, onSnapshot, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+    // Twoja konfiguracja
     const firebaseConfig = {
       apiKey: "AIzaSyD8qaNZKjmenGo0MxL4dI7MYb2khcHSUes",
       authDomain: "graznatalia-e1b58.firebaseapp.com",
@@ -127,126 +194,208 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const petRef = doc(db, "gameData", "ourTamagotchiV2");
+    const petRef = doc(db, "gameData", "ourProPengu");
 
-    const UI = {
-      lvl: document.getElementById('lvl'), coins: document.getElementById('coins'),
-      xp: document.getElementById('bar-xp'), hunger: document.getElementById('bar-hunger'),
-      hygiene: document.getElementById('bar-hygiene'), energy: document.getElementById('bar-energy'),
-      pet: document.getElementById('pet'), hat: document.getElementById('hat'), 
-      container: document.getElementById('pet-container'), status: document.getElementById('status')
+    const ui = {
+      name: document.getElementById('pet-name'), coins: document.getElementById('coins'),
+      hunger: document.getElementById('bar-hunger'), hygiene: document.getElementById('bar-hygiene'), energy: document.getElementById('bar-energy'),
+      svg: document.getElementById('pet-svg'), dirt: document.getElementById('dirt-layer'),
+      eyesOpen: document.getElementById('eyes-open'), eyesClosed: document.getElementById('eyes-closed'), blanket: document.getElementById('bed-blanket'),
+      cHat: document.getElementById('cloth-hat'), cGlass: document.getElementById('cloth-glasses'), cBow: document.getElementById('cloth-bow')
     };
 
-    const HATS = ["", "🎩", "👑", "🎀", "🕶️"]; // Dostępne czapki
-    
-    let dbData = {
-      level: 1, xp: 0, coins: 0, hunger: 50, hygiene: 50, energy: 50,
-      currentHatIndex: 0, sleepUntil: 0, lastAction: "idle", actionTime: Date.now()
+    let data = {
+      name: "", coins: 0, hunger: 50, hygiene: 50, energy: 50,
+      clothes: { hat: false, glasses: false, bow: false },
+      sleepUntil: 0
     };
 
     onSnapshot(petRef, (docSnap) => {
       if (docSnap.exists()) {
-        dbData = docSnap.data();
-        updateUI();
+        data = docSnap.data();
+        checkName();
+        render();
       } else {
-        setDoc(petRef, dbData);
+        setDoc(petRef, data);
       }
     });
 
-    function updateUI() {
-      UI.lvl.innerText = dbData.level;
-      UI.coins.innerText = dbData.coins;
-      UI.xp.style.width = `${(dbData.xp / (dbData.level * 100)) * 100}%`;
-      UI.hunger.style.width = `${dbData.hunger}%`;
-      UI.hygiene.style.width = `${dbData.hygiene}%`;
-      UI.energy.style.width = `${dbData.energy}%`;
-      UI.hat.innerText = HATS[dbData.currentHatIndex] || "";
+    async function checkName() {
+      if (!data.name) {
+        let n = prompt("To Wasze nowe zwierzątko! Jak je nazwiecie?");
+        if (n) await updateDoc(petRef, { name: n });
+      }
+      ui.name.innerText = data.name || "Nasz Pet";
+    }
 
-      const isSleeping = Date.now() < dbData.sleepUntil;
-      const isFreshAction = (Date.now() - dbData.actionTime) < 2000;
+    function render() {
+      ui.coins.innerText = data.coins;
+      ui.hunger.style.width = `${data.hunger}%`; ui.hygiene.style.width = `${data.hygiene}%`; ui.energy.style.width = `${data.energy}%`;
+      
+      // Render ubrań
+      ui.cHat.style.display = data.clothes.hat ? "block" : "none";
+      ui.cGlass.style.display = data.clothes.glasses ? "block" : "none";
+      ui.cBow.style.display = data.clothes.bow ? "block" : "none";
 
+      // Render brudu (pojawia się gdy higiena < 50)
+      if(data.hygiene < 50) {
+        ui.dirt.setAttribute("opacity", (50 - data.hygiene) / 50);
+      } else {
+        ui.dirt.setAttribute("opacity", 0);
+      }
+
+      // Render spania
+      const isSleeping = Date.now() < data.sleepUntil;
       if (isSleeping) {
-        UI.pet.innerText = '🐧';
-        UI.container.className = 'pet-container sleeping';
-        UI.status.innerText = "Zzz...";
-        return;
-      }
-
-      UI.container.className = 'pet-container';
-      UI.status.innerText = "";
-      
-      if (isFreshAction && dbData.lastAction !== 'idle') {
-        if(dbData.lastAction === 'eat') { UI.container.classList.add('anim-hop'); UI.pet.innerText = '🐟'; }
-        if(dbData.lastAction === 'wash') { UI.container.classList.add('anim-wash'); UI.pet.innerText = '🧼'; }
+        document.body.classList.add('night-mode');
+        ui.eyesOpen.style.display = "none"; ui.eyesClosed.style.display = "block";
+        ui.blanket.style.display = "block";
       } else {
-        UI.pet.innerText = '🐧';
+        document.body.classList.remove('night-mode');
+        ui.eyesOpen.style.display = "block"; ui.eyesClosed.style.display = "none";
+        ui.blanket.style.display = "none";
       }
     }
 
-    async function doAction(type, stat) {
-      if (Date.now() < dbData.sleepUntil) return alert("Pengu śpi! Nie budź go.");
+    // --- LOGIKA AKCJI ---
+    async function addStat(stat, val) {
+      if(Date.now() < data.sleepUntil) return alert("Ciii, " + data.name + " teraz śpi!");
+      let newVal = Math.min(100, data[stat] + val);
+      await updateDoc(petRef, { [stat]: newVal });
+    }
+
+    document.getElementById('btn-feed').onclick = () => {
+      ui.svg.classList.add('bouncing');
+      setTimeout(() => ui.svg.classList.remove('bouncing'), 500);
+      addStat('hunger', 20);
+    };
+
+    // --- ZAAWANSOWANE MYCIE (Mydło Drag & Drop) ---
+    const soap = document.getElementById('soap');
+    let isWashing = false; let washPoints = 0;
+
+    document.getElementById('btn-bathe').onclick = () => {
+      if(Date.now() < data.sleepUntil) return alert("Śpi!");
+      soap.style.display = 'block';
+      soap.style.left = '50%'; soap.style.top = '20%';
+      alert("Przeciągnij mydło i pocieraj pingwina, żeby go umyć!");
+    };
+
+    function moveSoap(e) {
+      if(!isWashing) return;
+      e.preventDefault();
+      let touch = e.touches ? e.touches[0] : e;
+      soap.style.left = (touch.clientX - 30) + 'px';
+      soap.style.top = (touch.clientY - 20) + 'px';
       
-      let val = Math.min(100, dbData[stat] + 20);
-      let newXp = dbData.xp + 15;
-      let newLvl = dbData.level;
-      let newCoins = dbData.coins + 5;
-
-      // Awansowanie na wyższy level
-      if (newXp >= newLvl * 100) {
-        newXp = 0; newLvl++;
+      // Detekcja kolizji z pingwinem (środek ekranu)
+      let rect = ui.svg.getBoundingClientRect();
+      if(touch.clientX > rect.left && touch.clientX < rect.right && touch.clientY > rect.top && touch.clientY < rect.bottom) {
+        washPoints++;
+        // Tworzenie bąbelka
+        if(washPoints % 3 === 0) {
+          let b = document.createElement('div'); b.className = 'bubble';
+          let size = Math.random() * 20 + 10;
+          b.style.width = size+'px'; b.style.height = size+'px';
+          b.style.left = touch.clientX + 'px'; b.style.top = touch.clientY + 'px';
+          document.body.appendChild(b);
+          setTimeout(() => b.remove(), 1000);
+        }
+        // Wysyłanie do bazy co 10 potarć
+        if(washPoints > 10) {
+          washPoints = 0;
+          if(data.hygiene < 100) updateDoc(petRef, { hygiene: Math.min(100, data.hygiene + 5) });
+          if(data.hygiene >= 95) { soap.style.display = 'none'; isWashing = false; }
+        }
       }
-
-      await updateDoc(petRef, {
-        [stat]: val, xp: newXp, level: newLvl, coins: newCoins,
-        lastAction: type, actionTime: Date.now()
-      });
     }
-
-    // Obsługa przycisków
-    document.getElementById('btn-feed').onclick = () => doAction('eat', 'hunger');
-    document.getElementById('btn-bathe').onclick = () => doAction('wash', 'hygiene');
+    soap.addEventListener('touchstart', () => { isWashing = true; }, {passive: false});
+    document.addEventListener('touchmove', moveSoap, {passive: false});
+    document.addEventListener('touchend', () => { isWashing = false; });
     
-    // Garderoba - po prostu zmienia index czapki
-    document.getElementById('btn-wardrobe').onclick = async () => {
-      let nextHat = (dbData.currentHatIndex + 1) % HATS.length;
-      await updateDoc(petRef, { currentHatIndex: nextHat });
-    };
+    // Myszka dla PC
+    soap.addEventListener('mousedown', () => { isWashing = true; });
+    document.addEventListener('mousemove', moveSoap);
+    document.addEventListener('mouseup', () => { isWashing = false; });
 
-    // Obsługa snu
+    // --- SPANIE ---
+    const modalSleep = document.getElementById('sleep-modal');
     document.getElementById('btn-sleep').onclick = () => {
-      if (Date.now() < dbData.sleepUntil) return alert("Już śpi!");
-      document.getElementById('sleep-modal').style.display = 'flex';
+      if(Date.now() < data.sleepUntil) return alert("Już śpi!");
+      modalSleep.style.display = 'flex';
+    };
+    document.getElementById('sleep-cancel').onclick = () => modalSleep.style.display = 'none';
+    const sleep = async (h) => {
+      modalSleep.style.display = 'none';
+      await updateDoc(petRef, { sleepUntil: Date.now() + (h*3600000), energy: 100 });
+    };
+    document.getElementById('sleep-1').onclick = () => sleep(1);
+    document.getElementById('sleep-8').onclick = () => sleep(8);
+
+    // --- SZAFA ---
+    const modalWardrobe = document.getElementById('wardrobe-modal');
+    document.getElementById('btn-wardrobe').onclick = () => {
+      document.getElementById('check-hat').checked = data.clothes.hat;
+      document.getElementById('check-glasses').checked = data.clothes.glasses;
+      document.getElementById('check-bow').checked = data.clothes.bow;
+      modalWardrobe.style.display = 'flex';
+    };
+    document.getElementById('btn-close-wardrobe').onclick = async () => {
+      modalWardrobe.style.display = 'none';
+      await updateDoc(petRef, {
+        clothes: {
+          hat: document.getElementById('check-hat').checked,
+          glasses: document.getElementById('check-glasses').checked,
+          bow: document.getElementById('check-bow').checked
+        }
+      });
     };
 
-    window.sleepFor = async (hours) => {
-      document.getElementById('sleep-modal').style.display = 'none';
-      let ms = hours * 60 * 60 * 1000;
-      await updateDoc(petRef, { sleepUntil: Date.now() + ms, energy: 100, lastAction: 'sleep', actionTime: Date.now() });
+    // --- MINIGRA ZŁAP RYBY ---
+    const mg = document.getElementById('minigame');
+    let mgScore = 0; let mgInterval;
+    document.getElementById('btn-game').onclick = () => {
+      if(Date.now() < data.sleepUntil) return alert("Śpi!");
+      mg.style.display = 'block'; mgScore = 0; document.getElementById('mg-score').innerText = mgScore;
+      document.getElementById('mg-start-text').style.display = 'block';
+    };
+    document.getElementById('mg-start-text').onclick = function() {
+      this.style.display = 'none';
+      mgInterval = setInterval(() => {
+        let f = document.createElement('div'); f.innerText = '🐟'; f.className = 'fish-drop';
+        f.style.left = Math.random() * 80 + 10 + '%'; f.style.top = '-50px';
+        mg.appendChild(f);
+        let pos = -50;
+        let fall = setInterval(() => {
+          pos += 5; f.style.top = pos + 'px';
+          if(pos > window.innerHeight) { clearInterval(fall); f.remove(); }
+        }, 30);
+        f.ontouchstart = f.onmousedown = async () => {
+          clearInterval(fall); f.remove(); mgScore++; document.getElementById('mg-score').innerText = mgScore;
+          if(mgScore >= 10) {
+            clearInterval(mgInterval); mg.style.display = 'none';
+            alert("Udało się! Wygrywasz 20 Monet!");
+            await updateDoc(petRef, { coins: data.coins + 20, energy: Math.max(0, data.energy - 10) });
+            // Usuń resztę ryb
+            document.querySelectorAll('.fish-drop').forEach(el => el.remove());
+          }
+        };
+      }, 800);
     };
 
-    // --- LOGIKA MINIGRY ---
-    let catches = 0;
-    window.openMinigame = () => {
-      if (Date.now() < dbData.sleepUntil) return alert("Pengu śpi!");
-      document.getElementById('minigame-area').style.display = 'block';
-      catches = 0; moveTarget();
-    };
-
-    const target = document.getElementById('target');
-    function moveTarget() {
-      target.style.top = Math.random() * 80 + 10 + '%';
-      target.style.left = Math.random() * 80 + 10 + '%';
-    }
-    target.onclick = async () => {
-      catches++;
-      if (catches >= 5) {
-        document.getElementById('minigame-area').style.display = 'none';
-        alert("Wygrałeś 50 monet!");
-        await updateDoc(petRef, { coins: dbData.coins + 50 });
-      } else {
-        moveTarget();
+    // --- SYSTEM OPADANIA STATYSTYK ---
+    setInterval(() => {
+      if(Date.now() > data.sleepUntil) {
+        if(data.hunger > 0 || data.hygiene > 0 || data.energy > 0) {
+           updateDoc(petRef, {
+             hunger: Math.max(0, data.hunger - 1),
+             hygiene: Math.max(0, data.hygiene - 1),
+             energy: Math.max(0, data.energy - 1)
+           });
+        }
       }
-    };
+    }, 60000); // Co 1 minutę
+
   </script>
 </body>
 </html>
