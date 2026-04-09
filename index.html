@@ -3,184 +3,113 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Nasz Zwierzak ❤️</title>
+  <title>Nasz Wymuskany Pengu ❤️</title>
   <style>
     :root {
       --primary: #ff758c;
-      --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-      --card-bg: rgba(255, 255, 255, 0.9);
+      --bg: #fdfbfb;
+      --panel: rgba(255, 255, 255, 0.95);
     }
     body { 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      margin: 0; 
-      height: 100vh; 
-      background: var(--bg-gradient); 
-      display: flex; 
-      flex-direction: column; 
-      color: #333; 
-      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0; height: 100vh; 
+      background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+      display: flex; flex-direction: column; color: #333; overflow: hidden;
     }
-    /* Nagłówek */
-    header {
-      padding: 20px;
-      text-align: center;
-      background: var(--card-bg);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      border-bottom-left-radius: 20px;
-      border-bottom-right-radius: 20px;
-      z-index: 10;
+    /* Pasek górny (Level, Monety) */
+    .top-bar {
+      display: flex; justify-content: space-between; padding: 15px 20px;
+      background: var(--panel); box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      border-bottom-radius: 15px; font-weight: bold; z-index: 10;
     }
-    header h1 {
-      margin: 0;
-      font-size: 22px;
-      color: #4a4a4a;
-    }
+    .level-badge { background: #ffdf00; padding: 5px 15px; border-radius: 20px; color: #b8860b; }
+    .coin-badge { background: #ffd700; padding: 5px 15px; border-radius: 20px; color: #8b6508; }
     
-    /* Paski statusu (Głód, Czystość, Energia) */
-    .stats-container {
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .stat-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: bold;
-      font-size: 14px;
-    }
-    .stat-icon {
-      font-size: 20px;
-      width: 25px;
-      text-align: center;
-    }
-    .bar-bg {
-      flex-grow: 1;
-      height: 14px;
-      background: #e0e0e0;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    .bar-fill {
-      height: 100%;
-      border-radius: 10px;
-      transition: width 0.5s ease-out, background-color 0.3s;
-    }
-    #bar-hunger { background-color: #ff9a9e; }
-    #bar-hygiene { background-color: #a1c4fd; }
-    #bar-energy { background-color: #f6d365; }
+    /* Statystyki */
+    .stats { padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+    .stat-row { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: bold; }
+    .bar-bg { flex-grow: 1; height: 12px; background: rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 10px; transition: width 0.3s; }
+    #bar-hunger { background: #ff9a9e; } #bar-hygiene { background: #a1c4fd; } #bar-energy { background: #f6d365; }
+    #bar-xp { background: #96e6a1; }
 
-    /* Główna sekcja ze zwierzakiem */
-    .pet-area {
-      flex-grow: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-    .pet { 
-      font-size: 140px; 
-      transition: all 0.3s ease;
-      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
-    }
+    /* Strefa zwierzaka */
+    .pet-area { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+    .pet-container { position: relative; font-size: 140px; transition: all 0.3s; }
+    .pet { filter: drop-shadow(0 10px 15px rgba(0,0,0,0.15)); }
+    .hat { position: absolute; top: -40px; left: 50%; transform: translateX(-50%); font-size: 80px; z-index: 2; }
+    .status-overlay { position: absolute; top: 20px; right: -20px; font-size: 40px; font-weight: bold; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
     
-    /* Animacje akcji */
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-20px) scale(1.05); }
-    }
-    @keyframes shake {
-      0%, 100% { transform: rotate(0deg); }
-      25% { transform: rotate(-10deg); }
-      75% { transform: rotate(10deg); }
-    }
-    @keyframes breathe {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-    .action-eating { animation: bounce 0.5s ease infinite; }
-    .action-bathing { animation: shake 0.8s ease infinite; }
-    .action-sleeping { animation: breathe 2s ease infinite; opacity: 0.8; }
+    /* Animacje */
+    @keyframes hop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-30px); } }
+    @keyframes wash { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-15deg); } 75% { transform: rotate(15deg); } }
+    .anim-hop { animation: hop 0.5s ease; }
+    .anim-wash { animation: wash 0.8s ease; }
+    .sleeping { opacity: 0.6; filter: grayscale(50%); }
 
-    /* Menu dolne (Przyciski akcji) */
+    /* Przyciski na dole */
     .action-bar {
-      background: var(--card-bg);
-      padding: 20px;
-      display: flex;
-      justify-content: space-around;
-      box-shadow: 0 -2px 15px rgba(0,0,0,0.05);
-      border-top-left-radius: 25px;
-      border-top-right-radius: 25px;
+      background: var(--panel); padding: 15px; display: flex; justify-content: space-around;
+      box-shadow: 0 -2px 15px rgba(0,0,0,0.1); border-top-left-radius: 25px; border-top-right-radius: 25px;
     }
-    .action-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-family: inherit;
-      color: #555;
-      font-weight: 600;
-      transition: transform 0.1s;
+    .btn {
+      display: flex; flex-direction: column; align-items: center; gap: 5px; background: none; border: none; font-weight: bold; cursor: pointer; color: #555;
     }
-    .action-btn:active {
-      transform: scale(0.9);
-    }
-    .btn-icon {
-      background: white;
-      font-size: 28px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-      border: 2px solid #f0f0f0;
-    }
+    .btn-icon { font-size: 24px; background: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    
+    /* Okienka Pop-up (Modal) */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
+    .modal-content { background: white; padding: 20px; border-radius: 20px; text-align: center; width: 80%; max-width: 300px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+    .modal button { margin: 5px; padding: 10px 20px; border: none; border-radius: 10px; background: var(--primary); color: white; font-weight: bold; cursor: pointer; }
+    
+    /* Minigra */
+    #minigame-area { display: none; position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 50; }
+    #target { position: absolute; font-size: 40px; cursor: pointer; user-select: none; }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>Nasz Pengu ❤️</h1>
-  </header>
+  <div class="top-bar">
+    <div class="level-badge">Lvl <span id="lvl">1</span></div>
+    <div class="coin-badge"><span id="coins">0</span> 💰</div>
+  </div>
 
-  <div class="stats-container">
-    <div class="stat-row">
-      <span class="stat-icon">🍎</span>
-      <div class="bar-bg"><div id="bar-hunger" class="bar-fill" style="width: 50%;"></div></div>
-    </div>
-    <div class="stat-row">
-      <span class="stat-icon">🛁</span>
-      <div class="bar-bg"><div id="bar-hygiene" class="bar-fill" style="width: 50%;"></div></div>
-    </div>
-    <div class="stat-row">
-      <span class="stat-icon">⚡</span>
-      <div class="bar-bg"><div id="bar-energy" class="bar-fill" style="width: 50%;"></div></div>
-    </div>
+  <div class="stats">
+    <div class="stat-row">XP <div class="bar-bg"><div id="bar-xp" class="bar-fill" style="width: 0%;"></div></div></div>
+    <div class="stat-row">🍎 <div class="bar-bg"><div id="bar-hunger" class="bar-fill" style="width: 50%;"></div></div></div>
+    <div class="stat-row">🛁 <div class="bar-bg"><div id="bar-hygiene" class="bar-fill" style="width: 50%;"></div></div></div>
+    <div class="stat-row">⚡ <div class="bar-bg"><div id="bar-energy" class="bar-fill" style="width: 50%;"></div></div></div>
   </div>
 
   <div class="pet-area">
-    <div id="pet" class="pet">🐧</div>
+    <div class="pet-container" id="pet-container">
+      <div id="hat" class="hat"></div>
+      <div id="pet" class="pet">🐧</div>
+      <div id="status" class="status-overlay"></div>
+    </div>
   </div>
 
   <div class="action-bar">
-    <button class="action-btn" id="btn-feed">
-      <div class="btn-icon">🍎</div>
-      <span>Nakarm</span>
-    </button>
-    <button class="action-btn" id="btn-bathe">
-      <div class="btn-icon">🛁</div>
-      <span>Umyj</span>
-    </button>
-    <button class="action-btn" id="btn-sleep">
-      <div class="btn-icon">💤</div>
-      <span>Lulu</span>
-    </button>
+    <button class="btn" onclick="openMinigame()"><div class="btn-icon">🎮</div>Graj</button>
+    <button class="btn" id="btn-feed"><div class="btn-icon">🍎</div>Jedz</button>
+    <button class="btn" id="btn-bathe"><div class="btn-icon">🛁</div>Myj</button>
+    <button class="btn" id="btn-sleep"><div class="btn-icon">💤</div>Lulu</button>
+    <button class="btn" id="btn-wardrobe"><div class="btn-icon">🎩</div>Szafa</button>
+  </div>
+
+  <div class="modal" id="sleep-modal">
+    <div class="modal-content">
+      <h3>Na ile usypiamy?</h3>
+      <button onclick="sleepFor(1)">1 Godzina</button>
+      <button onclick="sleepFor(4)">4 Godziny</button>
+      <button onclick="sleepFor(8)">8 Godzin (Cała noc)</button>
+      <button onclick="document.getElementById('sleep-modal').style.display='none'" style="background:#aaa;">Anuluj</button>
+    </div>
+  </div>
+
+  <div id="minigame-area">
+    <h2 style="color:white; text-align:center; margin-top:50px;">Złap 5 rybek!</h2>
+    <div id="target">🐟</div>
   </div>
 
   <script type="module">
@@ -193,116 +122,131 @@
       projectId: "graznatalia-e1b58",
       storageBucket: "graznatalia-e1b58.firebasestorage.app",
       messagingSenderId: "265631462505",
-      appId: "1:265631462505:web:40b3bb8c72908cf8461ef8",
-      measurementId: "G-JWW9JW9TD0"
+      appId: "1:265631462505:web:40b3bb8c72908cf8461ef8"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const petRef = doc(db, "gameData", "ourTamagotchi");
+    const petRef = doc(db, "gameData", "ourTamagotchiV2");
 
-    // Elementy UI
-    const petEl = document.getElementById('pet');
-    const barHunger = document.getElementById('bar-hunger');
-    const barHygiene = document.getElementById('bar-hygiene');
-    const barEnergy = document.getElementById('bar-energy');
-
-    // Domyślne wartości startowe
-    const defaultData = {
-      hunger: 50,
-      hygiene: 50,
-      energy: 50,
-      action: "idle", // idle, eating, bathing, sleeping
-      lastActionTime: Date.now()
+    const UI = {
+      lvl: document.getElementById('lvl'), coins: document.getElementById('coins'),
+      xp: document.getElementById('bar-xp'), hunger: document.getElementById('bar-hunger'),
+      hygiene: document.getElementById('bar-hygiene'), energy: document.getElementById('bar-energy'),
+      pet: document.getElementById('pet'), hat: document.getElementById('hat'), 
+      container: document.getElementById('pet-container'), status: document.getElementById('status')
     };
 
-    let currentData = { ...defaultData };
-    let revertTimer = null;
+    const HATS = ["", "🎩", "👑", "🎀", "🕶️"]; // Dostępne czapki
+    
+    let dbData = {
+      level: 1, xp: 0, coins: 0, hunger: 50, hygiene: 50, energy: 50,
+      currentHatIndex: 0, sleepUntil: 0, lastAction: "idle", actionTime: Date.now()
+    };
 
-    // Funkcja aktualizująca UI
-    function updateUI(data) {
-      // Aktualizacja pasków
-      barHunger.style.width = `${data.hunger}%`;
-      barHygiene.style.width = `${data.hygiene}%`;
-      barEnergy.style.width = `${data.energy}%`;
-
-      // Reset animacji
-      petEl.className = 'pet';
-      
-      // Sprawdzamy czy akcja jest świeża (mniej niż 5 sekund temu)
-      const isActionFresh = (Date.now() - data.lastActionTime) < 5000;
-
-      if (isActionFresh && data.action !== 'idle') {
-        if (data.action === 'eating') {
-          petEl.innerText = '🐟';
-          petEl.classList.add('action-eating');
-        } else if (data.action === 'bathing') {
-          petEl.innerText = '🧼';
-          petEl.classList.add('action-bathing');
-        } else if (data.action === 'sleeping') {
-          petEl.innerText = '😴';
-          petEl.classList.add('action-sleeping');
-        }
-
-        // Ustaw timer, żeby po 5 sekundach pingwin wrócił do normy u obu osób
-        clearTimeout(revertTimer);
-        revertTimer = setTimeout(() => {
-          petEl.innerText = '🐧';
-          petEl.className = 'pet';
-        }, 5000);
-      } else {
-        // Zwykły stan
-        petEl.innerText = '🐧';
-      }
-    }
-
-    // Nasłuchiwanie z Firebase
     onSnapshot(petRef, (docSnap) => {
       if (docSnap.exists()) {
-        currentData = docSnap.data();
-        updateUI(currentData);
+        dbData = docSnap.data();
+        updateUI();
       } else {
-        setDoc(petRef, defaultData);
+        setDoc(petRef, dbData);
       }
     });
 
-    // Funkcja wykonująca akcję
-    async function performAction(type, statToIncrease) {
-      // Zabezpieczenie: statystyki nie mogą przekroczyć 100%
-      let newValue = currentData[statToIncrease] + 20;
-      if (newValue > 100) newValue = 100;
+    function updateUI() {
+      UI.lvl.innerText = dbData.level;
+      UI.coins.innerText = dbData.coins;
+      UI.xp.style.width = `${(dbData.xp / (dbData.level * 100)) * 100}%`;
+      UI.hunger.style.width = `${dbData.hunger}%`;
+      UI.hygiene.style.width = `${dbData.hygiene}%`;
+      UI.energy.style.width = `${dbData.energy}%`;
+      UI.hat.innerText = HATS[dbData.currentHatIndex] || "";
 
-      const updates = {
-        action: type,
-        lastActionTime: Date.now()
-      };
-      updates[statToIncrease] = newValue;
+      const isSleeping = Date.now() < dbData.sleepUntil;
+      const isFreshAction = (Date.now() - dbData.actionTime) < 2000;
 
-      try {
-        await updateDoc(petRef, updates);
-      } catch(e) {
-        console.error("Błąd aktualizacji", e);
+      if (isSleeping) {
+        UI.pet.innerText = '🐧';
+        UI.container.className = 'pet-container sleeping';
+        UI.status.innerText = "Zzz...";
+        return;
+      }
+
+      UI.container.className = 'pet-container';
+      UI.status.innerText = "";
+      
+      if (isFreshAction && dbData.lastAction !== 'idle') {
+        if(dbData.lastAction === 'eat') { UI.container.classList.add('anim-hop'); UI.pet.innerText = '🐟'; }
+        if(dbData.lastAction === 'wash') { UI.container.classList.add('anim-wash'); UI.pet.innerText = '🧼'; }
+      } else {
+        UI.pet.innerText = '🐧';
       }
     }
 
-    // Podpięcie przycisków
-    document.getElementById('btn-feed').addEventListener('click', () => performAction('eating', 'hunger'));
-    document.getElementById('btn-bathe').addEventListener('click', () => performAction('bathing', 'hygiene'));
-    document.getElementById('btn-sleep').addEventListener('click', () => performAction('sleeping', 'energy'));
+    async function doAction(type, stat) {
+      if (Date.now() < dbData.sleepUntil) return alert("Pengu śpi! Nie budź go.");
+      
+      let val = Math.min(100, dbData[stat] + 20);
+      let newXp = dbData.xp + 15;
+      let newLvl = dbData.level;
+      let newCoins = dbData.coins + 5;
 
-    // Mechanika "opadania" statystyk - co 1 minutę zwierzak staje się odrobinę bardziej głodny, brudny i zmęczony
-    setInterval(async () => {
-      // Odpalamy to tylko, jeśli statystyki są większe niż 0
-      if (currentData.hunger > 0 || currentData.hygiene > 0 || currentData.energy > 0) {
-        const h = Math.max(0, currentData.hunger - 2);
-        const hyg = Math.max(0, currentData.hygiene - 2);
-        const e = Math.max(0, currentData.energy - 2);
-        
-        // Zapisujemy spadek bez zmieniania aktualnej animacji
-        await updateDoc(petRef, { hunger: h, hygiene: hyg, energy: e });
+      // Awansowanie na wyższy level
+      if (newXp >= newLvl * 100) {
+        newXp = 0; newLvl++;
       }
-    }, 60000); // 60000 ms = 1 minuta
 
+      await updateDoc(petRef, {
+        [stat]: val, xp: newXp, level: newLvl, coins: newCoins,
+        lastAction: type, actionTime: Date.now()
+      });
+    }
+
+    // Obsługa przycisków
+    document.getElementById('btn-feed').onclick = () => doAction('eat', 'hunger');
+    document.getElementById('btn-bathe').onclick = () => doAction('wash', 'hygiene');
+    
+    // Garderoba - po prostu zmienia index czapki
+    document.getElementById('btn-wardrobe').onclick = async () => {
+      let nextHat = (dbData.currentHatIndex + 1) % HATS.length;
+      await updateDoc(petRef, { currentHatIndex: nextHat });
+    };
+
+    // Obsługa snu
+    document.getElementById('btn-sleep').onclick = () => {
+      if (Date.now() < dbData.sleepUntil) return alert("Już śpi!");
+      document.getElementById('sleep-modal').style.display = 'flex';
+    };
+
+    window.sleepFor = async (hours) => {
+      document.getElementById('sleep-modal').style.display = 'none';
+      let ms = hours * 60 * 60 * 1000;
+      await updateDoc(petRef, { sleepUntil: Date.now() + ms, energy: 100, lastAction: 'sleep', actionTime: Date.now() });
+    };
+
+    // --- LOGIKA MINIGRY ---
+    let catches = 0;
+    window.openMinigame = () => {
+      if (Date.now() < dbData.sleepUntil) return alert("Pengu śpi!");
+      document.getElementById('minigame-area').style.display = 'block';
+      catches = 0; moveTarget();
+    };
+
+    const target = document.getElementById('target');
+    function moveTarget() {
+      target.style.top = Math.random() * 80 + 10 + '%';
+      target.style.left = Math.random() * 80 + 10 + '%';
+    }
+    target.onclick = async () => {
+      catches++;
+      if (catches >= 5) {
+        document.getElementById('minigame-area').style.display = 'none';
+        alert("Wygrałeś 50 monet!");
+        await updateDoc(petRef, { coins: dbData.coins + 50 });
+      } else {
+        moveTarget();
+      }
+    };
   </script>
 </body>
 </html>
