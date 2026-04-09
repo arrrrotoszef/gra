@@ -3,247 +3,218 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Nasz Słodki Kotek V5 🐾</title>
+  <title>Mój Gadający Kotek V6</title>
   <style>
-    :root {
-      --primary: #a29bfe;
-      --bg: #f5f6fa;
-      --panel: #ffffff;
-      --text: #2f3640;
-    }
-    body {
-      font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      text-align: center; background-color: var(--bg); margin: 0; padding: 10px;
-      display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: var(--text);
-      transition: background 0.5s;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&display=swap');
+    :root { --primary: #00cec9; --bg: #81ecec; --panel: #ffffff; --text: #2d3436; }
+    body { font-family: 'Nunito', sans-serif; text-align: center; background-color: var(--bg); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: var(--text); user-select: none; }
     
-    /* Top Bar */
-    .top-bar {
-      display: flex; justify-content: space-between; width: 95%; max-width: 450px;
-      background: var(--panel); padding: 15px 20px; border-radius: 20px;
-      box-shadow: 0 8px 15px rgba(0,0,0,0.05); margin-top: 5px; font-weight: bold; box-sizing: border-box;
-      z-index: 10;
-    }
-    .coins { color: #f39c12; font-size: 1.3em;}
-    .level { color: #e84393; font-size: 1.3em;}
-
-    h1 { margin: 15px 0 0 0; color: #6c5ce7; font-size: 2em; text-shadow: 1px 1px 0px white;}
-    .player-info { color: #7f8fa6; font-size: 0.9em; margin-bottom: 10px; }
-    .btn-small { background: none; border: 1px solid #7f8fa6; color: #7f8fa6; border-radius: 8px; padding: 2px 6px; cursor: pointer; font-size: 0.8em; margin-left: 5px; }
-
-    /* ========================================= */
-    /* SCENA I TŁA KOTKA                         */
-    /* ========================================= */
-    #cat-stage { 
-      width: 250px; height: 250px; margin: 10px 0; position: relative;
-      border-radius: 50%; box-shadow: inset 0 0 20px rgba(0,0,0,0.1), 0 10px 20px rgba(0,0,0,0.1);
-      transition: all 0.5s; overflow: hidden; display: flex; align-items: center; justify-content: center;
-    }
+    /* Top Bar & Leveling */
+    .top-bar { display: flex; justify-content: space-between; width: 95%; max-width: 450px; background: var(--panel); padding: 15px 20px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); margin-top: 5px; box-sizing: border-box; position: relative; z-index: 10;}
+    .coins-box { color: #f39c12; font-size: 1.4em; font-weight: 900;}
+    .lvl-box { color: #e84393; font-size: 1.4em; font-weight: 900; display: flex; align-items: center; gap: 10px; }
     
-    /* Style Tła */
-    .bg-default { background: linear-gradient(135deg, #ffeaa7, #fab1a0); }
-    .bg-garden { background: linear-gradient(135deg, #55efc4, #00b894); }
-    .bg-night { background: linear-gradient(135deg, #2d3436, #636e72); }
-    .bg-space { background: linear-gradient(135deg, #090a0f, #27104e, #9b59b6); }
+    .name-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px;}
+    h1 { margin: 0; color: #0984e3; font-size: 2.2em; text-shadow: 2px 2px 0px white;}
+    .btn-edit { background: white; border: 2px solid #0984e3; border-radius: 50%; width: 35px; height: 35px; font-size: 1.2em; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.1s;}
+    .btn-edit:active { transform: scale(0.9); }
 
-    #animated-cat { width: 90%; height: 90%; animation: float 3.5s ease-in-out infinite; z-index: 2; }
+    /* SVG Cat Stage (3D Look) */
+    #cat-stage { width: 280px; height: 280px; margin: 15px 0; position: relative; border-radius: 50%; background: radial-gradient(circle, #74b9ff 0%, #0984e3 100%); box-shadow: inset 0 0 30px rgba(0,0,0,0.3), 0 10px 20px rgba(0,0,0,0.2); overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    #animated-cat { width: 100%; height: 100%; animation: breathe 3s infinite ease-in-out; z-index: 2; }
     
-    @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+    @keyframes breathe { 0%, 100% { transform: scale(1) translateY(0); } 50% { transform: scale(1.02) translateY(-5px); } }
     @keyframes blink { 0%, 4%, 100% { transform: scaleY(1); } 2% { transform: scaleY(0.1); } }
-    @keyframes tailWag { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(15deg); } }
-    .eye-group { animation: blink 4s infinite; transform-origin: center; }
-    .tail { animation: tailWag 4s ease-in-out infinite; transform-origin: 75% 85%; }
-    .happy-jump { animation: happyJump 0.5s ease !important; }
-    @keyframes happyJump { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-25px) scale(1.05); } }
+    .eyes { animation: blink 4s infinite; transform-origin: 100px 90px; }
+    .happy-anim { animation: happy 0.5s ease; }
+    @keyframes happy { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
 
-    /* ========================================= */
-    /* INTERFEJS                                 */
-    /* ========================================= */
-    .panel {
-      width: 95%; max-width: 450px; background: var(--panel); padding: 15px;
-      border-radius: 20px; box-shadow: 0 8px 15px rgba(0,0,0,0.05); margin-bottom: 15px; box-sizing: border-box;
-      position: relative; z-index: 10;
-    }
-    .stat-row { margin-bottom: 8px; text-align: left; font-size: 0.9em; font-weight: bold; color: #555; }
-    .bar-bg { background-color: #f1f2f6; border-radius: 10px; height: 18px; width: 100%; margin-top: 5px; overflow: hidden; }
-    .bar-fill { height: 100%; transition: width 0.4s ease, background-color 0.4s ease; }
-    #bar-food { background-color: #00cec9; }
-    #bar-water { background-color: #0984e3; }
+    /* UI Panels */
+    .panel { width: 95%; max-width: 450px; background: var(--panel); padding: 15px; border-radius: 20px; box-shadow: 0 8px 15px rgba(0,0,0,0.05); margin-bottom: 15px; box-sizing: border-box; }
+    .bar-wrap { margin-bottom: 8px; text-align: left; font-size: 0.9em; font-weight: 900; color: #555; }
+    .bar-bg { background-color: #dfe6e9; border-radius: 12px; height: 22px; width: 100%; margin-top: 5px; overflow: hidden; box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);}
+    .bar-fill { height: 100%; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+    #bar-food { background: linear-gradient(90deg, #00b894, #55efc4); }
+    #bar-xp { background: linear-gradient(90deg, #6c5ce7, #a29bfe); }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    button.btn-big { padding: 15px 5px; font-size: 1.1em; border: none; border-radius: 15px; cursor: pointer; color: white; font-weight: 900; font-family: 'Nunito', sans-serif; box-shadow: 0 6px 0 rgba(0,0,0,0.2); transition: all 0.1s; display: flex; flex-direction: column; align-items: center; justify-content: center; text-transform: uppercase;}
+    button.btn-big span.icon { font-size: 1.8em; margin-bottom: 5px; }
+    button.btn-big:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 0 0 rgba(0,0,0,0.2); }
     
-    .panel-title { font-size: 0.9em; text-transform: uppercase; color: #b2bec3; margin-bottom: 10px; letter-spacing: 1px; font-weight: bold;}
-    .buttons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .btn-pet { background-color: #ff7675; }
+    .btn-feed { background-color: #00b894; }
+    .btn-game-flappy { background-color: #fdcb6e; color: #2d3436; }
+    .btn-game-memory { background-color: #a29bfe; }
+
+    /* Shop System */
+    .shop-tabs { display: flex; gap: 5px; margin-bottom: 10px; }
+    .shop-tab { flex: 1; padding: 10px; font-size: 0.9em; background: #dfe6e9; font-weight: 900; border-radius: 12px; cursor: pointer; }
+    .shop-tab.active { background: #0984e3; color: white; }
     
-    button {
-      padding: 12px 5px; font-size: 0.9em; border: none; border-radius: 15px;
-      cursor: pointer; color: white; font-weight: bold;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: all 0.1s; -webkit-tap-highlight-color: transparent;
-    }
-    button span { font-size: 1.5em; display: block; margin-bottom: 2px; }
-    button:active:not(:disabled) { transform: translateY(3px); box-shadow: none; }
-    button:disabled { filter: grayscale(100%); opacity: 0.5; cursor: not-allowed; }
-
-    .btn-action { background-color: var(--primary); }
-    .btn-shop { background-color: #fdcb6e; color: #2d3436; }
-    .btn-minigame { background-color: #ff7675; width: 100%; padding: 12px; font-size: 1.05em; margin-top: 8px; }
-
-    /* Kategorie Sklepu */
-    .shop-tabs { display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 5px; }
-    .shop-tab { flex: 1; padding: 8px 10px; font-size: 0.8em; background: #dfe6e9; color: #2d3436; border-radius: 10px; white-space: nowrap;}
-    .shop-tab.active { background: #6c5ce7; color: white; }
-
-    .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-height: 220px; overflow-y: auto; padding-right: 5px;}
-    .shop-item { background: #f8f9fa; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; align-items: center; border: 1px solid #f1f2f6;}
-    .shop-item-name { font-weight: bold; font-size: 0.85em; margin-bottom: 5px; text-align: center; }
-    .shop-btn { width: 100%; padding: 8px 0; font-size: 0.85em; border-radius: 8px; margin-top: auto; color: white;}
-    .shop-btn.buy { background-color: #00b894; }
+    .shop-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; max-height: 250px; overflow-y: auto; padding: 5px; }
+    .shop-item { background: #f8f9fa; border-radius: 15px; padding: 10px 5px; display: flex; flex-direction: column; align-items: center; border: 2px solid #eee; position: relative;}
+    .shop-icon { width: 50px; height: 50px; margin-bottom: 5px; }
+    .shop-btn { width: 90%; padding: 8px 0; font-weight: 900; font-family: 'Nunito'; border-radius: 8px; border: none; cursor: pointer; margin-top: auto; color: white;}
+    .shop-btn.buy { background-color: #00cec9; }
     .shop-btn.equip { background-color: #0984e3; }
-    .shop-btn.equipped { background-color: #b2bec3; box-shadow: inset 0 3px 5px rgba(0,0,0,0.1); }
+    .shop-btn.equipped { background-color: #b2bec3; }
 
-    /* Minigame Modals */
-    .modal {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.85); display: none; flex-direction: column;
-      align-items: center; justify-content: center; z-index: 2000; color: white;
-    }
-    .game-area { width: 90%; max-width: 400px; height: 60%; max-height: 400px; background: #74b9ff; border-radius: 20px; position: relative; overflow: hidden; border: 5px solid white; }
-    .game-target { position: absolute; font-size: 3.5em; cursor: pointer; user-select: none; transition: transform 0.1s; }
-    .game-target:active { transform: scale(0.8); }
-    .game-stats { font-size: 1.5em; margin-bottom: 15px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+    /* Fullscreen Modals */
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(45, 52, 54, 0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; color: white; }
+    .modal-content { background: white; color: #2d3436; padding: 30px; border-radius: 25px; text-align: center; max-width: 350px; width: 85%; }
+    .modal-content h2 { color: #e84393; font-size: 2em; margin-top: 0; }
+    .modal-btn { background: #0984e3; color: white; padding: 15px 30px; border-radius: 15px; font-size: 1.2em; font-weight: 900; border: none; margin-top: 20px; cursor: pointer; width: 100%;}
     
-    /* Myszka Game Specific */
-    #area-mouse { background: #55efc4; }
-    .hole { position: absolute; width: 60px; height: 20px; background: rgba(0,0,0,0.3); border-radius: 50%; }
+    /* Minigames */
+    canvas#flappy { background: #74b9ff; border-radius: 20px; border: 5px solid white; display: block; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5);}
+    .game-hud { position: absolute; top: 20px; font-size: 2em; font-weight: 900; color: white; text-shadow: 2px 2px 0 #000; }
+    
+    .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 90%; max-width: 400px; margin: 20px auto; }
+    .memory-card { background: #dfe6e9; border-radius: 10px; height: 80px; display: flex; align-items: center; justify-content: center; font-size: 2.5em; cursor: pointer; transition: transform 0.3s; transform-style: preserve-3d; }
+    .memory-card.flipped { background: white; transform: rotateY(180deg); }
+    .memory-card .content { transform: rotateY(180deg); display: none; }
+    .memory-card.flipped .content { display: block; }
   </style>
 </head>
 <body>
 
   <div class="top-bar">
-    <div class="level">Serduszka: <span id="xp-text">0</span> ❤️</div>
-    <div class="coins"><span id="coins-display">0</span> 🪙</div>
+    <div class="lvl-box">⭐ Lvl <span id="lvl-display">1</span></div>
+    <div class="coins-box"><span id="coins-display">0</span> 🪙</div>
   </div>
   
-  <h1 id="cat-name-display">Kotek</h1>
-  <div class="player-info">
-    Grasz jako: <strong id="current-player-display">Gracz</strong>
-    <button class="btn-small" onclick="changeMyName()">Zmień Nick</button>
+  <div class="name-container">
+    <h1 id="cat-name-display">Tom</h1>
+    <button class="btn-edit" onclick="changeCatName()">✏️</button>
   </div>
   
-  <div id="cat-stage" class="bg-default">
+  <div id="cat-stage">
     <svg id="animated-cat" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-      
-      <path class="tail" d="M 140 160 Q 190 150 170 100 Q 150 70 190 60" fill="none" stroke="#a4b0be" stroke-width="18" stroke-linecap="round"/>
-      
-      <ellipse cx="100" cy="155" rx="58" ry="45" fill="#a4b0be" />
-      <ellipse cx="100" cy="170" rx="40" ry="25" fill="#ffffff" /> <g id="cloth-bowtie" style="display: none;">
-        <path d="M 100 135 L 80 120 L 80 150 Z" fill="#e84393"/>
-        <path d="M 100 135 L 120 120 L 120 150 Z" fill="#e84393"/>
-        <circle cx="100" cy="135" r="6" fill="#fd79a8"/>
-      </g>
-      <g id="cloth-scarf" style="display: none;">
-        <path d="M 50 125 Q 100 150 150 125 L 140 140 Q 100 165 60 140 Z" fill="#d63031"/>
-        <path d="M 125 130 L 120 170 L 140 165 Z" fill="#d63031"/>
-      </g>
-      <g id="cloth-sweater" style="display: none;">
-        <path d="M 45 155 Q 100 110 155 155 L 140 190 Q 100 205 60 190 Z" fill="#0984e3"/>
-        <path d="M 60 190 Q 100 200 140 190 L 140 180 Q 100 190 60 180 Z" fill="#74b9ff"/> </g>
+      <defs>
+        <radialGradient id="bodyGrad" cx="30%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#b2bec3" />
+          <stop offset="100%" stop-color="#636e72" />
+        </radialGradient>
+        <radialGradient id="bellyGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ffffff" />
+          <stop offset="100%" stop-color="#dfe6e9" />
+        </radialGradient>
+        <radialGradient id="eyeGrad" cx="40%" cy="40%" r="60%">
+          <stop offset="0%" stop-color="#55efc4" />
+          <stop offset="100%" stop-color="#00b894" />
+        </radialGradient>
+      </defs>
 
-      <path d="M 45 95 L 30 30 L 85 55 Z" fill="#a4b0be" stroke="#747d8c" stroke-width="2"/> <path d="M 45 85 L 37 40 L 75 60 Z" fill="#ffcccc" /> <path d="M 155 95 L 170 30 L 115 55 Z" fill="#a4b0be" stroke="#747d8c" stroke-width="2"/> <path d="M 155 85 L 163 40 L 125 60 Z" fill="#ffcccc" /> <circle cx="100" cy="90" r="55" fill="#a4b0be" />
-      <ellipse cx="100" cy="115" rx="25" ry="15" fill="#ffffff" /> <path d="M 92 115 Q 100 125 108 115" fill="none" stroke="#2f3640" stroke-width="2.5" stroke-linecap="round"/>
-      <circle cx="100" cy="110" r="4" fill="#ff7675"/> <g class="eye-group">
-        <circle cx="70" cy="90" r="14" fill="#f1c40f"/>
-        <circle cx="70" cy="90" r="10" fill="#2d3436"/>
-        <circle cx="67" cy="85" r="4" fill="#ffffff"/> 
+      <path d="M 130 160 Q 180 180 180 120 Q 180 90 195 80" fill="none" stroke="url(#bodyGrad)" stroke-width="16" stroke-linecap="round"/>
+      
+      <path d="M 60 180 Q 50 120 100 120 Q 150 120 140 180 Z" fill="url(#bodyGrad)" />
+      <ellipse cx="100" cy="165" rx="30" ry="20" fill="url(#bellyGrad)" />
+      
+      <path d="M 70 175 Q 75 195 90 190" fill="url(#bellyGrad)" stroke="#636e72" stroke-width="2"/>
+      <path d="M 130 175 Q 125 195 110 190" fill="url(#bellyGrad)" stroke="#636e72" stroke-width="2"/>
+
+      <g id="cloth-shirt_red" style="display: none;">
+        <path d="M 58 150 Q 50 120 100 120 Q 150 120 142 150 Q 100 160 58 150 Z" fill="#ff7675" />
+      </g>
+      <g id="cloth-shirt_blue" style="display: none;">
+        <path d="M 58 150 Q 50 120 100 120 Q 150 120 142 150 Q 100 160 58 150 Z" fill="#0984e3" />
+        <rect x="90" y="125" width="20" height="20" fill="#74b9ff" rx="4"/>
+      </g>
+
+      <path d="M 50 100 L 35 30 L 90 55 Z" fill="url(#bodyGrad)" />
+      <path d="M 52 90 L 42 45 L 80 62 Z" fill="#ffcccc" />
+      <path d="M 150 100 L 165 30 L 110 55 Z" fill="url(#bodyGrad)" />
+      <path d="M 148 90 L 158 45 L 120 62 Z" fill="#ffcccc" />
+      
+      <circle cx="100" cy="95" r="55" fill="url(#bodyGrad)" />
+      
+      <ellipse cx="100" cy="115" rx="28" ry="18" fill="url(#bellyGrad)" />
+      <path d="M 88 115 Q 100 128 112 115" fill="none" stroke="#2d3436" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="100" cy="108" r="6" fill="#ff7675"/>
+
+      <g class="eyes">
+        <circle cx="75" cy="85" r="16" fill="white"/>
+        <circle cx="75" cy="85" r="10" fill="url(#eyeGrad)"/>
+        <circle cx="78" cy="85" r="6" fill="#2d3436"/>
+        <circle cx="81" cy="82" r="2" fill="white"/>
         
-        <circle cx="130" cy="90" r="14" fill="#f1c40f"/>
-        <circle cx="130" cy="90" r="10" fill="#2d3436"/>
-        <circle cx="127" cy="85" r="4" fill="#ffffff"/>
+        <circle cx="125" cy="85" r="16" fill="white"/>
+        <circle cx="125" cy="85" r="10" fill="url(#eyeGrad)"/>
+        <circle cx="122" cy="85" r="6" fill="#2d3436"/>
+        <circle cx="119" cy="82" r="2" fill="white"/>
       </g>
 
-      <path d="M 60 180 Q 65 200 85 195" fill="#ffffff" stroke="#747d8c" stroke-width="2"/> 
-      <path d="M 140 180 Q 135 200 115 195" fill="#ffffff" stroke="#747d8c" stroke-width="2"/> 
-
-      <g id="cloth-sunglasses" style="display: none;">
-        <rect x="52" y="75" width="36" height="24" rx="4" fill="#2d3436"/>
-        <rect x="112" y="75" width="36" height="24" rx="4" fill="#2d3436"/>
-        <line x1="88" y1="85" x2="112" y2="85" stroke="#2d3436" stroke-width="4"/>
-      </g>
-      <g id="cloth-nerd" style="display: none;">
-        <circle cx="70" cy="90" r="18" fill="none" stroke="#e84393" stroke-width="4"/>
-        <circle cx="130" cy="90" r="18" fill="none" stroke="#e84393" stroke-width="4"/>
-        <line x1="88" y1="90" x2="112" y2="90" stroke="#e84393" stroke-width="4"/>
+      <g id="cloth-glasses_cool" style="display: none;">
+        <rect x="55" y="70" width="40" height="25" rx="5" fill="#2d3436"/>
+        <rect x="105" y="70" width="40" height="25" rx="5" fill="#2d3436"/>
+        <line x1="95" y1="80" x2="105" y2="80" stroke="#2d3436" stroke-width="4"/>
       </g>
 
-      <g id="cloth-crown" style="display: none;">
-        <path d="M 65 45 L 55 5 L 85 25 L 100 -5 L 115 25 L 145 5 L 135 45 Z" fill="#f1c40f"/>
-        <circle cx="55" cy="5" r="5" fill="#e84393"/>
-        <circle cx="100" cy="-5" r="5" fill="#0984e3"/>
-        <circle cx="145" cy="5" r="5" fill="#e84393"/>
+      <g id="cloth-hat_cap" style="display: none;">
+        <path d="M 45 45 Q 100 -10 155 45 Z" fill="#d63031"/>
+        <path d="M 155 45 Q 190 40 190 55 Q 150 60 135 45" fill="#ff7675"/>
       </g>
-      <g id="cloth-cap" style="display: none;">
-        <path d="M 50 45 Q 100 -10 150 45 Z" fill="#d63031"/>
-        <path d="M 150 45 Q 180 40 180 50 Q 150 55 130 45" fill="#ff7675"/> <circle cx="100" cy="15" r="6" fill="#ffffff"/>
+      <g id="cloth-hat_crown" style="display: none;">
+        <path d="M 60 45 L 50 -5 L 80 20 L 100 -15 L 120 20 L 150 -5 L 140 45 Z" fill="#f1c40f"/>
+        <circle cx="100" cy="20" r="5" fill="#e84393"/>
       </g>
     </svg>
   </div>
   
   <div class="panel">
-    <div class="stat-row">🍗 Brzuszek (<span id="food-text">100</span>%)
-      <div class="bar-bg"><div id="bar-food" class="bar-fill"></div></div>
+    <div class="bar-wrap">Poziom XP
+      <div class="bar-bg"><div id="bar-xp" class="bar-fill" style="width: 0%;"></div></div>
     </div>
-    <div class="stat-row" style="margin-bottom:0;">💧 Pragnienie (<span id="water-text">100</span>%)
-      <div class="bar-bg"><div id="bar-water" class="bar-fill"></div></div>
-    </div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-title">Opieka</div>
-    <div class="buttons-grid">
-      <button class="btn-action" onclick="doAction('pet')"><span>🐾</span> Głaskaj<br><small>+1❤️ | -10 E</small></button>
-      <button class="btn-action" onclick="doAction('play')"><span>🧶</span> Baw się<br><small>+3❤️ | -25 E</small></button>
-      <button class="btn-shop" onclick="doAction('buyFood')"><span>🐟</span> Nakarm<br><small>10 🪙</small></button>
-      <button class="btn-shop" onclick="doAction('buyWater')"><span>🥛</span> Daj pić<br><small>5 🪙</small></button>
+    <div class="bar-wrap" style="margin-top: 15px;">Energia Brzuszka 🍗
+      <div class="bar-bg"><div id="bar-food" class="bar-fill" style="width: 100%;"></div></div>
     </div>
   </div>
 
   <div class="panel">
-    <div class="panel-title">Rozrywka (Zarabiaj Monety)</div>
-    <div class="buttons-grid">
-      <button class="btn-minigame" onclick="openGame('fish')">🎣 Złap Rybkę</button>
-      <button class="btn-minigame" style="background:#00b894;" onclick="openGame('mouse')">🐭 Złap Mysz</button>
+    <div class="grid-2">
+      <button class="btn-big btn-pet" onclick="doAction('pet')"><span class="icon">🐾</span>Głaskaj</button>
+      <button class="btn-big btn-feed" onclick="doAction('feed')"><span class="icon">🐟</span>Nakarm (10🪙)</button>
     </div>
   </div>
 
   <div class="panel">
-    <div class="panel-title">Sklep i Szafa</div>
+    <div style="font-weight: 900; color: #b2bec3; text-transform: uppercase; margin-bottom:10px;">Graj i Zarabiaj</div>
+    <div class="grid-2">
+      <button class="btn-big btn-game-flappy" onclick="openFlappy()"><span class="icon">🦅</span>Flappy Cat</button>
+      <button class="btn-big btn-game-memory" onclick="openMemory()"><span class="icon">🎴</span>Bystre Oko</button>
+    </div>
+  </div>
+
+  <div class="panel">
     <div class="shop-tabs">
-      <button class="shop-tab active" onclick="switchTab('clothes')">Ubrania</button>
-      <button class="shop-tab" onclick="switchTab('hats')">Czapki</button>
-      <button class="shop-tab" onclick="switchTab('glasses')">Okulary</button>
-      <button class="shop-tab" onclick="switchTab('bgs')">Tła</button>
+      <div class="shop-tab active" onclick="switchTab('hats')">Czapki</div>
+      <div class="shop-tab" onclick="switchTab('shirts')">Ubranka</div>
+      <div class="shop-tab" onclick="switchTab('glasses')">Okulary</div>
     </div>
     <div class="shop-grid" id="shop-container"></div>
   </div>
 
-  <div id="modal-fish" class="modal">
-    <div class="game-stats">Czas: <span id="time-fish">15</span>s | Zebrano: <span id="score-fish">0</span> 🪙</div>
-    <div id="area-fish" class="game-area">
-      <div id="obj-fish" class="game-target" onclick="clickTarget('fish')">🐟</div>
+  <div id="modal-levelup" class="modal">
+    <div class="modal-content">
+      <h2>🎉 Nowy Poziom!</h2>
+      <div style="font-size: 4em; margin: 10px 0;">⭐<span id="lvl-up-num">2</span></div>
+      <p id="lvl-up-reward" style="font-size: 1.2em; font-weight: bold; color: #00b894;"></p>
+      <button class="modal-btn" onclick="document.getElementById('modal-levelup').style.display='none'">Odbierz</button>
     </div>
-    <button class="btn-action" style="margin-top:20px; padding: 15px 30px;" onclick="closeGame()">Zakończ</button>
   </div>
 
-  <div id="modal-mouse" class="modal">
-    <div class="game-stats">Czas: <span id="time-mouse">15</span>s | Złapano: <span id="score-mouse">0</span> 🪙</div>
-    <div id="area-mouse" class="game-area">
-      <div class="hole" style="top:20%; left:20%;"></div>
-      <div class="hole" style="top:20%; left:60%;"></div>
-      <div class="hole" style="top:60%; left:20%;"></div>
-      <div class="hole" style="top:60%; left:60%;"></div>
-      <div class="hole" style="top:40%; left:40%;"></div>
-      <div id="obj-mouse" class="game-target" onclick="clickTarget('mouse')" style="font-size:3em;">🐭</div>
-    </div>
-    <button class="btn-action" style="margin-top:20px; padding: 15px 30px;" onclick="closeGame()">Zakończ</button>
+  <div id="modal-flappy" class="modal">
+    <div class="game-hud" id="flappy-score">0</div>
+    <canvas id="flappy" width="300" height="400"></canvas>
+    <div style="margin-top: 15px; font-weight: bold;">Stuknij w ekran, by lecieć!</div>
+    <button class="modal-btn" style="width: auto; background: #d63031;" onclick="closeFlappy()">Zakończ Grę</button>
+  </div>
+
+  <div id="modal-memory" class="modal">
+    <h2 style="margin:0; color:#fdcb6e;">Znajdź Pary</h2>
+    <div class="memory-grid" id="memory-grid"></div>
+    <button class="modal-btn" style="width: auto; background: #d63031;" onclick="closeMemory()">Wyjdź</button>
   </div>
 
   <script type="module">
@@ -256,63 +227,45 @@
       projectId: "graznatalia-e1b58",
       storageBucket: "graznatalia-e1b58.firebasestorage.app",
       messagingSenderId: "265631462505",
-      appId: "1:265631462505:web:40b3bb8c72908cf8461ef8",
-      measurementId: "G-JWW9JW9TD0"
+      appId: "1:265631462505:web:40b3bb8c72908cf8461ef8"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const catDocRef = doc(db, "gra", "wspolny_kotek_v5"); // V5 - Nowa Struktura!
+    const catDocRef = doc(db, "gra", "wspolny_kotek_v6"); // V6!
 
-    // Baza Przedmiotów podzielona na kategorie
+    // Baza Sklepu (Z SVG ikonami zamiast emoji!)
+    const svgIcons = {
+        none: `<svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="#ff7675" stroke-width="4"/><line x1="10" y1="10" x2="40" y2="40" stroke="#ff7675" stroke-width="4"/></svg>`,
+        cap: `<svg viewBox="0 0 50 50"><path d="M10 30 Q25 10 40 30 Z" fill="#d63031"/><path d="M40 30 Q45 35 35 30" stroke="#ff7675" stroke-width="4"/></svg>`,
+        crown: `<svg viewBox="0 0 50 50"><path d="M10 40 L10 15 L20 25 L25 10 L30 25 L40 15 L40 40 Z" fill="#f1c40f"/></svg>`,
+        shirt_red: `<svg viewBox="0 0 50 50"><path d="M10 20 L25 10 L40 20 L35 45 L15 45 Z" fill="#ff7675"/></svg>`,
+        shirt_blue: `<svg viewBox="0 0 50 50"><path d="M10 20 L25 10 L40 20 L35 45 L15 45 Z" fill="#0984e3"/></svg>`,
+        glasses_cool: `<svg viewBox="0 0 50 50"><rect x="5" y="20" width="15" height="10" rx="2" fill="#2d3436"/><rect x="30" y="20" width="15" height="10" rx="2" fill="#2d3436"/><line x1="20" y1="25" x2="30" y2="25" stroke="#2d3436" stroke-width="2"/></svg>`
+    };
+
     const shopDB = {
-      clothes: [
-        { id: 'none', name: 'Brak Ubranka', price: 0, emoji: '🚫' },
-        { id: 'bowtie', name: 'Różowa Mucha', price: 20, emoji: '🎀' },
-        { id: 'scarf', name: 'Ciepły Szalik', price: 35, emoji: '🧣' },
-        { id: 'sweater', name: 'Niebieski Sweter', price: 60, emoji: '🧥' }
-      ],
       hats: [
-        { id: 'none', name: 'Bez Czapki', price: 0, emoji: '🚫' },
-        { id: 'cap', name: 'Czapka z Daszkiem', price: 40, emoji: '🧢' },
-        { id: 'crown', name: 'Złota Korona', price: 150, emoji: '👑' }
+        { id: 'none', name: 'Brak', price: 0, icon: svgIcons.none },
+        { id: 'cap', name: 'Czapka', price: 50, icon: svgIcons.cap },
+        { id: 'crown', name: 'Korona', price: 200, icon: svgIcons.crown }
+      ],
+      shirts: [
+        { id: 'none', name: 'Brak', price: 0, icon: svgIcons.none },
+        { id: 'shirt_red', name: 'Czerwona', price: 60, icon: svgIcons.shirt_red },
+        { id: 'shirt_blue', name: 'Niebieska', price: 80, icon: svgIcons.shirt_blue }
       ],
       glasses: [
-        { id: 'none', name: 'Bez Okularów', price: 0, emoji: '🚫' },
-        { id: 'sunglasses', name: 'Przeciwsłoneczne', price: 30, emoji: '🕶️' },
-        { id: 'nerd', name: 'Różowe Kujonki', price: 50, emoji: '👓' }
-      ],
-      bgs: [
-        { id: 'default', name: 'Domowy Pokój', price: 0, emoji: '🏠' },
-        { id: 'garden', name: 'Słoneczny Ogród', price: 80, emoji: '🌳' },
-        { id: 'night', name: 'Nocna Sypialnia', price: 100, emoji: '🌙' },
-        { id: 'space', name: 'Magiczny Kosmos', price: 200, emoji: '🚀' }
+        { id: 'none', name: 'Brak', price: 0, icon: svgIcons.none },
+        { id: 'glasses_cool', name: 'RayBany', price: 100, icon: svgIcons.glasses_cool }
       ]
     };
 
-    let currentTab = 'clothes';
-    let state = { 
-      catName: "Puszek", xp: 0, coins: 50, food: 100, water: 100, 
-      inventory: ['clothes_none', 'hats_none', 'glasses_none', 'bgs_default'], 
-      equipped: { clothes: 'none', hats: 'none', glasses: 'none', bgs: 'default' } 
-    };
+    let currentTab = 'hats';
+    let state = { catName: "Tom", level: 1, xp: 0, coins: 50, food: 100, inventory: ['hats_none', 'shirts_none', 'glasses_none'], equipped: { hats: 'none', shirts: 'none', glasses: 'none' } };
     
-    // Obsługa Imienia
-    let myName = localStorage.getItem("playerName");
-    if(!myName) {
-        myName = prompt("Wpisz swoje imię:") || "Gracz";
-        localStorage.setItem("playerName", myName);
-    }
-    document.getElementById("current-player-display").innerText = myName;
-
-    window.changeMyName = function() {
-        const newName = prompt("Zmień swój nick:", myName);
-        if(newName && newName.trim() !== "") {
-            myName = newName.trim();
-            localStorage.setItem("playerName", myName);
-            document.getElementById("current-player-display").innerText = myName;
-        }
-    }
+    // Level System (Z każdym poziomem trzeba więcej XP)
+    function getXpForNextLevel(lvl) { return lvl * 50; }
 
     // --- RENDER SKLEPU ---
     window.switchTab = function(tabName) {
@@ -327,188 +280,208 @@
       container.innerHTML = "";
       
       shopDB[currentTab].forEach(item => {
-        const globalId = `${currentTab}_${item.id}`; // np. hats_crown
+        const globalId = `${currentTab}_${item.id}`;
         const isOwned = state.inventory.includes(globalId);
         const isEquipped = state.equipped[currentTab] === item.id;
         
-        let btnHTML = "";
-        if (isEquipped) {
-            btnHTML = `<button class="shop-btn equipped" disabled>Używane</button>`;
-        } else if (isOwned) {
-            btnHTML = `<button class="shop-btn equip" onclick="equipItem('${currentTab}', '${item.id}')">Użyj</button>`;
-        } else {
-            btnHTML = `<button class="shop-btn buy" onclick="buyItem('${currentTab}', '${item.id}', ${item.price})" ${state.coins < item.price ? 'disabled' : ''}>Kup (${item.price}🪙)</button>`;
-        }
+        let btnHTML = isEquipped ? `<button class="shop-btn equipped" disabled>Założone</button>` 
+                    : isOwned ? `<button class="shop-btn equip" onclick="equipItem('${currentTab}', '${item.id}')">Załóż</button>` 
+                    : `<button class="shop-btn buy" onclick="buyItem('${currentTab}', '${item.id}', ${item.price})" ${state.coins < item.price ? 'disabled' : ''}>${item.price}🪙</button>`;
 
         container.innerHTML += `
           <div class="shop-item">
-            <span style="font-size: 2em; margin-bottom: 5px;">${item.emoji}</span>
-            <div class="shop-item-name">${item.name}</div>
+            <div class="shop-icon">${item.icon}</div>
+            <div style="font-size:0.8em; font-weight:bold; margin-bottom:5px;">${item.name}</div>
             ${btnHTML}
           </div>
         `;
       });
     }
 
-    // --- SYNCHRONIZACJA Z BAZĄ ---
+    // --- SYNCHRONIZACJA Z FIREBASE ---
     onSnapshot(catDocRef, (docSnap) => {
       if (docSnap.exists()) {
+        const oldLvl = state.level;
         state = docSnap.data();
         
-        // Zabezpieczenie na wypadek brakujących struktur w bazie
-        if(!state.equipped) state.equipped = { clothes: 'none', hats: 'none', glasses: 'none', bgs: 'default' };
-        if(!state.inventory) state.inventory = ['clothes_none', 'hats_none', 'glasses_none', 'bgs_default'];
-
+        // Aktualizacja UI
+        document.getElementById("cat-name-display").innerText = state.catName;
+        document.getElementById("lvl-display").innerText = state.level;
         document.getElementById("coins-display").innerText = state.coins;
-        document.getElementById("xp-text").innerText = state.xp;
         
-        document.getElementById("food-text").innerText = state.food;
+        // Paski
         document.getElementById("bar-food").style.width = state.food + "%";
-        document.getElementById("water-text").innerText = state.water;
-        document.getElementById("bar-water").style.width = state.water + "%";
+        const xpNeeded = getXpForNextLevel(state.level);
+        document.getElementById("bar-xp").style.width = ((state.xp / xpNeeded) * 100) + "%";
+
+        // Level Up Wykrycie
+        if(state.level > oldLvl && oldLvl !== undefined) {
+            document.getElementById('lvl-up-num').innerText = state.level;
+            document.getElementById('lvl-up-reward').innerText = `+50 Monet! 🪙`;
+            document.getElementById('modal-levelup').style.display = 'flex';
+        }
 
         applyEquipment();
         renderShop(); 
       } else {
-        // Pierwsze utworzenie V5
         setDoc(catDocRef, state);
       }
     });
 
     function applyEquipment() {
-        // Tło
-        const stage = document.getElementById("cat-stage");
-        stage.className = `bg-${state.equipped.bgs}`;
-
-        // Ubrania (Ukryj wszystko)
-        const allItems = ['bowtie', 'scarf', 'sweater', 'sunglasses', 'nerd', 'crown', 'cap'];
-        allItems.forEach(id => {
-            const el = document.getElementById(`cloth-${id}`);
+        ['cloth-hat_cap', 'cloth-hat_crown', 'cloth-shirt_red', 'cloth-shirt_blue', 'cloth-glasses_cool'].forEach(id => {
+            const el = document.getElementById(id);
             if(el) el.style.display = "none";
         });
-
-        // Pokazuj wybrane
-        if(state.equipped.clothes !== 'none') document.getElementById(`cloth-${state.equipped.clothes}`).style.display = "block";
-        if(state.equipped.hats !== 'none') document.getElementById(`cloth-${state.equipped.hats}`).style.display = "block";
-        if(state.equipped.glasses !== 'none') document.getElementById(`cloth-${state.equipped.glasses}`).style.display = "block";
+        if(state.equipped.hats !== 'none') document.getElementById(`cloth-hat_${state.equipped.hats}`).style.display = "block";
+        if(state.equipped.shirts !== 'none') document.getElementById(`cloth-shirt_${state.equipped.shirts}`).style.display = "block";
+        if(state.equipped.glasses !== 'none') document.getElementById(`cloth-glasses_${state.equipped.glasses}`).style.display = "block";
     }
 
-    // --- ZAKUPY ---
-    window.buyItem = async function(category, itemId, price) {
-        const globalId = `${category}_${itemId}`;
-        if(state.coins >= price && !state.inventory.includes(globalId)) {
-            const newCoins = state.coins - price;
-            const newInventory = [...state.inventory, globalId];
-            await updateDoc(catDocRef, { coins: newCoins, inventory: newInventory });
+    window.changeCatName = async function() {
+        const newName = prompt("Jak nowe imię dla kotka?", state.catName);
+        if(newName && newName.trim()) await updateDoc(catDocRef, { catName: newName.trim() });
+    }
+
+    window.buyItem = async function(cat, id, price) {
+        const gId = `${cat}_${id}`;
+        if(state.coins >= price && !state.inventory.includes(gId)) {
+            await updateDoc(catDocRef, { coins: state.coins - price, inventory: [...state.inventory, gId] });
         }
+    }
+    window.equipItem = async function(cat, id) {
+        let newEq = { ...state.equipped }; newEq[cat] = id;
+        await updateDoc(catDocRef, { equipped: newEq });
+    }
+
+    window.doAction = async function(type) {
+      let { xp, level, coins, food } = state;
+
+      if (type === 'pet') {
+        if (food <= 0) return alert("Kotek opadł z sił!");
+        xp += 10; food -= 5;
+        document.getElementById("animated-cat").classList.add("happy-anim");
+        setTimeout(() => document.getElementById("animated-cat").classList.remove("happy-anim"), 500);
+      } else if (type === 'feed') {
+        if (coins < 10) return;
+        coins -= 10; food += 30;
+      }
+
+      // Check Level Up
+      let xpNeeded = getXpForNextLevel(level);
+      if (xp >= xpNeeded) {
+        level++; xp = 0; coins += 50; // Nagroda za level
+      }
+
+      food = Math.min(100, Math.max(0, food));
+      await updateDoc(catDocRef, { xp, level, coins, food });
+    }
+
+    // --- MINIGRA 1: FLAPPY CAT ---
+    let flappyFrame, flappyScore = 0, catY = 200, catV = 0, pipes = [], gameActive = false;
+    const canvas = document.getElementById("flappy"), ctx = canvas.getContext("2d");
+
+    window.openFlappy = function() {
+        document.getElementById('modal-flappy').style.display = 'flex';
+        catY = 200; catV = 0; pipes = []; flappyScore = 0; gameActive = true;
+        document.getElementById('flappy-score').innerText = 0;
+        flappyLoop();
     }
     
-    window.equipItem = async function(category, itemId) {
-        const globalId = `${category}_${itemId}`;
-        if(state.inventory.includes(globalId)) {
-            let newEquipped = { ...state.equipped };
-            newEquipped[category] = itemId;
-            await updateDoc(catDocRef, { equipped: newEquipped });
+    canvas.addEventListener('touchstart', jump);
+    canvas.addEventListener('mousedown', jump);
+    function jump(e) { e.preventDefault(); if(gameActive) catV = -6; }
+
+    function flappyLoop() {
+        if(!gameActive) return;
+        ctx.clearRect(0,0,300,400);
+        
+        // Fizyka
+        catV += 0.3; catY += catV;
+        
+        // Rysuj Kotka (Kwadrat)
+        ctx.fillStyle = "#ff7675";
+        ctx.fillRect(50, catY, 30, 30);
+        ctx.fillStyle = "white"; ctx.fillRect(65, catY+5, 10, 10); ctx.fillStyle = "black"; ctx.fillRect(70, catY+8, 4, 4);
+
+        // Rury
+        if(frames % 90 === 0) {
+            let topH = Math.random() * 200 + 50;
+            pipes.push({ x: 300, top: topH, passed: false });
+        }
+        
+        ctx.fillStyle = "#00b894";
+        for(let i=0; i<pipes.length; i++) {
+            let p = pipes[i]; p.x -= 3;
+            ctx.fillRect(p.x, 0, 40, p.top);
+            ctx.fillRect(p.x, p.top + 100, 40, 400); // 100 to szpara
+            
+            // Kolizja
+            if(50 < p.x+40 && 80 > p.x && (catY < p.top || catY+30 > p.top+100) || catY > 400 || catY < 0) {
+                gameActive = false;
+            }
+            // Punkt
+            if(p.x === 50) { flappyScore++; document.getElementById('flappy-score').innerText = flappyScore; }
+        }
+        frames++;
+        if(gameActive) flappyFrame = requestAnimationFrame(flappyLoop);
+        else {
+            ctx.fillStyle = "rgba(0,0,0,0.5)"; ctx.fillRect(0,0,300,400);
+            ctx.fillStyle = "white"; ctx.font = "30px Arial"; ctx.fillText("Koniec!", 100, 200);
+        }
+    }
+    let frames = 0;
+
+    window.closeFlappy = async function() {
+        gameActive = false; cancelAnimationFrame(flappyFrame);
+        document.getElementById('modal-flappy').style.display = 'none';
+        if(flappyScore > 0) await updateDoc(catDocRef, { coins: state.coins + flappyScore });
+    }
+
+    // --- MINIGRA 2: MEMORY ---
+    const emojis = ['🍎','🍎','🐶','🐶','🚀','🚀','⚽','⚽','💎','💎','🍕','🍕'];
+    let flipped = [], matched = 0, memoryScore = 0;
+    
+    window.openMemory = function() {
+        document.getElementById('modal-memory').style.display = 'flex';
+        const grid = document.getElementById('memory-grid');
+        grid.innerHTML = ''; flipped = []; matched = 0; memoryScore = 20; // Max nagroda to 20
+        
+        let shuffled = emojis.sort(() => 0.5 - Math.random());
+        shuffled.forEach((emoji, i) => {
+            let card = document.createElement('div');
+            card.className = 'memory-card'; card.dataset.val = emoji; card.dataset.idx = i;
+            card.innerHTML = `<div class="content">${emoji}</div>`;
+            card.onclick = () => flipCard(card);
+            grid.appendChild(card);
+        });
+    }
+
+    function flipCard(card) {
+        if(flipped.length >= 2 || card.classList.contains('flipped')) return;
+        card.classList.add('flipped');
+        flipped.push(card);
+        if(flipped.length === 2) {
+            setTimeout(() => {
+                if(flipped[0].dataset.val === flipped[1].dataset.val) {
+                    matched += 2;
+                    if(matched === emojis.length) finishMemory();
+                } else {
+                    flipped[0].classList.remove('flipped');
+                    flipped[1].classList.remove('flipped');
+                    memoryScore = Math.max(5, memoryScore - 2); // Kara za błąd
+                }
+                flipped = [];
+            }, 800);
         }
     }
 
-    // --- AKCJE OPIEKI ---
-    window.doAction = async function(actionType) {
-      let { xp, coins, food, water } = state;
-
-      if (actionType === 'pet') {
-        if (food < 10 || water < 10) return alert(`Kotek jest zbyt głodny!`);
-        xp += 1; food -= 10; water -= 10; animateCat();
-      } 
-      else if (actionType === 'play') {
-        if (food < 25 || water < 25) return alert(`Kotek opadł z sił!`);
-        xp += 3; food -= 25; water -= 25; animateCat();
-      }
-      else if (actionType === 'buyFood') {
-        if (coins < 10) return; coins -= 10; food += 40;
-      }
-      else if (actionType === 'buyWater') {
-        if (coins < 5) return; coins -= 5; water += 40;
-      }
-
-      food = Math.max(0, Math.min(100, food));
-      water = Math.max(0, Math.min(100, water));
-      await updateDoc(catDocRef, { xp, coins, food, water });
+    async function finishMemory() {
+        alert(`Wygrana! Otrzymujesz ${memoryScore} 🪙`);
+        await updateDoc(catDocRef, { coins: state.coins + memoryScore });
+        closeMemory();
     }
-
-    function animateCat() {
-        const cat = document.getElementById("animated-cat");
-        cat.classList.remove("happy-jump");
-        void cat.offsetWidth; 
-        cat.classList.add("happy-jump");
-    }
-
-    // --- SYSTEM MINIGIER ---
-    let gameInterval, gameTimer;
-    let currentGame = null;
-    let timeLeft = 15;
-    let currentScore = 0;
-
-    // Norki dla myszy
-    const holes = [
-        {top: 15, left: 15}, {top: 15, left: 55}, 
-        {top: 55, left: 15}, {top: 55, left: 55}, {top: 35, left: 35}
-    ];
-
-    window.openGame = function(gameName) {
-        currentGame = gameName;
-        document.getElementById(`modal-${gameName}`).style.display = "flex";
-        timeLeft = 15; currentScore = 0;
-        
-        document.getElementById(`time-${gameName}`).innerText = timeLeft;
-        document.getElementById(`score-${gameName}`).innerText = currentScore;
-        
-        moveTarget();
-        gameInterval = setInterval(moveTarget, gameName === 'fish' ? 800 : 700);
-        
-        gameTimer = setInterval(() => {
-            timeLeft--;
-            document.getElementById(`time-${gameName}`).innerText = timeLeft;
-            if(timeLeft <= 0) closeGame();
-        }, 1000);
-    }
-
-    window.clickTarget = function(gameName) {
-        currentScore++;
-        document.getElementById(`score-${gameName}`).innerText = currentScore;
-        const obj = document.getElementById(`obj-${gameName}`);
-        obj.style.display = "none";
-        setTimeout(moveTarget, 150);
-    }
-
-    function moveTarget() {
-        const obj = document.getElementById(`obj-${currentGame}`);
-        if(currentGame === 'fish') {
-            const area = document.getElementById("area-fish");
-            const maxX = area.clientWidth - 50;
-            const maxY = area.clientHeight - 50;
-            obj.style.left = Math.floor(Math.random() * maxX) + "px";
-            obj.style.top = Math.floor(Math.random() * maxY) + "px";
-        } else if (currentGame === 'mouse') {
-            const randomHole = holes[Math.floor(Math.random() * holes.length)];
-            obj.style.left = (randomHole.left - 2) + "%";
-            obj.style.top = (randomHole.top - 8) + "%";
-        }
-        obj.style.display = "block";
-    }
-
-    window.closeGame = async function() {
-        if(!currentGame) return;
-        clearInterval(gameInterval);
-        clearInterval(gameTimer);
-        document.getElementById(`modal-${currentGame}`).style.display = "none";
-        
-        if (currentScore > 0) {
-            alert(`Koniec czasu! Zarabiasz ${currentScore} 🪙`);
-            await updateDoc(catDocRef, { coins: state.coins + currentScore });
-        }
-        currentGame = null;
-    }
+    window.closeMemory = function() { document.getElementById('modal-memory').style.display = 'none'; }
   </script>
 </body>
 </html>
