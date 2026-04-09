@@ -8,236 +8,374 @@
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       text-align: center;
-      background-color: #f3e5f5; /* Pastelowy fiolet */
+      background-color: #f4f6f8;
       margin: 0;
-      padding: 0;
+      padding: 10px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       min-height: 100vh;
-      color: #4a148c;
-    }
-    h1 { color: #6a1b9a; margin-bottom: 5px; }
-    p.subtitle { color: #8e24aa; margin-top: 0; margin-bottom: 20px; font-weight: bold; }
-    
-    #cat-container {
-      font-size: 130px;
-      margin: 10px 0;
-      display: inline-block;
-      transition: transform 0.2s;
+      color: #333;
     }
     
-    /* Animacja radości kotka */
-    @keyframes purr {
-      0% { transform: scale(1) rotate(0deg); }
-      25% { transform: scale(1.1) rotate(5deg); }
-      50% { transform: scale(1) rotate(0deg); }
-      75% { transform: scale(1.1) rotate(-5deg); }
-      100% { transform: scale(1) rotate(0deg); }
-    }
-    .purr { animation: purr 0.4s ease-in-out; }
-
-    .stats {
-      background: white;
-      padding: 20px;
-      border-radius: 20px;
-      box-shadow: 0 8px 15px rgba(0,0,0,0.08);
-      margin-bottom: 25px;
-      width: 85%;
-      max-width: 350px;
-    }
-    .stats-info {
+    /* Pasek górny z poziomem i monetami */
+    .top-bar {
       display: flex;
       justify-content: space-between;
-      font-size: 1.2em;
-      margin-bottom: 12px;
+      width: 90%;
+      max-width: 400px;
+      background: white;
+      padding: 15px 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      margin-top: 10px;
       font-weight: bold;
+      font-size: 1.2em;
+      box-sizing: border-box;
     }
-    .progress-bar {
-      background-color: #eeeeee;
-      border-radius: 10px;
-      height: 22px;
-      width: 100%;
-      overflow: hidden;
-      box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-      position: relative;
+    .coins { color: #f57c00; }
+    .level { color: #6a1b9a; }
+
+    /* Nagłówek i imiona */
+    h1 { margin: 15px 0 5px 0; color: #4a148c; font-size: 2em; }
+    .player-info { color: #777; font-size: 0.9em; margin-bottom: 10px; }
+    .btn-small { background: none; border: 1px solid #ab47bc; color: #ab47bc; border-radius: 8px; padding: 2px 8px; cursor: pointer; font-size: 0.8em; margin-left: 5px; }
+
+    /* Kotek */
+    #cat-container {
+      font-size: 110px;
+      margin: 10px 0;
+      transition: transform 0.2s;
     }
-    #progress {
-      background-color: #ab47bc;
-      height: 100%;
-      width: 0%;
-      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    .shake { animation: shake 0.4s ease-in-out; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px) rotate(-5deg); }
+      75% { transform: translateX(10px) rotate(5deg); }
     }
 
+    /* Paski potrzeb */
+    .vital-stats {
+      width: 90%;
+      max-width: 400px;
+      background: white;
+      padding: 15px 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      margin-bottom: 15px;
+      box-sizing: border-box;
+    }
+    .stat-row {
+      margin-bottom: 10px;
+      text-align: left;
+      font-size: 0.9em;
+      font-weight: bold;
+      color: #555;
+    }
+    .bar-bg {
+      background-color: #eee;
+      border-radius: 10px;
+      height: 18px;
+      width: 100%;
+      margin-top: 5px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      transition: width 0.4s ease, background-color 0.4s ease;
+    }
+    #bar-food { width: 100%; background-color: #8bc34a; }
+    #bar-water { width: 100%; background-color: #29b6f6; }
+    #bar-xp { width: 0%; background-color: #ab47bc; height: 10px; margin-top: 10px; border-radius: 5px; }
+
+    /* Panele z przyciskami */
+    .action-panel {
+      width: 90%;
+      max-width: 400px;
+      margin-bottom: 10px;
+    }
+    .panel-title {
+      font-size: 0.85em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+    }
     .buttons-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      width: 90%;
-      max-width: 380px;
+      gap: 10px;
     }
-    button {
-      padding: 15px 10px;
-      font-size: 1.05em;
+    
+    button.action-btn {
+      padding: 10px 5px;
+      font-size: 0.9em;
       border: none;
-      border-radius: 15px;
+      border-radius: 12px;
       cursor: pointer;
       color: white;
       font-weight: bold;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-      transition: transform 0.1s, filter 0.2s;
-      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: transform 0.1s;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 5px;
     }
-    button span { font-size: 1.5em; } /* Większe emoji na przyciskach */
-    button:active { 
-      transform: translateY(3px); 
-      box-shadow: 0 1px 2px rgba(0,0,0,0.15); 
-    }
-    
-    /* Kolory przycisków */
-    #btn-feed { background-color: #ff9800; }
-    #btn-play { background-color: #29b6f6; }
-    #btn-pet { background-color: #ef5350; }
-    #btn-nip { background-color: #66bb6a; }
+    button.action-btn span { font-size: 1.4em; }
+    button.action-btn:active:not(:disabled) { transform: translateY(3px); box-shadow: none; }
+    button.action-btn:disabled { filter: grayscale(100%); opacity: 0.6; cursor: not-allowed; }
+
+    .btn-earn { background-color: #ab47bc; }
+    .btn-shop-food { background-color: #ff9800; }
+    .btn-shop-water { background-color: #03a9f4; }
 
     #log {
-      margin-top: 25px;
-      font-size: 0.95em;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      font-size: 0.85em;
       color: #666;
-      min-height: 25px;
       background: white;
       padding: 10px 20px;
       border-radius: 12px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      max-width: 400px;
+      width: 80%;
       font-weight: 500;
+    }
+
+    /* Modale (Okienka pop-up) */
+    #name-modal {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    .modal-box {
+      background: white; padding: 30px; border-radius: 20px;
+      text-align: center; width: 80%; max-width: 300px;
+    }
+    .modal-box input {
+      width: 90%; padding: 12px; margin: 15px 0;
+      border: 2px solid #ab47bc; border-radius: 10px;
+      font-size: 1.1em; text-align: center; outline: none;
+    }
+    .modal-box button {
+      background: #ab47bc; color: white; border: none;
+      padding: 12px 25px; border-radius: 10px; font-size: 1.1em; cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <h1>Nasz Kotek 🐾</h1>
-  <p class="subtitle">Wspólna opieka</p>
+  <div id="name-modal">
+    <div class="modal-box">
+      <h2>Kim jesteś? 👋</h2>
+      <p>Wpisz swoje imię (np. Arek lub Natalia):</p>
+      <input type="text" id="player-name-input" placeholder="Twoje imię...">
+      <button onclick="savePlayerName()">Zapisz</button>
+    </div>
+  </div>
+
+  <div class="top-bar">
+    <div class="level"><span id="level-text">Kociak</span> <span style="font-size:0.7em" id="xp-text">(0 XP)</span></div>
+    <div class="coins"><span id="coins-display">0</span> 🪙</div>
+  </div>
+  
+  <h1 id="cat-name-display">Kotek</h1>
+  <div class="player-info">
+    Grasz jako: <strong id="current-player-display">Gość</strong> 
+    <button class="btn-small" onclick="changeCatName()">Zmień imię kotka</button>
+  </div>
   
   <div id="cat-container">🐱</div>
   
-  <div class="stats">
-    <div class="stats-info">
-      <span id="level-text">Śpiący Kociak</span>
-      <span><strong id="score">0</strong> XP</span>
+  <div class="vital-stats">
+    <div class="stat-row">
+      🍗 Najedzenie (<span id="food-text">100</span>%)
+      <div class="bar-bg"><div id="bar-food" class="bar-fill"></div></div>
     </div>
-    <div class="progress-bar"><div id="progress"></div></div>
+    <div class="stat-row" style="margin-bottom: 0;">
+      💧 Nawodnienie (<span id="water-text">100</span>%)
+      <div class="bar-bg"><div id="bar-water" class="bar-fill"></div></div>
+    </div>
+    <div style="text-align: center; font-size: 0.8em; margin-top: 15px; color: #888;">Postęp do zmiany wyglądu:</div>
+    <div class="bar-bg" style="height: 8px;"><div id="bar-xp" class="bar-fill"></div></div>
   </div>
 
-  <div class="buttons-grid">
-    <button id="btn-feed"><span>🐟</span> Nakarm (+2)</button>
-    <button id="btn-play"><span>🧶</span> Pobaw się (+3)</button>
-    <button id="btn-pet"><span>🐾</span> Pogłaszcz (+1)</button>
-    <button id="btn-nip"><span>🌿</span> Kocimiętka (+5)</button>
+  <div class="action-panel">
+    <div class="panel-title">Zabawa (Zarabiaj Monety)</div>
+    <div class="buttons-grid">
+      <button class="action-btn btn-earn" id="btn-pet"><span>🐾</span> Głaskaj<br><small>+2🪙 / -10% Energii</small></button>
+      <button class="action-btn btn-earn" id="btn-play"><span>🧶</span> Baw się<br><small>+5🪙 / -25% Energii</small></button>
+    </div>
   </div>
 
-  <div id="log">Czekam na pierwszą akcję...</div>
+  <div class="action-panel">
+    <div class="panel-title">Sklep (Odnawiaj Potrzeby)</div>
+    <div class="buttons-grid">
+      <button class="action-btn btn-shop-food" id="btn-buy-food"><span>🐟</span> Kup Rybę<br><small>Koszt: 10🪙 (+40% 🍗)</small></button>
+      <button class="action-btn btn-shop-water" id="btn-buy-water"><span>🥛</span> Kup Mleko<br><small>Koszt: 5🪙 (+40% 💧)</small></button>
+    </div>
+  </div>
+
+  <div id="log">Witajcie w grze! 🐾</div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, doc, onSnapshot, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    // Konfiguracja Firebase
+    // NOWA KONFIGURACJA FIREBASE
     const firebaseConfig = {
-      apiKey: "AIzaSyBkJqgyQaxgjAtbwnNEpc7fRcreiQwDet4",
-      authDomain: "graonline-99bbe.firebaseapp.com",
-      projectId: "graonline-99bbe",
-      storageBucket: "graonline-99bbe.firebasestorage.app",
-      messagingSenderId: "528336041283",
-      appId: "1:528336041283:web:e3346bcd3aa5ac8413abf6",
-      measurementId: "G-YDVJRCW12T"
+      apiKey: "AIzaSyD8qaNZKjmenGo0MxL4dI7MYb2khcHSUes",
+      authDomain: "graznatalia-e1b58.firebaseapp.com",
+      projectId: "graznatalia-e1b58",
+      storageBucket: "graznatalia-e1b58.firebasestorage.app",
+      messagingSenderId: "265631462505",
+      appId: "1:265631462505:web:40b3bb8c72908cf8461ef8",
+      measurementId: "G-JWW9JW9TD0"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    // Zmieniliśmy nazwę dokumentu na nasz_kotek!
-    const catDocRef = doc(db, "gra", "nasz_kotek");
+    // Używamy dokumentu o nazwie 'wspolny_kotek'
+    const catDocRef = doc(db, "gra", "wspolny_kotek");
 
-    const catEl = document.getElementById("cat-container");
-    const scoreEl = document.getElementById("score");
-    const levelTextEl = document.getElementById("level-text");
-    const progressEl = document.getElementById("progress");
-    const logEl = document.getElementById("log");
-
-    // Fazy rozwoju Kotka
-    const phases = [
-      { min: 0, max: 49, emoji: "🐱💤", name: "Śpiący Kociak" },
-      { min: 50, max: 149, emoji: "🐈", name: "Rozbrykany Kocur" },
-      { min: 150, max: 399, emoji: "🐅", name: "Domowy Tygrys" },
-      { min: 400, max: 99999, emoji: "👑🦁", name: "Królewski Lew" }
-    ];
-
-    function getPhase(score) {
-      return phases.find(p => score >= p.min && score <= p.max) || phases[0];
+    let state = { catName: "Puszek", xp: 0, coins: 20, food: 100, water: 100, log: "Zaczynamy!" };
+    
+    // --- OBSŁUGA IMIENIA GRACZA (LOCAL STORAGE) ---
+    let myName = localStorage.getItem("playerName");
+    if (!myName) {
+      document.getElementById("name-modal").style.display = "flex";
+    } else {
+      document.getElementById("current-player-display").innerText = myName;
     }
 
-    // Nasłuchiwanie bazy danych w czasie rzeczywistym
+    window.savePlayerName = function() {
+      const input = document.getElementById("player-name-input").value.trim();
+      if(input) {
+        myName = input;
+        localStorage.setItem("playerName", myName);
+        document.getElementById("current-player-display").innerText = myName;
+        document.getElementById("name-modal").style.display = "none";
+      }
+    };
+
+    // --- ZMIANA IMIENIA KOTKA ---
+    window.changeCatName = async function() {
+      const newName = prompt("Jak chcecie nazwać kotka?", state.catName);
+      if (newName && newName.trim() !== "") {
+        try {
+          await updateDoc(catDocRef, { catName: newName.trim() });
+        } catch(e) { console.error("Błąd zmiany imienia:", e); }
+      }
+    };
+
+    // Fazy rozwoju
+    const phases = [
+      { min: 0, max: 49, emoji: "🐱", name: "Kociak" },
+      { min: 50, max: 149, emoji: "🐈", name: "Kocur" },
+      { min: 150, max: 399, emoji: "🐅", name: "Tygrys" },
+      { min: 400, max: 99999, emoji: "🦁", name: "Lew" }
+    ];
+
+    function updateColor(barElement, value) {
+      if(value > 50) barElement.style.backgroundColor = barElement.id === 'bar-food' ? '#8bc34a' : '#29b6f6';
+      else if(value > 20) barElement.style.backgroundColor = '#ffeb3b';
+      else barElement.style.backgroundColor = '#f44336';
+    }
+
+    // Nasłuchiwanie bazy
     onSnapshot(catDocRef, (docSnap) => {
       if (docSnap.exists()) {
-        const data = docSnap.data();
-        const score = data.punkty || 0;
+        state = docSnap.data();
         
-        scoreEl.innerText = score;
-        if(data.ostatniaAkcja) logEl.innerText = data.ostatniaAkcja;
+        // Aktualizacja interfejsu
+        document.getElementById("cat-name-display").innerText = state.catName + " 🐾";
+        document.getElementById("coins-display").innerText = state.coins;
+        document.getElementById("xp-text").innerText = `(${state.xp} XP)`;
+        
+        // Paski
+        document.getElementById("food-text").innerText = state.food;
+        const foodBar = document.getElementById("bar-food");
+        foodBar.style.width = state.food + "%";
+        updateColor(foodBar, state.food);
+
+        document.getElementById("water-text").innerText = state.water;
+        const waterBar = document.getElementById("bar-water");
+        waterBar.style.width = state.water + "%";
+        updateColor(waterBar, state.water);
 
         // Animacja
-        catEl.classList.remove("purr");
-        void catEl.offsetWidth; // Wymuszenie reflow dla restartu animacji
-        catEl.classList.add("purr");
+        const catEl = document.getElementById("cat-container");
+        catEl.classList.remove("shake");
+        void catEl.offsetWidth; 
+        catEl.classList.add("shake");
 
-        const currentPhase = getPhase(score);
+        // Poziom
+        const currentPhase = phases.find(p => state.xp >= p.min && state.xp <= p.max) || phases[0];
         catEl.innerText = currentPhase.emoji;
-        levelTextEl.innerText = currentPhase.name;
+        document.getElementById("level-text").innerText = currentPhase.name;
 
-        // Pasek postępu
-        let percent = 100;
-        if (currentPhase.max !== 99999) {
-            const phaseRange = currentPhase.max - currentPhase.min + 1;
-            const pointsInPhase = score - currentPhase.min;
-            percent = (pointsInPhase / phaseRange) * 100;
-        }
-        progressEl.style.width = percent + "%";
+        let xpPercent = 100;
+        if (currentPhase.max !== 99999) xpPercent = ((state.xp - currentPhase.min) / (currentPhase.max - currentPhase.min)) * 100;
+        document.getElementById("bar-xp").style.width = xpPercent + "%";
+
+        if(state.log) document.getElementById("log").innerText = state.log;
+
+        // Włączanie/wyłączanie przycisków
+        document.getElementById("btn-buy-food").disabled = state.coins < 10 || state.food >= 100;
+        document.getElementById("btn-buy-water").disabled = state.coins < 5 || state.water >= 100;
 
       } else {
-        setDoc(catDocRef, { punkty: 0, ostatniaAkcja: "Przygarnęliście kotka! 🐾" });
+        // Nowa baza! Startowe dane
+        setDoc(catDocRef, { catName: "Puszek", xp: 0, coins: 20, food: 100, water: 100, log: "Witajcie w nowym domku! 🐾" });
       }
     });
 
-    // Funkcja dodająca punkty do bazy
-    async function performAction(points, actionMessage) {
-        const buttons = document.querySelectorAll('button');
-        buttons.forEach(btn => btn.disabled = true);
-        
-        const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        
-        try {
-            await updateDoc(catDocRef, { 
-                punkty: increment(points),
-                ostatniaAkcja: `${actionMessage} (o ${time})`
-            });
-        } catch (error) {
-            console.error("Błąd zapisu:", error);
-        }
-        
-        setTimeout(() => {
-            buttons.forEach(btn => btn.disabled = false);
-        }, 400); // Krótka blokada przed spamowaniem
+    // Główna funkcja akcji
+    async function doAction(actionType) {
+      if(!myName) return alert("Najpierw podaj swoje imię!");
+      
+      let { xp, coins, food, water, catName } = state;
+      let logMsg = "";
+      const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+      if (actionType === 'pet') {
+        if (food < 10 || water < 10) return alert(`${catName} jest zbyt głodny/spragniony!`);
+        xp += 1; coins += 2; food -= 10; water -= 10;
+        logMsg = `${myName} głaszcze kotka! (+2🪙) o ${time}`;
+      } 
+      else if (actionType === 'play') {
+        if (food < 25 || water < 25) return alert(`${catName} opadł z sił, nakarm go!`);
+        xp += 3; coins += 5; food -= 25; water -= 25;
+        logMsg = `${myName} bawi się z kotkiem! (+5🪙) o ${time}`;
+      }
+      else if (actionType === 'buyFood') {
+        if (coins < 10) return;
+        coins -= 10; food += 40;
+        logMsg = `${myName} kupuje rybkę! 🐟 o ${time}`;
+      }
+      else if (actionType === 'buyWater') {
+        if (coins < 5) return;
+        coins -= 5; water += 40;
+        logMsg = `${myName} daje mleko! 🥛 o ${time}`;
+      }
+
+      food = Math.max(0, Math.min(100, food));
+      water = Math.max(0, Math.min(100, water));
+
+      try {
+        await updateDoc(catDocRef, { xp, coins, food, water, log: logMsg });
+      } catch (e) { console.error("Błąd zapisu:", e); }
     }
 
-    // Podpięcie przycisków
-    document.getElementById("btn-feed").addEventListener("click", () => performAction(2, "Kotek dostał pyszną rybkę 🐟"));
-    document.getElementById("btn-play").addEventListener("click", () => performAction(3, "Świetna zabawa kłębkiem! 🧶"));
-    document.getElementById("btn-pet").addEventListener("click", () => performAction(1, "Kotek głośno mruczy z radości 🥰"));
-    document.getElementById("btn-nip").addEventListener("click", () => performAction(5, "Kocimiętka! Kotek szaleje! 🌿🐈"));
+    document.getElementById("btn-pet").addEventListener("click", () => doAction('pet'));
+    document.getElementById("btn-play").addEventListener("click", () => doAction('play'));
+    document.getElementById("btn-buy-food").addEventListener("click", () => doAction('buyFood'));
+    document.getElementById("btn-buy-water").addEventListener("click", () => doAction('buyWater'));
   </script>
 </body>
 </html>
