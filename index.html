@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Together Online ❤️</title>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<style>
+body { margin:0; font-family:Arial; background:#0f172a; color:white; text-align:center; }
+.container { padding:20px; }
+button { padding:15px; margin:10px; border:none; border-radius:10px; font-size:16px; }
+.choice { background:#334155; color:white; width:100%; }
+input { padding:10px; border-radius:10px; border:none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>❤️ Together Online</h1>
+
+  <div id="menu">
+    <button onclick="createRoom()">Stwórz pokój</button>
+    <br>
+    <input id="roomInput" placeholder="Kod pokoju">
+    <button onclick="joinRoom()">Dołącz</button>
+  </div>
+
+  <div id="game" style="display:none">
+    <h2 id="roomCode"></h2>
+    <p id="question"></p>
+    <div id="choices"></div>
+    <h3 id="result"></h3>
+  </div>
+</div>
+
+<script>
+// 🔥 TU WSTAW SWOJE DANE Z FIREBASE
+const firebaseConfig = {
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_DOMAIN",
+  databaseURL: "YOUR_DB_URL",
+  projectId: "YOUR_ID",
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let room = "";
+let player = "";
+
+const questions = [
+  { q: "Pizza czy burger?", a:["Pizza","Burger"] },
+  { q: "Film czy serial?", a:["Film","Serial"] },
+  { q: "Noc czy dzień?", a:["Noc","Dzień"] }
+];
+
+function createRoom() {
+  room = Math.floor(Math.random()*10000).toString();
+  player = "p1";
+  db.ref("rooms/"+room).set({});
+  start();
+}
+
+function joinRoom() {
+  room = document.getElementById("roomInput").value;
+  player = "p2";
+  start();
+}
+
+function start() {
+  document.getElementById("menu").style.display="none";
+  document.getElementById("game").style.display="block";
+  document.getElementById("roomCode").innerText = "Pokój: "+room;
+  loadQuestion();
+}
+
+function loadQuestion() {
+  const q = questions[Math.floor(Math.random()*questions.length)];
+  document.getElementById("question").innerText = q.q;
+
+  const div = document.getElementById("choices");
+  div.innerHTML = "";
+
+  q.a.forEach(ans => {
+    const btn = document.createElement("button");
+    btn.className = "choice";
+    btn.innerText = ans;
+    btn.onclick = () => sendAnswer(ans);
+    div.appendChild(btn);
+  });
+}
+
+function sendAnswer(ans) {
+  db.ref("rooms/"+room+"/"+player).set(ans);
+
+  db.ref("rooms/"+room).on("value", snap => {
+    const data = snap.val();
+    if(data.p1 && data.p2) {
+      if(data.p1 === data.p2) {
+        document.getElementById("result").innerText = "❤️ ZGODA!";
+      } else {
+        document.getElementById("result").innerText = "😂 Różne odpowiedzi";
+      }
+      setTimeout(()=>{
+        document.getElementById("result").innerText="";
+        loadQuestion();
+        db.ref("rooms/"+room).set({});
+      },2000);
+    }
+  });
+}
+
+  const firebaseConfig = {
+  apiKey: "AIzaSyBkJqgyQaxgjAtbwnNEpc7fRcreiQwDet4",
+</script>
+</body>
+</html>
