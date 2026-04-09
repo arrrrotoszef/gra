@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Nasza Roślinka 🌱</title>
+  <title>Nasz Kotek 🐾</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       text-align: center;
-      background-color: #e8f5e9; /* Pastelowy zielony */
+      background-color: #f3e5f5; /* Pastelowy fiolet */
       margin: 0;
       padding: 0;
       display: flex;
@@ -16,172 +16,189 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      color: #333;
+      color: #4a148c;
     }
-    h1 { color: #2e7d32; margin-bottom: 5px; }
-    p.subtitle { color: #555; margin-top: 0; margin-bottom: 30px; }
+    h1 { color: #6a1b9a; margin-bottom: 5px; }
+    p.subtitle { color: #8e24aa; margin-top: 0; margin-bottom: 20px; font-weight: bold; }
     
-    #plant-container {
-      font-size: 120px;
-      margin: 20px 0;
-      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    #cat-container {
+      font-size: 130px;
+      margin: 10px 0;
+      display: inline-block;
+      transition: transform 0.2s;
     }
-    .bounce { transform: scale(1.3); }
+    
+    /* Animacja radości kotka */
+    @keyframes purr {
+      0% { transform: scale(1) rotate(0deg); }
+      25% { transform: scale(1.1) rotate(5deg); }
+      50% { transform: scale(1) rotate(0deg); }
+      75% { transform: scale(1.1) rotate(-5deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+    .purr { animation: purr 0.4s ease-in-out; }
 
     .stats {
       background: white;
       padding: 20px;
       border-radius: 20px;
-      box-shadow: 0 8px 15px rgba(0,0,0,0.05);
-      margin-bottom: 30px;
+      box-shadow: 0 8px 15px rgba(0,0,0,0.08);
+      margin-bottom: 25px;
       width: 85%;
       max-width: 350px;
     }
     .stats-info {
       display: flex;
       justify-content: space-between;
-      font-size: 1.1em;
-      margin-bottom: 10px;
+      font-size: 1.2em;
+      margin-bottom: 12px;
+      font-weight: bold;
     }
     .progress-bar {
-      background-color: #f5f5f5;
+      background-color: #eeeeee;
       border-radius: 10px;
-      height: 20px;
+      height: 22px;
       width: 100%;
       overflow: hidden;
       box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+      position: relative;
     }
     #progress {
-      background-color: #4caf50;
+      background-color: #ab47bc;
       height: 100%;
       width: 0%;
-      transition: width 0.5s ease-out;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .buttons {
-      display: flex;
-      gap: 15px;
-      flex-wrap: wrap;
-      justify-content: center;
+    .buttons-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
       width: 90%;
+      max-width: 380px;
     }
     button {
-      flex: 1;
-      min-width: 140px;
-      padding: 15px 20px;
-      font-size: 1.1em;
+      padding: 15px 10px;
+      font-size: 1.05em;
       border: none;
       border-radius: 15px;
       cursor: pointer;
       color: white;
       font-weight: bold;
       box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-      transition: all 0.1s;
+      transition: transform 0.1s, filter 0.2s;
       -webkit-tap-highlight-color: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
     }
+    button span { font-size: 1.5em; } /* Większe emoji na przyciskach */
     button:active { 
-      transform: translateY(4px); 
-      box-shadow: 0 0px 0px rgba(0,0,0,0.15); 
+      transform: translateY(3px); 
+      box-shadow: 0 1px 2px rgba(0,0,0,0.15); 
     }
-    #btn-water { background-color: #29b6f6; } /* Niebieski */
-    #btn-love { background-color: #ec407a; } /* Różowy */
+    
+    /* Kolory przycisków */
+    #btn-feed { background-color: #ff9800; }
+    #btn-play { background-color: #29b6f6; }
+    #btn-pet { background-color: #ef5350; }
+    #btn-nip { background-color: #66bb6a; }
 
     #log {
-      margin-top: 30px;
-      font-size: 0.9em;
-      color: #777;
-      min-height: 20px;
-      background: rgba(255,255,255,0.5);
-      padding: 8px 15px;
-      border-radius: 10px;
+      margin-top: 25px;
+      font-size: 0.95em;
+      color: #666;
+      min-height: 25px;
+      background: white;
+      padding: 10px 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      font-weight: 500;
     }
   </style>
 </head>
 <body>
 
-  <h1>Nasza Roślinka</h1>
-  <p class="subtitle">Dbajcie o nią wspólnie!</p>
+  <h1>Nasz Kotek 🐾</h1>
+  <p class="subtitle">Wspólna opieka</p>
   
-  <div id="plant-container">🌱</div>
+  <div id="cat-container">🐱</div>
   
   <div class="stats">
     <div class="stats-info">
-      <span id="level-text">Ziarenko</span>
-      <span><strong id="score">0</strong> pkt</span>
+      <span id="level-text">Śpiący Kociak</span>
+      <span><strong id="score">0</strong> XP</span>
     </div>
     <div class="progress-bar"><div id="progress"></div></div>
   </div>
 
-  <div class="buttons">
-    <button id="btn-water">Podlej 💧</button>
-    <button id="btn-love">Daj miłość ❤️</button>
+  <div class="buttons-grid">
+    <button id="btn-feed"><span>🐟</span> Nakarm (+2)</button>
+    <button id="btn-play"><span>🧶</span> Pobaw się (+3)</button>
+    <button id="btn-pet"><span>🐾</span> Pogłaszcz (+1)</button>
+    <button id="btn-nip"><span>🌿</span> Kocimiętka (+5)</button>
   </div>
 
-  <div id="log">Ładowanie...</div>
+  <div id="log">Czekam na pierwszą akcję...</div>
 
   <script type="module">
-    // Importy Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, doc, onSnapshot, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    // Twoja konfiguracja Firebase
+    // Konfiguracja Firebase
     const firebaseConfig = {
-  apiKey: "AIzaSyD8qaNZKjmenGo0MxL4dI7MYb2khcHSUes",
-  authDomain: "graznatalia-e1b58.firebaseapp.com",
-  projectId: "graznatalia-e1b58",
-  storageBucket: "graznatalia-e1b58.firebasestorage.app",
-  messagingSenderId: "265631462505",
-  appId: "1:265631462505:web:40b3bb8c72908cf8461ef8",
-  measurementId: "G-JWW9JW9TD0"
+      apiKey: "AIzaSyBkJqgyQaxgjAtbwnNEpc7fRcreiQwDet4",
+      authDomain: "graonline-99bbe.firebaseapp.com",
+      projectId: "graonline-99bbe",
+      storageBucket: "graonline-99bbe.firebasestorage.app",
+      messagingSenderId: "528336041283",
+      appId: "1:528336041283:web:e3346bcd3aa5ac8413abf6",
+      measurementId: "G-YDVJRCW12T"
     };
 
-    // Inicjalizacja
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const plantDocRef = doc(db, "gra", "nasza_roslinka");
+    // Zmieniliśmy nazwę dokumentu na nasz_kotek!
+    const catDocRef = doc(db, "gra", "nasz_kotek");
 
-    // Elementy interfejsu
-    const plantEl = document.getElementById("plant-container");
+    const catEl = document.getElementById("cat-container");
     const scoreEl = document.getElementById("score");
     const levelTextEl = document.getElementById("level-text");
     const progressEl = document.getElementById("progress");
     const logEl = document.getElementById("log");
-    const btnWater = document.getElementById("btn-water");
-    const btnLove = document.getElementById("btn-love");
 
-    // Fazy rozwoju rośliny (ile punktów potrzeba na daną fazę)
+    // Fazy rozwoju Kotka
     const phases = [
-      { min: 0, max: 19, emoji: "🌱", name: "Ziarenko" },
-      { min: 20, max: 49, emoji: "🌿", name: "Kiełek" },
-      { min: 50, max: 99, emoji: "🌷", name: "Piękny Kwiatek" },
-      { min: 100, max: 99999, emoji: "🌳", name: "Wielkie Drzewo" }
+      { min: 0, max: 49, emoji: "🐱💤", name: "Śpiący Kociak" },
+      { min: 50, max: 149, emoji: "🐈", name: "Rozbrykany Kocur" },
+      { min: 150, max: 399, emoji: "🐅", name: "Domowy Tygrys" },
+      { min: 400, max: 99999, emoji: "👑🦁", name: "Królewski Lew" }
     ];
 
-    // Funkcja sprawdzająca aktualną fazę
     function getPhase(score) {
       return phases.find(p => score >= p.min && score <= p.max) || phases[0];
     }
 
-    // Nasłuchiwanie zmian w bazie (czas rzeczywisty)
-    onSnapshot(plantDocRef, (docSnap) => {
+    // Nasłuchiwanie bazy danych w czasie rzeczywistym
+    onSnapshot(catDocRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
         const score = data.punkty || 0;
         
-        // Zaktualizuj tekst punktów i log
         scoreEl.innerText = score;
         if(data.ostatniaAkcja) logEl.innerText = data.ostatniaAkcja;
 
-        // Efekt odbicia (animacja przy zmianie punktów)
-        plantEl.classList.add("bounce");
-        setTimeout(() => plantEl.classList.remove("bounce"), 300);
+        // Animacja
+        catEl.classList.remove("purr");
+        void catEl.offsetWidth; // Wymuszenie reflow dla restartu animacji
+        catEl.classList.add("purr");
 
-        // Ustal fazę i zaktualizuj emoji/tekst
         const currentPhase = getPhase(score);
-        plantEl.innerText = currentPhase.emoji;
+        catEl.innerText = currentPhase.emoji;
         levelTextEl.innerText = currentPhase.name;
 
-        // Oblicz pasek postępu do następnego poziomu
+        // Pasek postępu
         let percent = 100;
         if (currentPhase.max !== 99999) {
             const phaseRange = currentPhase.max - currentPhase.min + 1;
@@ -191,38 +208,36 @@
         progressEl.style.width = percent + "%";
 
       } else {
-        // Tworzy dokument z punktem startowym, jeśli nie istnieje
-        setDoc(plantDocRef, { punkty: 0, ostatniaAkcja: "Zasadzono nową roślinkę! 🌱" });
+        setDoc(catDocRef, { punkty: 0, ostatniaAkcja: "Przygarnęliście kotka! 🐾" });
       }
     });
 
     // Funkcja dodająca punkty do bazy
-    async function addPoints(points, actionName) {
-        // Blokada przycisków na moment, żeby nie klikać za szybko
-        btnWater.disabled = true;
-        btnLove.disabled = true;
+    async function performAction(points, actionMessage) {
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(btn => btn.disabled = true);
         
         const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         
         try {
-            await updateDoc(plantDocRef, { 
+            await updateDoc(catDocRef, { 
                 punkty: increment(points),
-                ostatniaAkcja: `${actionName} (o ${time})`
+                ostatniaAkcja: `${actionMessage} (o ${time})`
             });
         } catch (error) {
-            console.error("Błąd!", error);
+            console.error("Błąd zapisu:", error);
         }
         
-        // Odblokowanie po 300ms
         setTimeout(() => {
-            btnWater.disabled = false;
-            btnLove.disabled = false;
-        }, 300);
+            buttons.forEach(btn => btn.disabled = false);
+        }, 400); // Krótka blokada przed spamowaniem
     }
 
-    // Przypisanie zdarzeń do przycisków
-    btnWater.addEventListener("click", () => addPoints(1, "Ktoś podlał roślinkę 💧"));
-    btnLove.addEventListener("click", () => addPoints(5, "Roślinka dostała dużo miłości ❤️"));
+    // Podpięcie przycisków
+    document.getElementById("btn-feed").addEventListener("click", () => performAction(2, "Kotek dostał pyszną rybkę 🐟"));
+    document.getElementById("btn-play").addEventListener("click", () => performAction(3, "Świetna zabawa kłębkiem! 🧶"));
+    document.getElementById("btn-pet").addEventListener("click", () => performAction(1, "Kotek głośno mruczy z radości 🥰"));
+    document.getElementById("btn-nip").addEventListener("click", () => performAction(5, "Kocimiętka! Kotek szaleje! 🌿🐈"));
   </script>
 </body>
 </html>
