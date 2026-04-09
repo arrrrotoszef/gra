@@ -3,18 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Nasz Słodki Kotek 🐾</title>
+  <title>Nasz Słodki Kotek V5 🐾</title>
   <style>
     :root {
-      --primary: #ff6b81;
-      --bg: #ffeaa7;
+      --primary: #a29bfe;
+      --bg: #f5f6fa;
       --panel: #ffffff;
-      --text: #2d3436;
+      --text: #2f3640;
     }
     body {
       font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       text-align: center; background-color: var(--bg); margin: 0; padding: 10px;
       display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: var(--text);
+      transition: background 0.5s;
     }
     
     /* Top Bar */
@@ -22,24 +23,37 @@
       display: flex; justify-content: space-between; width: 95%; max-width: 450px;
       background: var(--panel); padding: 15px 20px; border-radius: 20px;
       box-shadow: 0 8px 15px rgba(0,0,0,0.05); margin-top: 5px; font-weight: bold; box-sizing: border-box;
+      z-index: 10;
     }
     .coins { color: #f39c12; font-size: 1.3em;}
-    .level { color: var(--primary); font-size: 1.3em;}
+    .level { color: #e84393; font-size: 1.3em;}
 
-    h1 { margin: 15px 0 0 0; color: #d63031; font-size: 2em; text-shadow: 1px 1px 0px white;}
-    .player-info { color: #636e72; font-size: 0.9em; margin-bottom: 5px; }
+    h1 { margin: 15px 0 0 0; color: #6c5ce7; font-size: 2em; text-shadow: 1px 1px 0px white;}
+    .player-info { color: #7f8fa6; font-size: 0.9em; margin-bottom: 10px; }
+    .btn-small { background: none; border: 1px solid #7f8fa6; color: #7f8fa6; border-radius: 8px; padding: 2px 6px; cursor: pointer; font-size: 0.8em; margin-left: 5px; }
 
     /* ========================================= */
-    /* SŁODKI KOTEK (SVG)                        */
+    /* SCENA I TŁA KOTKA                         */
     /* ========================================= */
-    #cat-stage { width: 240px; height: 240px; margin: 5px 0; position: relative; }
-    #animated-cat { width: 100%; height: 100%; animation: float 3s ease-in-out infinite; }
+    #cat-stage { 
+      width: 250px; height: 250px; margin: 10px 0; position: relative;
+      border-radius: 50%; box-shadow: inset 0 0 20px rgba(0,0,0,0.1), 0 10px 20px rgba(0,0,0,0.1);
+      transition: all 0.5s; overflow: hidden; display: flex; align-items: center; justify-content: center;
+    }
     
-    @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+    /* Style Tła */
+    .bg-default { background: linear-gradient(135deg, #ffeaa7, #fab1a0); }
+    .bg-garden { background: linear-gradient(135deg, #55efc4, #00b894); }
+    .bg-night { background: linear-gradient(135deg, #2d3436, #636e72); }
+    .bg-space { background: linear-gradient(135deg, #090a0f, #27104e, #9b59b6); }
+
+    #animated-cat { width: 90%; height: 90%; animation: float 3.5s ease-in-out infinite; z-index: 2; }
+    
+    @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
     @keyframes blink { 0%, 4%, 100% { transform: scaleY(1); } 2% { transform: scaleY(0.1); } }
-    @keyframes tailWag { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(20deg); } }
-    .eye-group { animation: blink 5s infinite; transform-origin: center; }
-    .tail { animation: tailWag 3s ease-in-out infinite; transform-origin: 70% 80%; }
+    @keyframes tailWag { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(15deg); } }
+    .eye-group { animation: blink 4s infinite; transform-origin: center; }
+    .tail { animation: tailWag 4s ease-in-out infinite; transform-origin: 75% 85%; }
     .happy-jump { animation: happyJump 0.5s ease !important; }
     @keyframes happyJump { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-25px) scale(1.05); } }
 
@@ -49,12 +63,13 @@
     .panel {
       width: 95%; max-width: 450px; background: var(--panel); padding: 15px;
       border-radius: 20px; box-shadow: 0 8px 15px rgba(0,0,0,0.05); margin-bottom: 15px; box-sizing: border-box;
+      position: relative; z-index: 10;
     }
     .stat-row { margin-bottom: 8px; text-align: left; font-size: 0.9em; font-weight: bold; color: #555; }
-    .bar-bg { background-color: #dfe6e9; border-radius: 10px; height: 18px; width: 100%; margin-top: 5px; overflow: hidden; }
+    .bar-bg { background-color: #f1f2f6; border-radius: 10px; height: 18px; width: 100%; margin-top: 5px; overflow: hidden; }
     .bar-fill { height: 100%; transition: width 0.4s ease, background-color 0.4s ease; }
-    #bar-food { background-color: #55efc4; }
-    #bar-water { background-color: #74b9ff; }
+    #bar-food { background-color: #00cec9; }
+    #bar-water { background-color: #0984e3; }
     
     .panel-title { font-size: 0.9em; text-transform: uppercase; color: #b2bec3; margin-bottom: 10px; letter-spacing: 1px; font-weight: bold;}
     .buttons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -69,28 +84,36 @@
     button:disabled { filter: grayscale(100%); opacity: 0.5; cursor: not-allowed; }
 
     .btn-action { background-color: var(--primary); }
-    .btn-shop { background-color: #0984e3; }
-    .btn-minigame { background-color: #f39c12; width: 100%; padding: 15px; font-size: 1.1em; margin-top: 5px; }
+    .btn-shop { background-color: #fdcb6e; color: #2d3436; }
+    .btn-minigame { background-color: #ff7675; width: 100%; padding: 12px; font-size: 1.05em; margin-top: 8px; }
 
-    /* Shop Grid */
-    .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-height: 200px; overflow-y: auto; padding-right: 5px;}
-    .shop-item { background: #f1f2f6; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-    .shop-item-name { font-weight: bold; font-size: 0.9em; margin-bottom: 5px; }
-    .shop-btn { width: 100%; padding: 8px 0; font-size: 0.85em; border-radius: 8px; margin-top: auto; }
-    .shop-btn.buy { background-color: #2ed573; }
-    .shop-btn.equip { background-color: #3742fa; }
-    .shop-btn.equipped { background-color: #a4b0be; box-shadow: inset 0 3px 5px rgba(0,0,0,0.1); }
+    /* Kategorie Sklepu */
+    .shop-tabs { display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 5px; }
+    .shop-tab { flex: 1; padding: 8px 10px; font-size: 0.8em; background: #dfe6e9; color: #2d3436; border-radius: 10px; white-space: nowrap;}
+    .shop-tab.active { background: #6c5ce7; color: white; }
 
-    /* Minigame Modal */
-    #minigame-modal {
+    .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-height: 220px; overflow-y: auto; padding-right: 5px;}
+    .shop-item { background: #f8f9fa; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; align-items: center; border: 1px solid #f1f2f6;}
+    .shop-item-name { font-weight: bold; font-size: 0.85em; margin-bottom: 5px; text-align: center; }
+    .shop-btn { width: 100%; padding: 8px 0; font-size: 0.85em; border-radius: 8px; margin-top: auto; color: white;}
+    .shop-btn.buy { background-color: #00b894; }
+    .shop-btn.equip { background-color: #0984e3; }
+    .shop-btn.equipped { background-color: #b2bec3; box-shadow: inset 0 3px 5px rgba(0,0,0,0.1); }
+
+    /* Minigame Modals */
+    .modal {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.9); display: none; flex-direction: column;
+      background: rgba(0,0,0,0.85); display: none; flex-direction: column;
       align-items: center; justify-content: center; z-index: 2000; color: white;
     }
-    #game-area { width: 90%; height: 60%; background: #74b9ff; border-radius: 20px; position: relative; overflow: hidden; border: 5px solid white; }
-    .fish-target { position: absolute; font-size: 3em; cursor: pointer; user-select: none; transition: transform 0.1s; }
-    .fish-target:active { transform: scale(0.8); }
-    .game-stats { font-size: 1.5em; margin-bottom: 15px; font-weight: bold; }
+    .game-area { width: 90%; max-width: 400px; height: 60%; max-height: 400px; background: #74b9ff; border-radius: 20px; position: relative; overflow: hidden; border: 5px solid white; }
+    .game-target { position: absolute; font-size: 3.5em; cursor: pointer; user-select: none; transition: transform 0.1s; }
+    .game-target:active { transform: scale(0.8); }
+    .game-stats { font-size: 1.5em; margin-bottom: 15px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+    
+    /* Myszka Game Specific */
+    #area-mouse { background: #55efc4; }
+    .hole { position: absolute; width: 60px; height: 20px; background: rgba(0,0,0,0.3); border-radius: 50%; }
   </style>
 </head>
 <body>
@@ -101,53 +124,65 @@
   </div>
   
   <h1 id="cat-name-display">Kotek</h1>
-  <div class="player-info">Grasz jako: <strong id="current-player-display">Arek</strong></div>
+  <div class="player-info">
+    Grasz jako: <strong id="current-player-display">Gracz</strong>
+    <button class="btn-small" onclick="changeMyName()">Zmień Nick</button>
+  </div>
   
-  <div id="cat-stage">
+  <div id="cat-stage" class="bg-default">
     <svg id="animated-cat" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-      <path class="tail" d="M 130 160 Q 180 170 170 120 Q 160 90 190 70" fill="none" stroke="#ffb142" stroke-width="16" stroke-linecap="round"/>
       
-      <ellipse cx="100" cy="150" rx="55" ry="40" fill="#ffb142" />
-      <ellipse cx="100" cy="165" rx="45" ry="25" fill="#f7f1e3" /> <path d="M 65 170 Q 70 195 85 190" fill="#ffb142" stroke="#cc8e35" stroke-width="2"/> 
-      <path d="M 135 170 Q 130 195 115 190" fill="#ffb142" stroke="#cc8e35" stroke-width="2"/> 
-
-      <path d="M 50 100 L 40 40 L 90 65 Z" fill="#ffb142" stroke="#cc8e35" stroke-width="2"/>
-      <path d="M 50 90 L 47 50 L 80 70 Z" fill="#ffda79" /> <path d="M 150 100 L 160 40 L 110 65 Z" fill="#ffb142" stroke="#cc8e35" stroke-width="2"/>
-      <path d="M 150 90 L 153 50 L 120 70 Z" fill="#ffda79" /> <circle cx="100" cy="95" r="50" fill="#ffb142" />
-      <ellipse cx="100" cy="115" rx="20" ry="12" fill="#f7f1e3" />
-      <path d="M 95 115 Q 100 120 105 115" fill="none" stroke="#2d3436" stroke-width="2" stroke-linecap="round"/> <circle cx="100" cy="112" r="3" fill="#ff7979"/> <g class="eye-group">
-        <circle cx="75" cy="95" r="10" fill="#2d3436"/>
-        <circle cx="72" cy="92" r="4" fill="#ffffff"/> <circle cx="78" cy="98" r="2" fill="#ffffff"/> 
-        
-        <circle cx="125" cy="95" r="10" fill="#2d3436"/>
-        <circle cx="122" cy="92" r="4" fill="#ffffff"/> <circle cx="128" cy="98" r="2" fill="#ffffff"/>
-      </g>
-      <ellipse cx="60" cy="110" rx="7" ry="4" fill="#ff7979" opacity="0.6"/>
-      <ellipse cx="140" cy="110" rx="7" ry="4" fill="#ff7979" opacity="0.6"/>
-
-      <g id="cloth-bowtie" style="display: none;">
-        <path d="M 100 145 L 85 135 L 85 155 Z" fill="#ff4757"/>
-        <path d="M 100 145 L 115 135 L 115 155 Z" fill="#ff4757"/>
-        <circle cx="100" cy="145" r="5" fill="#ff6b81"/>
+      <path class="tail" d="M 140 160 Q 190 150 170 100 Q 150 70 190 60" fill="none" stroke="#a4b0be" stroke-width="18" stroke-linecap="round"/>
+      
+      <ellipse cx="100" cy="155" rx="58" ry="45" fill="#a4b0be" />
+      <ellipse cx="100" cy="170" rx="40" ry="25" fill="#ffffff" /> <g id="cloth-bowtie" style="display: none;">
+        <path d="M 100 135 L 80 120 L 80 150 Z" fill="#e84393"/>
+        <path d="M 100 135 L 120 120 L 120 150 Z" fill="#e84393"/>
+        <circle cx="100" cy="135" r="6" fill="#fd79a8"/>
       </g>
       <g id="cloth-scarf" style="display: none;">
-        <path d="M 55 135 Q 100 155 145 135 L 140 145 Q 100 165 60 145 Z" fill="#2ed573"/>
-        <path d="M 130 140 L 125 170 L 145 165 Z" fill="#2ed573"/>
+        <path d="M 50 125 Q 100 150 150 125 L 140 140 Q 100 165 60 140 Z" fill="#d63031"/>
+        <path d="M 125 130 L 120 170 L 140 165 Z" fill="#d63031"/>
       </g>
-      <g id="cloth-glasses" style="display: none;">
-        <circle cx="75" cy="95" r="14" fill="rgba(0,0,0,0.5)" stroke="#1e272e" stroke-width="3"/>
-        <circle cx="125" cy="95" r="14" fill="rgba(0,0,0,0.5)" stroke="#1e272e" stroke-width="3"/>
-        <line x1="89" y1="95" x2="111" y2="95" stroke="#1e272e" stroke-width="3"/>
+      <g id="cloth-sweater" style="display: none;">
+        <path d="M 45 155 Q 100 110 155 155 L 140 190 Q 100 205 60 190 Z" fill="#0984e3"/>
+        <path d="M 60 190 Q 100 200 140 190 L 140 180 Q 100 190 60 180 Z" fill="#74b9ff"/> </g>
+
+      <path d="M 45 95 L 30 30 L 85 55 Z" fill="#a4b0be" stroke="#747d8c" stroke-width="2"/> <path d="M 45 85 L 37 40 L 75 60 Z" fill="#ffcccc" /> <path d="M 155 95 L 170 30 L 115 55 Z" fill="#a4b0be" stroke="#747d8c" stroke-width="2"/> <path d="M 155 85 L 163 40 L 125 60 Z" fill="#ffcccc" /> <circle cx="100" cy="90" r="55" fill="#a4b0be" />
+      <ellipse cx="100" cy="115" rx="25" ry="15" fill="#ffffff" /> <path d="M 92 115 Q 100 125 108 115" fill="none" stroke="#2f3640" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="100" cy="110" r="4" fill="#ff7675"/> <g class="eye-group">
+        <circle cx="70" cy="90" r="14" fill="#f1c40f"/>
+        <circle cx="70" cy="90" r="10" fill="#2d3436"/>
+        <circle cx="67" cy="85" r="4" fill="#ffffff"/> 
+        
+        <circle cx="130" cy="90" r="14" fill="#f1c40f"/>
+        <circle cx="130" cy="90" r="10" fill="#2d3436"/>
+        <circle cx="127" cy="85" r="4" fill="#ffffff"/>
       </g>
-      <g id="cloth-hat" style="display: none;">
-        <ellipse cx="100" cy="50" rx="35" ry="8" fill="#2f3640"/>
-        <path d="M 75 50 L 80 15 L 120 15 L 125 50 Z" fill="#2f3640"/>
-        <path d="M 76 40 L 124 40 L 125 48 L 75 48 Z" fill="#e84118"/> </g>
+
+      <path d="M 60 180 Q 65 200 85 195" fill="#ffffff" stroke="#747d8c" stroke-width="2"/> 
+      <path d="M 140 180 Q 135 200 115 195" fill="#ffffff" stroke="#747d8c" stroke-width="2"/> 
+
+      <g id="cloth-sunglasses" style="display: none;">
+        <rect x="52" y="75" width="36" height="24" rx="4" fill="#2d3436"/>
+        <rect x="112" y="75" width="36" height="24" rx="4" fill="#2d3436"/>
+        <line x1="88" y1="85" x2="112" y2="85" stroke="#2d3436" stroke-width="4"/>
+      </g>
+      <g id="cloth-nerd" style="display: none;">
+        <circle cx="70" cy="90" r="18" fill="none" stroke="#e84393" stroke-width="4"/>
+        <circle cx="130" cy="90" r="18" fill="none" stroke="#e84393" stroke-width="4"/>
+        <line x1="88" y1="90" x2="112" y2="90" stroke="#e84393" stroke-width="4"/>
+      </g>
+
       <g id="cloth-crown" style="display: none;">
-        <path d="M 70 55 L 60 20 L 85 35 L 100 10 L 115 35 L 140 20 L 130 55 Z" fill="#f1c40f"/>
-        <circle cx="60" cy="20" r="4" fill="#e74c3c"/>
-        <circle cx="100" cy="10" r="4" fill="#3498db"/>
-        <circle cx="140" cy="20" r="4" fill="#e74c3c"/>
+        <path d="M 65 45 L 55 5 L 85 25 L 100 -5 L 115 25 L 145 5 L 135 45 Z" fill="#f1c40f"/>
+        <circle cx="55" cy="5" r="5" fill="#e84393"/>
+        <circle cx="100" cy="-5" r="5" fill="#0984e3"/>
+        <circle cx="145" cy="5" r="5" fill="#e84393"/>
+      </g>
+      <g id="cloth-cap" style="display: none;">
+        <path d="M 50 45 Q 100 -10 150 45 Z" fill="#d63031"/>
+        <path d="M 150 45 Q 180 40 180 50 Q 150 55 130 45" fill="#ff7675"/> <circle cx="100" cy="15" r="6" fill="#ffffff"/>
       </g>
     </svg>
   </div>
@@ -164,30 +199,51 @@
   <div class="panel">
     <div class="panel-title">Opieka</div>
     <div class="buttons-grid">
-      <button class="btn-action" onclick="doAction('pet')"><span>🐾</span> Głaskaj<br><small>+1❤️ | -10% Energii</small></button>
-      <button class="btn-action" onclick="doAction('play')"><span>🧶</span> Baw się<br><small>+3❤️ | -25% Energii</small></button>
-      <button class="btn-shop" id="btn-buy-food" onclick="doAction('buyFood')"><span>🐟</span> Nakarm<br><small>10 🪙</small></button>
-      <button class="btn-shop" id="btn-buy-water" onclick="doAction('buyWater')"><span>🥛</span> Daj pić<br><small>5 🪙</small></button>
+      <button class="btn-action" onclick="doAction('pet')"><span>🐾</span> Głaskaj<br><small>+1❤️ | -10 E</small></button>
+      <button class="btn-action" onclick="doAction('play')"><span>🧶</span> Baw się<br><small>+3❤️ | -25 E</small></button>
+      <button class="btn-shop" onclick="doAction('buyFood')"><span>🐟</span> Nakarm<br><small>10 🪙</small></button>
+      <button class="btn-shop" onclick="doAction('buyWater')"><span>🥛</span> Daj pić<br><small>5 🪙</small></button>
     </div>
   </div>
 
   <div class="panel">
-    <div class="panel-title">Minigry (Zarabiaj)</div>
-    <button class="btn-minigame" onclick="openMinigame()">🎣 Złap Rybkę (Zarabiaj 🪙)</button>
+    <div class="panel-title">Rozrywka (Zarabiaj Monety)</div>
+    <div class="buttons-grid">
+      <button class="btn-minigame" onclick="openGame('fish')">🎣 Złap Rybkę</button>
+      <button class="btn-minigame" style="background:#00b894;" onclick="openGame('mouse')">🐭 Złap Mysz</button>
+    </div>
   </div>
 
   <div class="panel">
     <div class="panel-title">Sklep i Szafa</div>
-    <div class="shop-grid" id="shop-container">
-      </div>
+    <div class="shop-tabs">
+      <button class="shop-tab active" onclick="switchTab('clothes')">Ubrania</button>
+      <button class="shop-tab" onclick="switchTab('hats')">Czapki</button>
+      <button class="shop-tab" onclick="switchTab('glasses')">Okulary</button>
+      <button class="shop-tab" onclick="switchTab('bgs')">Tła</button>
+    </div>
+    <div class="shop-grid" id="shop-container"></div>
   </div>
 
-  <div id="minigame-modal">
-    <div class="game-stats">Czas: <span id="game-time">15</span>s | Zebrano: <span id="game-score">0</span> 🪙</div>
-    <div id="game-area">
-      <div id="fish" class="fish-target" onclick="catchFish()" style="display:none;">🐟</div>
+  <div id="modal-fish" class="modal">
+    <div class="game-stats">Czas: <span id="time-fish">15</span>s | Zebrano: <span id="score-fish">0</span> 🪙</div>
+    <div id="area-fish" class="game-area">
+      <div id="obj-fish" class="game-target" onclick="clickTarget('fish')">🐟</div>
     </div>
-    <button class="btn-action" style="margin-top:20px; padding: 15px 30px;" onclick="closeMinigame()">Zakończ</button>
+    <button class="btn-action" style="margin-top:20px; padding: 15px 30px;" onclick="closeGame()">Zakończ</button>
+  </div>
+
+  <div id="modal-mouse" class="modal">
+    <div class="game-stats">Czas: <span id="time-mouse">15</span>s | Złapano: <span id="score-mouse">0</span> 🪙</div>
+    <div id="area-mouse" class="game-area">
+      <div class="hole" style="top:20%; left:20%;"></div>
+      <div class="hole" style="top:20%; left:60%;"></div>
+      <div class="hole" style="top:60%; left:20%;"></div>
+      <div class="hole" style="top:60%; left:60%;"></div>
+      <div class="hole" style="top:40%; left:40%;"></div>
+      <div id="obj-mouse" class="game-target" onclick="clickTarget('mouse')" style="font-size:3em;">🐭</div>
+    </div>
+    <button class="btn-action" style="margin-top:20px; padding: 15px 30px;" onclick="closeGame()">Zakończ</button>
   </div>
 
   <script type="module">
@@ -206,43 +262,82 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const catDocRef = doc(db, "gra", "wspolny_kotek_v4"); // Wersja 4!
+    const catDocRef = doc(db, "gra", "wspolny_kotek_v5"); // V5 - Nowa Struktura!
 
-    // Asortyment sklepu
-    const shopItems = [
-      { id: 'none', name: 'Nic (Golas)', price: 0, emoji: '🐱' },
-      { id: 'bowtie', name: 'Elegancka Mucha', price: 20, emoji: '🎀' },
-      { id: 'scarf', name: 'Ciepły Szalik', price: 30, emoji: '🧣' },
-      { id: 'glasses', name: 'Okulary', price: 40, emoji: '🕶️' },
-      { id: 'hat', name: 'Cylinder', price: 60, emoji: '🎩' },
-      { id: 'crown', name: 'Korona Króla', price: 150, emoji: '👑' }
-    ];
+    // Baza Przedmiotów podzielona na kategorie
+    const shopDB = {
+      clothes: [
+        { id: 'none', name: 'Brak Ubranka', price: 0, emoji: '🚫' },
+        { id: 'bowtie', name: 'Różowa Mucha', price: 20, emoji: '🎀' },
+        { id: 'scarf', name: 'Ciepły Szalik', price: 35, emoji: '🧣' },
+        { id: 'sweater', name: 'Niebieski Sweter', price: 60, emoji: '🧥' }
+      ],
+      hats: [
+        { id: 'none', name: 'Bez Czapki', price: 0, emoji: '🚫' },
+        { id: 'cap', name: 'Czapka z Daszkiem', price: 40, emoji: '🧢' },
+        { id: 'crown', name: 'Złota Korona', price: 150, emoji: '👑' }
+      ],
+      glasses: [
+        { id: 'none', name: 'Bez Okularów', price: 0, emoji: '🚫' },
+        { id: 'sunglasses', name: 'Przeciwsłoneczne', price: 30, emoji: '🕶️' },
+        { id: 'nerd', name: 'Różowe Kujonki', price: 50, emoji: '👓' }
+      ],
+      bgs: [
+        { id: 'default', name: 'Domowy Pokój', price: 0, emoji: '🏠' },
+        { id: 'garden', name: 'Słoneczny Ogród', price: 80, emoji: '🌳' },
+        { id: 'night', name: 'Nocna Sypialnia', price: 100, emoji: '🌙' },
+        { id: 'space', name: 'Magiczny Kosmos', price: 200, emoji: '🚀' }
+      ]
+    };
 
-    let state = { catName: "Kłębek", xp: 0, coins: 20, food: 100, water: 100, inventory: ['none'], equipped: 'none' };
+    let currentTab = 'clothes';
+    let state = { 
+      catName: "Puszek", xp: 0, coins: 50, food: 100, water: 100, 
+      inventory: ['clothes_none', 'hats_none', 'glasses_none', 'bgs_default'], 
+      equipped: { clothes: 'none', hats: 'none', glasses: 'none', bgs: 'default' } 
+    };
     
-    let myName = localStorage.getItem("playerName") || "Gracz";
-    if(!localStorage.getItem("playerName")) {
+    // Obsługa Imienia
+    let myName = localStorage.getItem("playerName");
+    if(!myName) {
         myName = prompt("Wpisz swoje imię:") || "Gracz";
         localStorage.setItem("playerName", myName);
     }
     document.getElementById("current-player-display").innerText = myName;
 
-    // --- BUDOWANIE SKLEPU HTML ---
+    window.changeMyName = function() {
+        const newName = prompt("Zmień swój nick:", myName);
+        if(newName && newName.trim() !== "") {
+            myName = newName.trim();
+            localStorage.setItem("playerName", myName);
+            document.getElementById("current-player-display").innerText = myName;
+        }
+    }
+
+    // --- RENDER SKLEPU ---
+    window.switchTab = function(tabName) {
+        currentTab = tabName;
+        document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+        renderShop();
+    }
+
     function renderShop() {
       const container = document.getElementById("shop-container");
       container.innerHTML = "";
       
-      shopItems.forEach(item => {
-        const isOwned = state.inventory.includes(item.id);
-        const isEquipped = state.equipped === item.id;
+      shopDB[currentTab].forEach(item => {
+        const globalId = `${currentTab}_${item.id}`; // np. hats_crown
+        const isOwned = state.inventory.includes(globalId);
+        const isEquipped = state.equipped[currentTab] === item.id;
         
         let btnHTML = "";
         if (isEquipped) {
-            btnHTML = `<button class="shop-btn equipped" disabled>Założone</button>`;
+            btnHTML = `<button class="shop-btn equipped" disabled>Używane</button>`;
         } else if (isOwned) {
-            btnHTML = `<button class="shop-btn equip" onclick="equipItem('${item.id}')">Załóż</button>`;
+            btnHTML = `<button class="shop-btn equip" onclick="equipItem('${currentTab}', '${item.id}')">Użyj</button>`;
         } else {
-            btnHTML = `<button class="shop-btn buy" onclick="buyItem('${item.id}', ${item.price})" ${state.coins < item.price ? 'disabled' : ''}>Kup (${item.price}🪙)</button>`;
+            btnHTML = `<button class="shop-btn buy" onclick="buyItem('${currentTab}', '${item.id}', ${item.price})" ${state.coins < item.price ? 'disabled' : ''}>Kup (${item.price}🪙)</button>`;
         }
 
         container.innerHTML += `
@@ -255,12 +350,15 @@
       });
     }
 
-    // --- ODBIÓR DANYCH (Real-time) ---
+    // --- SYNCHRONIZACJA Z BAZĄ ---
     onSnapshot(catDocRef, (docSnap) => {
       if (docSnap.exists()) {
-        state = Object.assign({ inventory: ['none'], equipped: 'none' }, docSnap.data());
+        state = docSnap.data();
         
-        document.getElementById("cat-name-display").innerText = state.catName;
+        // Zabezpieczenie na wypadek brakujących struktur w bazie
+        if(!state.equipped) state.equipped = { clothes: 'none', hats: 'none', glasses: 'none', bgs: 'default' };
+        if(!state.inventory) state.inventory = ['clothes_none', 'hats_none', 'glasses_none', 'bgs_default'];
+
         document.getElementById("coins-display").innerText = state.coins;
         document.getElementById("xp-text").innerText = state.xp;
         
@@ -269,48 +367,61 @@
         document.getElementById("water-text").innerText = state.water;
         document.getElementById("bar-water").style.width = state.water + "%";
 
-        // Ubrania - Ukryj wszystko, pokaż wybrane
-        shopItems.forEach(item => {
-            if(item.id !== 'none') document.getElementById(`cloth-${item.id}`).style.display = "none";
-        });
-        if(state.equipped && state.equipped !== 'none') {
-            document.getElementById(`cloth-${state.equipped}`).style.display = "block";
-        }
-
-        document.getElementById("btn-buy-food").disabled = state.coins < 10 || state.food >= 100;
-        document.getElementById("btn-buy-water").disabled = state.coins < 5 || state.water >= 100;
-
-        renderShop(); // Odśwież sklep przy każdej zmianie
+        applyEquipment();
+        renderShop(); 
       } else {
-        setDoc(catDocRef, { catName: "Kłębek", xp: 0, coins: 30, food: 100, water: 100, inventory: ['none'], equipped: 'none' });
+        // Pierwsze utworzenie V5
+        setDoc(catDocRef, state);
       }
     });
 
-    // --- LOGIKA SKLEPU ---
-    window.buyItem = async function(itemId, price) {
-        if(state.coins >= price && !state.inventory.includes(itemId)) {
+    function applyEquipment() {
+        // Tło
+        const stage = document.getElementById("cat-stage");
+        stage.className = `bg-${state.equipped.bgs}`;
+
+        // Ubrania (Ukryj wszystko)
+        const allItems = ['bowtie', 'scarf', 'sweater', 'sunglasses', 'nerd', 'crown', 'cap'];
+        allItems.forEach(id => {
+            const el = document.getElementById(`cloth-${id}`);
+            if(el) el.style.display = "none";
+        });
+
+        // Pokazuj wybrane
+        if(state.equipped.clothes !== 'none') document.getElementById(`cloth-${state.equipped.clothes}`).style.display = "block";
+        if(state.equipped.hats !== 'none') document.getElementById(`cloth-${state.equipped.hats}`).style.display = "block";
+        if(state.equipped.glasses !== 'none') document.getElementById(`cloth-${state.equipped.glasses}`).style.display = "block";
+    }
+
+    // --- ZAKUPY ---
+    window.buyItem = async function(category, itemId, price) {
+        const globalId = `${category}_${itemId}`;
+        if(state.coins >= price && !state.inventory.includes(globalId)) {
             const newCoins = state.coins - price;
-            const newInventory = [...state.inventory, itemId];
+            const newInventory = [...state.inventory, globalId];
             await updateDoc(catDocRef, { coins: newCoins, inventory: newInventory });
         }
     }
     
-    window.equipItem = async function(itemId) {
-        if(state.inventory.includes(itemId)) {
-            await updateDoc(catDocRef, { equipped: itemId });
+    window.equipItem = async function(category, itemId) {
+        const globalId = `${category}_${itemId}`;
+        if(state.inventory.includes(globalId)) {
+            let newEquipped = { ...state.equipped };
+            newEquipped[category] = itemId;
+            await updateDoc(catDocRef, { equipped: newEquipped });
         }
     }
 
-    // --- LOGIKA OPIEKI ---
+    // --- AKCJE OPIEKI ---
     window.doAction = async function(actionType) {
       let { xp, coins, food, water } = state;
 
       if (actionType === 'pet') {
-        if (food < 10 || water < 10) return alert(`Kotek jest głodny/spragniony!`);
+        if (food < 10 || water < 10) return alert(`Kotek jest zbyt głodny!`);
         xp += 1; food -= 10; water -= 10; animateCat();
       } 
       else if (actionType === 'play') {
-        if (food < 25 || water < 25) return alert(`Kotek nie ma siły na zabawę!`);
+        if (food < 25 || water < 25) return alert(`Kotek opadł z sił!`);
         xp += 3; food -= 25; water -= 25; animateCat();
       }
       else if (actionType === 'buyFood') {
@@ -332,64 +443,71 @@
         cat.classList.add("happy-jump");
     }
 
-    // --- MINIGRA: ZŁAP RYBKĘ ---
+    // --- SYSTEM MINIGIER ---
     let gameInterval, gameTimer;
+    let currentGame = null;
     let timeLeft = 15;
     let currentScore = 0;
 
-    window.openMinigame = function() {
-        document.getElementById("minigame-modal").style.display = "flex";
-        timeLeft = 15; currentScore = 0;
-        document.getElementById("game-time").innerText = timeLeft;
-        document.getElementById("game-score").innerText = currentScore;
-        
-        const fish = document.getElementById("fish");
-        fish.style.display = "block";
-        moveFish();
+    // Norki dla myszy
+    const holes = [
+        {top: 15, left: 15}, {top: 15, left: 55}, 
+        {top: 55, left: 15}, {top: 55, left: 55}, {top: 35, left: 35}
+    ];
 
-        // Ruch rybki co 0.8 sekundy
-        gameInterval = setInterval(moveFish, 800);
+    window.openGame = function(gameName) {
+        currentGame = gameName;
+        document.getElementById(`modal-${gameName}`).style.display = "flex";
+        timeLeft = 15; currentScore = 0;
         
-        // Zegar
+        document.getElementById(`time-${gameName}`).innerText = timeLeft;
+        document.getElementById(`score-${gameName}`).innerText = currentScore;
+        
+        moveTarget();
+        gameInterval = setInterval(moveTarget, gameName === 'fish' ? 800 : 700);
+        
         gameTimer = setInterval(() => {
             timeLeft--;
-            document.getElementById("game-time").innerText = timeLeft;
-            if(timeLeft <= 0) closeMinigame();
+            document.getElementById(`time-${gameName}`).innerText = timeLeft;
+            if(timeLeft <= 0) closeGame();
         }, 1000);
     }
 
-    window.catchFish = function() {
+    window.clickTarget = function(gameName) {
         currentScore++;
-        document.getElementById("game-score").innerText = currentScore;
-        const fish = document.getElementById("fish");
-        fish.style.display = "none"; // znika po kliknięciu
-        setTimeout(moveFish, 200); // pojawia się w nowym miejscu
+        document.getElementById(`score-${gameName}`).innerText = currentScore;
+        const obj = document.getElementById(`obj-${gameName}`);
+        obj.style.display = "none";
+        setTimeout(moveTarget, 150);
     }
 
-    function moveFish() {
-        const fish = document.getElementById("fish");
-        const area = document.getElementById("game-area");
-        // Losowa pozycja (odjęte wymiary rybki żeby nie wychodziła poza ekran)
-        const maxW = area.clientWidth - 60;
-        const maxH = area.clientHeight - 60;
-        const randX = Math.floor(Math.random() * maxW);
-        const randY = Math.floor(Math.random() * maxH);
-        
-        fish.style.left = randX + "px";
-        fish.style.top = randY + "px";
-        fish.style.display = "block";
+    function moveTarget() {
+        const obj = document.getElementById(`obj-${currentGame}`);
+        if(currentGame === 'fish') {
+            const area = document.getElementById("area-fish");
+            const maxX = area.clientWidth - 50;
+            const maxY = area.clientHeight - 50;
+            obj.style.left = Math.floor(Math.random() * maxX) + "px";
+            obj.style.top = Math.floor(Math.random() * maxY) + "px";
+        } else if (currentGame === 'mouse') {
+            const randomHole = holes[Math.floor(Math.random() * holes.length)];
+            obj.style.left = (randomHole.left - 2) + "%";
+            obj.style.top = (randomHole.top - 8) + "%";
+        }
+        obj.style.display = "block";
     }
 
-    window.closeMinigame = async function() {
+    window.closeGame = async function() {
+        if(!currentGame) return;
         clearInterval(gameInterval);
         clearInterval(gameTimer);
-        document.getElementById("minigame-modal").style.display = "none";
+        document.getElementById(`modal-${currentGame}`).style.display = "none";
         
         if (currentScore > 0) {
-            alert(`Koniec czasu! Zdobywasz ${currentScore} 🪙`);
-            // Zapis do chmury (dodajemy zdobyte monety do obecnych)
+            alert(`Koniec czasu! Zarabiasz ${currentScore} 🪙`);
             await updateDoc(catDocRef, { coins: state.coins + currentScore });
         }
+        currentGame = null;
     }
   </script>
 </body>
