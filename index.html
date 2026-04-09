@@ -3,169 +3,111 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Nasz Kotek 🐾</title>
+  <title>Nasz Animowany Kotek 🐾</title>
   <style>
+    :root {
+      --primary: #ab47bc;
+      --bg: #f4f6f8;
+      --panel: #ffffff;
+    }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      text-align: center;
-      background-color: #f4f6f8;
-      margin: 0;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      color: #333;
+      text-align: center; background-color: var(--bg); margin: 0; padding: 10px;
+      display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: #333;
     }
     
-    /* Pasek górny z poziomem i monetami */
     .top-bar {
-      display: flex;
-      justify-content: space-between;
-      width: 90%;
-      max-width: 400px;
-      background: white;
-      padding: 15px 20px;
-      border-radius: 15px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      margin-top: 10px;
-      font-weight: bold;
-      font-size: 1.2em;
-      box-sizing: border-box;
+      display: flex; justify-content: space-between; width: 95%; max-width: 450px;
+      background: var(--panel); padding: 15px 20px; border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-top: 10px; font-weight: bold; box-sizing: border-box;
     }
-    .coins { color: #f57c00; }
-    .level { color: #6a1b9a; }
+    .coins { color: #f57c00; font-size: 1.2em;}
+    .level { color: var(--primary); font-size: 1.2em;}
 
-    /* Nagłówek i imiona */
-    h1 { margin: 15px 0 5px 0; color: #4a148c; font-size: 2em; }
-    .player-info { color: #777; font-size: 0.9em; margin-bottom: 10px; }
-    .btn-small { background: none; border: 1px solid #ab47bc; color: #ab47bc; border-radius: 8px; padding: 2px 8px; cursor: pointer; font-size: 0.8em; margin-left: 5px; }
+    h1 { margin: 15px 0 5px 0; color: #4a148c; font-size: 1.8em; }
+    .player-info { color: #777; font-size: 0.9em; margin-bottom: 5px; }
+    .btn-small { background: none; border: 1px solid var(--primary); color: var(--primary); border-radius: 8px; padding: 3px 8px; cursor: pointer; font-size: 0.8em; margin-left: 5px; }
 
-    /* Kotek */
-    #cat-container {
-      font-size: 110px;
-      margin: 10px 0;
-      transition: transform 0.2s;
+    /* ========================================= */
+    /* ANIMOWANY KOTEK (CSS + SVG)               */
+    /* ========================================= */
+    #cat-stage {
+      width: 220px; height: 220px; margin: 10px 0;
+      position: relative;
     }
-    .shake { animation: shake 0.4s ease-in-out; }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-10px) rotate(-5deg); }
-      75% { transform: translateX(10px) rotate(5deg); }
+    #animated-cat {
+      width: 100%; height: 100%;
+      /* Lekkie unoszenie się (oddychanie) */
+      animation: float 3s ease-in-out infinite;
     }
-
-    /* Paski potrzeb */
-    .vital-stats {
-      width: 90%;
-      max-width: 400px;
-      background: white;
-      padding: 15px 20px;
-      border-radius: 15px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      margin-bottom: 15px;
-      box-sizing: border-box;
+    /* Animacje */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
     }
-    .stat-row {
-      margin-bottom: 10px;
-      text-align: left;
-      font-size: 0.9em;
-      font-weight: bold;
-      color: #555;
+    @keyframes blink {
+      0%, 4%, 100% { transform: scaleY(1); }
+      2% { transform: scaleY(0.1); }
     }
-    .bar-bg {
-      background-color: #eee;
-      border-radius: 10px;
-      height: 18px;
-      width: 100%;
-      margin-top: 5px;
-      overflow: hidden;
+    @keyframes tailWag {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(15deg); }
     }
-    .bar-fill {
-      height: 100%;
-      transition: width 0.4s ease, background-color 0.4s ease;
-    }
-    #bar-food { width: 100%; background-color: #8bc34a; }
-    #bar-water { width: 100%; background-color: #29b6f6; }
-    #bar-xp { width: 0%; background-color: #ab47bc; height: 10px; margin-top: 10px; border-radius: 5px; }
-
-    /* Panele z przyciskami */
-    .action-panel {
-      width: 90%;
-      max-width: 400px;
-      margin-bottom: 10px;
-    }
-    .panel-title {
-      font-size: 0.85em;
-      text-transform: uppercase;
-      color: #888;
-      margin-bottom: 6px;
-      letter-spacing: 1px;
-    }
-    .buttons-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
+    .eye { animation: blink 4s infinite; transform-origin: center; }
+    .tail { animation: tailWag 3s ease-in-out infinite; transform-origin: 60% 80%; }
     
-    button.action-btn {
-      padding: 10px 5px;
-      font-size: 0.9em;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      color: white;
-      font-weight: bold;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      transition: transform 0.1s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 5px;
-    }
-    button.action-btn span { font-size: 1.4em; }
-    button.action-btn:active:not(:disabled) { transform: translateY(3px); box-shadow: none; }
-    button.action-btn:disabled { filter: grayscale(100%); opacity: 0.6; cursor: not-allowed; }
-
-    .btn-earn { background-color: #ab47bc; }
-    .btn-shop-food { background-color: #ff9800; }
-    .btn-shop-water { background-color: #03a9f4; }
-
-    #log {
-      margin-top: 10px;
-      margin-bottom: 20px;
-      font-size: 0.85em;
-      color: #666;
-      background: white;
-      padding: 10px 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      max-width: 400px;
-      width: 80%;
-      font-weight: 500;
+    /* Zmiana przy akcji */
+    .happy-jump { animation: happyJump 0.5s ease !important; }
+    @keyframes happyJump {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-20px) scale(1.05); }
     }
 
-    /* Modale (Okienka pop-up) */
+    /* ========================================= */
+    /* INTERFEJS I PASKI                         */
+    /* ========================================= */
+    .vital-stats {
+      width: 95%; max-width: 450px; background: var(--panel); padding: 15px;
+      border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 15px; box-sizing: border-box;
+    }
+    .stat-row { margin-bottom: 8px; text-align: left; font-size: 0.9em; font-weight: bold; color: #555; }
+    .bar-bg { background-color: #eee; border-radius: 10px; height: 16px; width: 100%; margin-top: 5px; overflow: hidden; }
+    .bar-fill { height: 100%; transition: width 0.4s ease, background-color 0.4s ease; }
+    #bar-food { background-color: #8bc34a; }
+    #bar-water { background-color: #29b6f6; }
+    #bar-xp { background-color: var(--primary); height: 8px; margin-top: 5px; }
+
+    .action-panel { width: 95%; max-width: 450px; margin-bottom: 15px; }
+    .panel-title { font-size: 0.85em; text-transform: uppercase; color: #888; margin-bottom: 8px; letter-spacing: 1px; font-weight: bold;}
+    
+    .buttons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .wardrobe-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 5px; }
+
+    button {
+      padding: 10px 5px; font-size: 0.9em; border: none; border-radius: 12px;
+      cursor: pointer; color: white; font-weight: bold;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: all 0.2s;
+    }
+    button span { font-size: 1.4em; display: block; margin-bottom: 2px; }
+    button:active:not(:disabled) { transform: translateY(3px); box-shadow: none; }
+    button:disabled { filter: grayscale(100%); opacity: 0.5; cursor: not-allowed; }
+
+    .btn-earn { background-color: var(--primary); }
+    .btn-shop { background-color: #03a9f4; }
+    .btn-wardrobe { background-color: #607d8b; font-size: 0.75em; padding: 10px 2px; }
+    .btn-wardrobe.active { background-color: #ff9800; box-shadow: 0 0 10px #ff9800; border: 2px solid white;}
+
+    #log { font-size: 0.85em; color: #666; background: white; padding: 10px; border-radius: 12px; width: 90%; max-width: 400px; margin-bottom: 20px;}
+
+    /* Modal imienia */
     #name-modal {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
-      display: none; flex-direction: column;
-      align-items: center; justify-content: center;
-      z-index: 1000;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8); display: none; flex-direction: column;
+      align-items: center; justify-content: center; z-index: 1000;
     }
-    .modal-box {
-      background: white; padding: 30px; border-radius: 20px;
-      text-align: center; width: 80%; max-width: 300px;
-    }
-    .modal-box input {
-      width: 90%; padding: 12px; margin: 15px 0;
-      border: 2px solid #ab47bc; border-radius: 10px;
-      font-size: 1.1em; text-align: center; outline: none;
-    }
-    .modal-box button {
-      background: #ab47bc; color: white; border: none;
-      padding: 12px 25px; border-radius: 10px; font-size: 1.1em; cursor: pointer;
-    }
+    .modal-box { background: white; padding: 30px; border-radius: 20px; text-align: center; }
+    .modal-box input { width: 90%; padding: 10px; margin: 15px 0; border: 2px solid var(--primary); border-radius: 10px; font-size: 1.1em; text-align: center; }
+    .modal-box button { background: var(--primary); color: white; padding: 10px 20px; border-radius: 10px; font-size: 1.1em; }
   </style>
 </head>
 <body>
@@ -173,61 +115,81 @@
   <div id="name-modal">
     <div class="modal-box">
       <h2>Kim jesteś? 👋</h2>
-      <p>Wpisz swoje imię (np. Arek lub Natalia):</p>
-      <input type="text" id="player-name-input" placeholder="Twoje imię...">
-      <button onclick="savePlayerName()">Zapisz</button>
+      <input type="text" id="player-name-input" placeholder="Wpisz imię...">
+      <button onclick="savePlayerName()">Wejdź do gry</button>
     </div>
   </div>
 
   <div class="top-bar">
-    <div class="level"><span id="level-text">Kociak</span> <span style="font-size:0.7em" id="xp-text">(0 XP)</span></div>
+    <div class="level">Poziom: <span id="level-text">1</span> <span style="font-size:0.7em" id="xp-text">(0 XP)</span></div>
     <div class="coins"><span id="coins-display">0</span> 🪙</div>
   </div>
   
   <h1 id="cat-name-display">Kotek</h1>
-  <div class="player-info">
-    Grasz jako: <strong id="current-player-display">Gość</strong> 
-    <button class="btn-small" onclick="changeCatName()">Zmień imię kotka</button>
-  </div>
+  <div class="player-info">Grasz jako: <strong id="current-player-display">Gość</strong> <button class="btn-small" onclick="changeCatName()">Zmień imię</button></div>
   
-  <div id="cat-container">🐱</div>
+  <div id="cat-stage">
+    <svg id="animated-cat" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <path class="tail" d="M 140 150 Q 180 150 170 100 Q 160 80 180 60" fill="none" stroke="#ffb74d" stroke-width="15" stroke-linecap="round"/>
+      
+      <path d="M 60 170 Q 100 110 140 170 Z" fill="#ffb74d" />
+      <path d="M 65 170 L 80 190 L 95 170" fill="#ffb74d" /> <path d="M 105 170 L 120 190 L 135 170" fill="#ffb74d" /> <polygon points="65,95 50,40 95,70" fill="#ff9800"/> <polygon points="135,95 150,40 105,70" fill="#ff9800"/> <circle cx="100" cy="100" r="45" fill="#ffb74d"/> <circle cx="100" cy="110" r="15" fill="#fff"/>
+      <ellipse cx="100" cy="105" rx="4" ry="3" fill="#ff8a80"/> <circle class="eye" cx="82" cy="90" r="4" fill="#333"/> <circle class="eye" cx="118" cy="90" r="4" fill="#333"/> <g id="cloth-bowtie" style="display: none;">
+        <polygon points="100,140 80,130 80,150" fill="#d50000"/>
+        <polygon points="100,140 120,130 120,150" fill="#d50000"/>
+        <circle cx="100" cy="140" r="4" fill="#ff1744"/>
+      </g>
+      <g id="cloth-glasses" style="display: none;">
+        <circle cx="82" cy="90" r="12" fill="none" stroke="#212121" stroke-width="4"/>
+        <circle cx="118" cy="90" r="12" fill="none" stroke="#212121" stroke-width="4"/>
+        <line x1="94" y1="90" x2="106" y2="90" stroke="#212121" stroke-width="4"/>
+      </g>
+      <g id="cloth-crown" style="display: none;">
+        <polygon points="70,55 85,25 100,45 115,25 130,55" fill="#ffea00"/>
+        <circle cx="85" cy="25" r="4" fill="#f50057"/>
+        <circle cx="100" cy="45" r="4" fill="#29b6f6"/>
+        <circle cx="115" cy="25" r="4" fill="#f50057"/>
+      </g>
+    </svg>
+  </div>
   
   <div class="vital-stats">
-    <div class="stat-row">
-      🍗 Najedzenie (<span id="food-text">100</span>%)
+    <div class="stat-row">🍗 Jedzenie (<span id="food-text">100</span>%)
       <div class="bar-bg"><div id="bar-food" class="bar-fill"></div></div>
     </div>
-    <div class="stat-row" style="margin-bottom: 0;">
-      💧 Nawodnienie (<span id="water-text">100</span>%)
+    <div class="stat-row" style="margin-bottom:0;">💧 Woda (<span id="water-text">100</span>%)
       <div class="bar-bg"><div id="bar-water" class="bar-fill"></div></div>
     </div>
-    <div style="text-align: center; font-size: 0.8em; margin-top: 15px; color: #888;">Postęp do zmiany wyglądu:</div>
-    <div class="bar-bg" style="height: 8px;"><div id="bar-xp" class="bar-fill"></div></div>
+    <div style="text-align: center; font-size: 0.8em; margin-top: 15px;">Postęp do następnego poziomu:</div>
+    <div class="bar-bg" style="height: 6px;"><div id="bar-xp" class="bar-fill"></div></div>
   </div>
 
   <div class="action-panel">
-    <div class="panel-title">Zabawa (Zarabiaj Monety)</div>
-    <div class="buttons-grid">
-      <button class="action-btn btn-earn" id="btn-pet"><span>🐾</span> Głaskaj<br><small>+2🪙 / -10% Energii</small></button>
-      <button class="action-btn btn-earn" id="btn-play"><span>🧶</span> Baw się<br><small>+5🪙 / -25% Energii</small></button>
+    <div class="panel-title">Szafa (Odblokuj poziomami)</div>
+    <div class="wardrobe-grid">
+      <button class="btn-wardrobe" id="btn-wear-none" onclick="equip('none')">Nic</button>
+      <button class="btn-wardrobe" id="btn-wear-bowtie" onclick="equip('bowtie')">Mucha<br>(Lvl 2)</button>
+      <button class="btn-wardrobe" id="btn-wear-glasses" onclick="equip('glasses')">Okulary<br>(Lvl 3)</button>
+      <button class="btn-wardrobe" id="btn-wear-crown" onclick="equip('crown')">Korona<br>(Lvl 4)</button>
     </div>
   </div>
 
   <div class="action-panel">
-    <div class="panel-title">Sklep (Odnawiaj Potrzeby)</div>
+    <div class="panel-title">Zabawa i Sklep</div>
     <div class="buttons-grid">
-      <button class="action-btn btn-shop-food" id="btn-buy-food"><span>🐟</span> Kup Rybę<br><small>Koszt: 10🪙 (+40% 🍗)</small></button>
-      <button class="action-btn btn-shop-water" id="btn-buy-water"><span>🥛</span> Kup Mleko<br><small>Koszt: 5🪙 (+40% 💧)</small></button>
+      <button class="btn-earn" onclick="doAction('pet')"><span>🐾</span> Głaskaj<br><small>+2🪙 | -10 E</small></button>
+      <button class="btn-earn" onclick="doAction('play')"><span>🧶</span> Baw się<br><small>+5🪙 | -25 E</small></button>
+      <button class="btn-shop" id="btn-buy-food" onclick="doAction('buyFood')"><span>🐟</span> Jedzenie<br><small>10🪙</small></button>
+      <button class="btn-shop" id="btn-buy-water" onclick="doAction('buyWater')"><span>🥛</span> Woda<br><small>5🪙</small></button>
     </div>
   </div>
 
-  <div id="log">Witajcie w grze! 🐾</div>
+  <div id="log">Ładowanie grafiki... 🐾</div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, doc, onSnapshot, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    // NOWA KONFIGURACJA FIREBASE
     const firebaseConfig = {
       apiKey: "AIzaSyD8qaNZKjmenGo0MxL4dI7MYb2khcHSUes",
       authDomain: "graznatalia-e1b58.firebaseapp.com",
@@ -240,142 +202,147 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    // Używamy dokumentu o nazwie 'wspolny_kotek'
-    const catDocRef = doc(db, "gra", "wspolny_kotek");
+    // WERSJA 3 - Nowe statystyki i ubrania
+    const catDocRef = doc(db, "gra", "wspolny_kotek_v3");
 
-    let state = { catName: "Puszek", xp: 0, coins: 20, food: 100, water: 100, log: "Zaczynamy!" };
+    let state = { catName: "Puszek", xp: 0, coins: 50, food: 100, water: 100, log: "Gotowy na zabawę!", equipped: "none" };
     
-    // --- OBSŁUGA IMIENIA GRACZA (LOCAL STORAGE) ---
+    // --- OBSŁUGA GRACZA ---
     let myName = localStorage.getItem("playerName");
-    if (!myName) {
-      document.getElementById("name-modal").style.display = "flex";
-    } else {
-      document.getElementById("current-player-display").innerText = myName;
-    }
+    if (!myName) document.getElementById("name-modal").style.display = "flex";
+    else document.getElementById("current-player-display").innerText = myName;
 
     window.savePlayerName = function() {
       const input = document.getElementById("player-name-input").value.trim();
       if(input) {
-        myName = input;
-        localStorage.setItem("playerName", myName);
+        myName = input; localStorage.setItem("playerName", myName);
         document.getElementById("current-player-display").innerText = myName;
         document.getElementById("name-modal").style.display = "none";
       }
     };
 
-    // --- ZMIANA IMIENIA KOTKA ---
     window.changeCatName = async function() {
-      const newName = prompt("Jak chcecie nazwać kotka?", state.catName);
-      if (newName && newName.trim() !== "") {
-        try {
-          await updateDoc(catDocRef, { catName: newName.trim() });
-        } catch(e) { console.error("Błąd zmiany imienia:", e); }
-      }
+      const newName = prompt("Zmień imię kotka:", state.catName);
+      if (newName && newName.trim() !== "") await updateDoc(catDocRef, { catName: newName.trim() });
     };
 
-    // Fazy rozwoju
-    const phases = [
-      { min: 0, max: 49, emoji: "🐱", name: "Kociak" },
-      { min: 50, max: 149, emoji: "🐈", name: "Kocur" },
-      { min: 150, max: 399, emoji: "🐅", name: "Tygrys" },
-      { min: 400, max: 99999, emoji: "🦁", name: "Lew" }
+    // System poziomów (XP do awansu)
+    const levels = [
+      { level: 1, reqXp: 0 },
+      { level: 2, reqXp: 20 }, // Odblokowuje muchę
+      { level: 3, reqXp: 50 }, // Odblokowuje okulary
+      { level: 4, reqXp: 100 } // Odblokowuje koronę
     ];
 
-    function updateColor(barElement, value) {
-      if(value > 50) barElement.style.backgroundColor = barElement.id === 'bar-food' ? '#8bc34a' : '#29b6f6';
-      else if(value > 20) barElement.style.backgroundColor = '#ffeb3b';
-      else barElement.style.backgroundColor = '#f44336';
+    function getLevel(xp) {
+      let current = levels[0];
+      for(let l of levels) if(xp >= l.reqXp) current = l;
+      return current;
     }
 
-    // Nasłuchiwanie bazy
+    // --- UBIERANIE KOTKA ---
+    window.equip = async function(item) {
+      if(!myName) return;
+      await updateDoc(catDocRef, { equipped: item, log: `${myName} przebrał(a) kotka! 👕` });
+    }
+
+    // --- ODBIÓR DANYCH (Real-time) ---
     onSnapshot(catDocRef, (docSnap) => {
       if (docSnap.exists()) {
         state = docSnap.data();
         
-        // Aktualizacja interfejsu
+        // Zwykłe statystyki
         document.getElementById("cat-name-display").innerText = state.catName + " 🐾";
         document.getElementById("coins-display").innerText = state.coins;
         document.getElementById("xp-text").innerText = `(${state.xp} XP)`;
-        
-        // Paski
         document.getElementById("food-text").innerText = state.food;
-        const foodBar = document.getElementById("bar-food");
-        foodBar.style.width = state.food + "%";
-        updateColor(foodBar, state.food);
-
+        document.getElementById("bar-food").style.width = state.food + "%";
         document.getElementById("water-text").innerText = state.water;
-        const waterBar = document.getElementById("bar-water");
-        waterBar.style.width = state.water + "%";
-        updateColor(waterBar, state.water);
-
-        // Animacja
-        const catEl = document.getElementById("cat-container");
-        catEl.classList.remove("shake");
-        void catEl.offsetWidth; 
-        catEl.classList.add("shake");
-
-        // Poziom
-        const currentPhase = phases.find(p => state.xp >= p.min && state.xp <= p.max) || phases[0];
-        catEl.innerText = currentPhase.emoji;
-        document.getElementById("level-text").innerText = currentPhase.name;
-
-        let xpPercent = 100;
-        if (currentPhase.max !== 99999) xpPercent = ((state.xp - currentPhase.min) / (currentPhase.max - currentPhase.min)) * 100;
-        document.getElementById("bar-xp").style.width = xpPercent + "%";
-
+        document.getElementById("bar-water").style.width = state.water + "%";
         if(state.log) document.getElementById("log").innerText = state.log;
 
-        // Włączanie/wyłączanie przycisków
+        // Obliczanie poziomu
+        const currentLvl = getLevel(state.xp);
+        document.getElementById("level-text").innerText = currentLvl.level;
+        
+        // Pasek XP do następnego poziomu
+        let nextLvl = levels.find(l => l.level === currentLvl.level + 1);
+        let xpPercent = 100;
+        if(nextLvl) {
+            let xpInLevel = state.xp - currentLvl.reqXp;
+            let xpNeeded = nextLvl.reqXp - currentLvl.reqXp;
+            xpPercent = (xpInLevel / xpNeeded) * 100;
+        }
+        document.getElementById("bar-xp").style.width = xpPercent + "%";
+
+        // Odblokowywanie szafy na podstawie poziomu
+        document.getElementById("btn-wear-bowtie").disabled = currentLvl.level < 2;
+        document.getElementById("btn-wear-glasses").disabled = currentLvl.level < 3;
+        document.getElementById("btn-wear-crown").disabled = currentLvl.level < 4;
+
+        // Reset zaznaczenia szafy i ukrycie ubrań w SVG
+        ['none', 'bowtie', 'glasses', 'crown'].forEach(item => {
+            document.getElementById(`btn-wear-${item}`).classList.remove("active");
+            if(item !== 'none') document.getElementById(`cloth-${item}`).style.display = "none";
+        });
+
+        // Włączenie wybranego ubrania
+        document.getElementById(`btn-wear-${state.equipped || 'none'}`).classList.add("active");
+        if(state.equipped && state.equipped !== 'none') {
+            document.getElementById(`cloth-${state.equipped}`).style.display = "block";
+        }
+
+        // Sklep wyłączanie
         document.getElementById("btn-buy-food").disabled = state.coins < 10 || state.food >= 100;
         document.getElementById("btn-buy-water").disabled = state.coins < 5 || state.water >= 100;
 
       } else {
-        // Nowa baza! Startowe dane
-        setDoc(catDocRef, { catName: "Puszek", xp: 0, coins: 20, food: 100, water: 100, log: "Witajcie w nowym domku! 🐾" });
+        // Dajemy wam 50 monet na start
+        setDoc(catDocRef, { catName: "Puszek", xp: 0, coins: 50, food: 100, water: 100, log: "Witaj w grze Pro!", equipped: "none" });
       }
     });
 
-    // Główna funkcja akcji
-    async function doAction(actionType) {
-      if(!myName) return alert("Najpierw podaj swoje imię!");
-      
+    // --- AKCJE ---
+    window.doAction = async function(actionType) {
+      if(!myName) return;
       let { xp, coins, food, water, catName } = state;
       let logMsg = "";
       const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
       if (actionType === 'pet') {
-        if (food < 10 || water < 10) return alert(`${catName} jest zbyt głodny/spragniony!`);
-        xp += 1; coins += 2; food -= 10; water -= 10;
+        if (food < 10 || water < 10) return alert(`${catName} nie ma siły!`);
+        xp += 2; coins += 2; food -= 10; water -= 10;
         logMsg = `${myName} głaszcze kotka! (+2🪙) o ${time}`;
+        animateCat();
       } 
       else if (actionType === 'play') {
-        if (food < 25 || water < 25) return alert(`${catName} opadł z sił, nakarm go!`);
-        xp += 3; coins += 5; food -= 25; water -= 25;
-        logMsg = `${myName} bawi się z kotkiem! (+5🪙) o ${time}`;
+        if (food < 25 || water < 25) return alert(`${catName} opadł z sił!`);
+        xp += 5; coins += 5; food -= 25; water -= 25;
+        logMsg = `${myName} super się bawi! (+5🪙) o ${time}`;
+        animateCat();
       }
       else if (actionType === 'buyFood') {
-        if (coins < 10) return;
-        coins -= 10; food += 40;
-        logMsg = `${myName} kupuje rybkę! 🐟 o ${time}`;
+        if (coins < 10) return; coins -= 10; food += 40;
+        logMsg = `${myName} karmi kotka 🐟 o ${time}`;
       }
       else if (actionType === 'buyWater') {
-        if (coins < 5) return;
-        coins -= 5; water += 40;
-        logMsg = `${myName} daje mleko! 🥛 o ${time}`;
+        if (coins < 5) return; coins -= 5; water += 40;
+        logMsg = `${myName} daje pić 🥛 o ${time}`;
       }
 
       food = Math.max(0, Math.min(100, food));
       water = Math.max(0, Math.min(100, water));
 
-      try {
-        await updateDoc(catDocRef, { xp, coins, food, water, log: logMsg });
-      } catch (e) { console.error("Błąd zapisu:", e); }
+      await updateDoc(catDocRef, { xp, coins, food, water, log: logMsg });
     }
 
-    document.getElementById("btn-pet").addEventListener("click", () => doAction('pet'));
-    document.getElementById("btn-play").addEventListener("click", () => doAction('play'));
-    document.getElementById("btn-buy-food").addEventListener("click", () => doAction('buyFood'));
-    document.getElementById("btn-buy-water").addEventListener("click", () => doAction('buyWater'));
+    // Efekt podskoku kotka przy głaskaniu/zabawie
+    function animateCat() {
+        const cat = document.getElementById("animated-cat");
+        cat.classList.remove("happy-jump");
+        void cat.offsetWidth; // reset animacji
+        cat.classList.add("happy-jump");
+    }
   </script>
 </body>
 </html>
