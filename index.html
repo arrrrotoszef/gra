@@ -94,17 +94,35 @@ function sendAnswer(ans) {
 
   db.ref("rooms/"+room).on("value", snap => {
     const data = snap.val();
-    if(data.p1 && data.p2) {
+function start() {
+  document.getElementById("menu").style.display="none";
+  document.getElementById("game").style.display="block";
+  document.getElementById("roomCode").innerText = "Pokój: "+room;
+
+  // Listener działa cały czas
+  db.ref("rooms/"+room).on("value", snap => {
+    const data = snap.val();
+    if(data && data.p1 && data.p2) {
       if(data.p1 === data.p2) {
         document.getElementById("result").innerText = "❤️ ZGODA!";
       } else {
         document.getElementById("result").innerText = "😂 Różne odpowiedzi";
       }
+      // Reset tylko pól odpowiedzi, nie całego obiektu
       setTimeout(()=>{
         document.getElementById("result").innerText="";
         loadQuestion();
-        db.ref("rooms/"+room).set({});
+        db.ref("rooms/"+room).update({p1:null,p2:null});
       },2000);
+    }
+  });
+
+  loadQuestion();
+}
+
+function sendAnswer(ans) {
+  db.ref("rooms/"+room+"/"+player).set(ans);
+}
     }
   });
 }
