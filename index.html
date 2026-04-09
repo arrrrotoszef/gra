@@ -110,108 +110,106 @@
     <button id="waterBtn" disabled>Ładowanie... 💧</button>
   </div>
 
-  <script type="module">
-    // Importujemy moduły Firebase z oficjalnego CDN
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+  import { getFirestore, doc, onSnapshot, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    // Twoja konfiguracja Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyBkJqgyQaxgjAtbwnNEpc7fRcreiQwDet4",
-      authDomain: "graonline-99bbe.firebaseapp.com",
-      projectId: "graonline-99bbe",
-      storageBucket: "graonline-99bbe.firebasestorage.app",
-      messagingSenderId: "528336041283",
-      appId: "1:528336041283:web:e3346bcd3aa5ac8413abf6",
-      measurementId: "G-YDVJRCW12T"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyBkJqgyQaxgjAtbwnNEpc7fRcreiQwDet4",
+    authDomain: "graonline-99bbe.firebaseapp.com",
+    projectId: "graonline-99bbe",
+    storageBucket: "graonline-99bbe.firebasestorage.app",
+    messagingSenderId: "528336041283",
+    appId: "1:528336041283:web:e3346bcd3aa5ac8413abf6",
+    measurementId: "G-YDVJRCW12T"
+  };
 
-    // Inicjalizacja Firebase i Firestore
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const treeRef = doc(db, "tree", "shared");
 
-    // Referencja do dokumentu "shared" w kolekcji "tree"
-    const treeRef = doc(db, "tree", "shared");
+  const treeEmoji = document.getElementById('treeEmoji');
+  const statusText = document.getElementById('statusText');
+  const messageDisplay = document.getElementById('messageDisplay');
+  const newMessageInput = document.getElementById('newMessage');
+  const waterBtn = document.getElementById('waterBtn');
 
-    // Pobieranie elementów z HTML
-    const treeEmoji = document.getElementById('treeEmoji');
-    const statusText = document.getElementById('statusText');
-    const messageDisplay = document.getElementById('messageDisplay');
-    const newMessageInput = document.getElementById('newMessage');
-    const waterBtn = document.getElementById('waterBtn');
+  let globalLastWatered = Date.now();
 
-    let globalLastWatered = Date.now();
+  function updateTreeStatus() {
+    const now = Date.now();
+    const hoursPassed = (now - globalLastWatered) / (1000 * 60 * 60);
 
-    // Funkcja obliczająca stan drzewka na podstawie upływu czasu
-    function updateTreeStatus() {
-      const now = Date.now();
-      const hoursPassed = (now - globalLastWatered) / (1000 * 60 * 60);
-
-      if (hoursPassed < 12) {
-        treeEmoji.innerText = "🌳";
-        statusText.innerText = "Drzewko jest szczęśliwe!";
-        statusText.style.color = "#2e7d32";
-      } else if (hoursPassed < 24) {
-        treeEmoji.innerText = "🌿";
-        statusText.innerText = "Drzewko chce pić...";
-        statusText.style.color = "#f57c00";
-      } else {
-        treeEmoji.innerText = "🥀";
-        statusText.innerText = "Drzewko usycha! Ratuj!";
-        statusText.style.color = "#d32f2f";
-      }
+    if (hoursPassed < 12) {
+      treeEmoji.innerText = "🌳";
+      statusText.innerText = "Drzewko jest szczęśliwe!";
+      statusText.style.color = "#2e7d32";
+    } else if (hoursPassed < 24) {
+      treeEmoji.innerText = "🌿";
+      statusText.innerText = "Drzewko chce pić...";
+      statusText.style.color = "#f57c00";
+    } else {
+      treeEmoji.innerText = "🥀";
+      statusText.innerText = "Drzewko usycha! Ratuj!";
+      statusText.style.color = "#d32f2f";
     }
+  }
 
-    // Nasłuchiwanie na zmiany w bazie danych w czasie rzeczywistym
-    onSnapshot(treeRef, (docSnap) => {
+  // FUNKCJA NASŁUCHUJĄCA (To ona odpowiada za odświeżanie u obu osób)
+  onSnapshot(treeRef, (docSnap) => {
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      console.log("Odebrano dane z bazy:", data); // Debugowanie w konsoli
+      
+      // Aktualizacja wiadomości na ekranie
+      messageDisplay.innerText = data.message || "Brak wiadomości.";
+      globalLastWatered = data.lastWatered || Date.now();
+      updateTreeStatus();
+      
       waterBtn.disabled = false;
       waterBtn.innerText = "Podlej drzewko 💧";
+    } else {
+      // Inicjalizacja, jeśli dokument nie istnieje
+      setDoc(treeRef, {
+        message: "Witajcie! Podlejcie mnie 😊",
+        lastWatered: Date.now()
+      });
+    }
+  });
 
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        messageDisplay.innerText = data.message || "Brak wiadomości.";
-        globalLastWatered = data.lastWatered || Date.now();
-        updateTreeStatus();
-      } else {
-        // Jeśli to pierwsze uruchomienie, stwórzmy dokument w bazie
-        setDoc(treeRef, {
-          message: "Witaj w naszej grze! Podlej mnie 😊",
-          lastWatered: Date.now()
-        });
+  // AKCJA PODLEWANIA
+  waterBtn.addEventListener('click', async () => {
+    const msg = newMessageInput.value.trim();
+    
+    // Blokujemy przycisk na chwilę wysyłania
+    waterBtn.disabled = true;
+    waterBtn.innerText = "Wysyłanie...";
+
+    try {
+      // Przygotowujemy dane do aktualizacji
+      const updateData = {
+        lastWatered: Date.now()
+      };
+      
+      // Jeśli użytkownik wpisał nową wiadomość, dodajemy ją do aktualizacji
+      if (msg !== "") {
+        updateData.message = msg;
       }
-    }, (error) => {
-      console.error("Błąd Firebase:", error);
-      statusText.innerText = "Błąd połączenia. Sprawdź reguły bazy danych!";
-      statusText.style.color = "red";
-    });
 
-    // Akcja podlewania (zapis do bazy)
-    waterBtn.addEventListener('click', async () => {
-      const msg = newMessageInput.value;
-      // Jeśli pole tekstowe jest puste, zachowaj starą wiadomość
-      const finalMessage = msg.trim() !== "" ? msg : messageDisplay.innerText;
+      // Używamy updateDoc, aby nie nadpisać całego dokumentu, tylko wybrane pola
+      await updateDoc(treeRef, updateData);
+      
+      newMessageInput.value = ""; 
+      console.log("Zaktualizowano pomyślnie!");
+    } catch (error) {
+      console.error("Błąd zapisu:", error);
+      alert("Wystąpił błąd zapisu. Upewnij się, że masz włączone reguły zapisu w konsoli Firebase Firestore!");
+      waterBtn.disabled = false;
+      waterBtn.innerText = "Spróbuj ponownie 💧";
+    }
+  });
 
-      waterBtn.disabled = true;
-      waterBtn.innerText = "Podlewanie...";
-
-      // Ustawienie uroczej animacji na kliknięcie
-      treeEmoji.style.transform = "scale(1.3) rotate(5deg)";
-      setTimeout(() => { treeEmoji.style.transform = "scale(1) rotate(0deg)"; }, 300);
-
-      try {
-        await setDoc(treeRef, {
-          message: finalMessage,
-          lastWatered: Date.now()
-        });
-        newMessageInput.value = ""; // Wyczyść pole po wysłaniu
-      } catch (error) {
-        console.error("Nie udało się podlać:", error);
-        alert("Błąd! Nie zapisało się. Prawdopodobnie brak uprawnień Firestore.");
-      }
-    });
-
-    // Odświeżaj stan drzewka wizualnie co 1 minutę (bez nabijania odczytów w bazie)
-    setInterval(updateTreeStatus, 60000);
-  </script>
+  setInterval(updateTreeStatus, 60000);
+</script>
 </body>
 </html>
