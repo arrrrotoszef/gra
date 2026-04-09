@@ -3,213 +3,226 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Nasze Drzewko 💚</title>
+  <title>Nasza Roślinka 🌱</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #e8f5e9;
-      color: #2e7d32;
+      text-align: center;
+      background-color: #e8f5e9; /* Pastelowy zielony */
+      margin: 0;
+      padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      margin: 0;
-      text-align: center;
-    }
-    .container {
-      background: white;
-      padding: 30px 20px;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-      width: 85%;
-      max-width: 400px;
-    }
-    h2 {
-      margin-top: 0;
-      color: #388e3c;
-    }
-    .tree {
-      font-size: 100px;
-      margin: 10px 0;
-      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      display: inline-block;
-    }
-    .status {
-      font-weight: 600;
-      margin-bottom: 25px;
-      font-size: 1.1em;
-    }
-    .message-box {
-      background: #f1f8e9;
-      border-left: 5px solid #8bc34a;
-      padding: 15px;
-      margin: 20px 0;
-      border-radius: 0 10px 10px 0;
-      color: #555;
-      text-align: left;
-    }
-    .message-text {
-      font-style: italic;
-      font-size: 1.1em;
-      display: block;
-      margin-top: 5px;
       color: #333;
     }
-    input[type="text"] {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 12px;
-      border: 2px solid #e0e0e0;
-      border-radius: 12px;
-      margin-bottom: 15px;
-      font-size: 16px;
-      outline: none;
-      transition: border-color 0.3s;
+    h1 { color: #2e7d32; margin-bottom: 5px; }
+    p.subtitle { color: #555; margin-top: 0; margin-bottom: 30px; }
+    
+    #plant-container {
+      font-size: 120px;
+      margin: 20px 0;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    input[type="text"]:focus {
-      border-color: #8bc34a;
+    .bounce { transform: scale(1.3); }
+
+    .stats {
+      background: white;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+      margin-bottom: 30px;
+      width: 85%;
+      max-width: 350px;
+    }
+    .stats-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.1em;
+      margin-bottom: 10px;
+    }
+    .progress-bar {
+      background-color: #f5f5f5;
+      border-radius: 10px;
+      height: 20px;
+      width: 100%;
+      overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    }
+    #progress {
+      background-color: #4caf50;
+      height: 100%;
+      width: 0%;
+      transition: width 0.5s ease-out;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 90%;
     }
     button {
-      background-color: #4caf50;
-      color: white;
+      flex: 1;
+      min-width: 140px;
+      padding: 15px 20px;
+      font-size: 1.1em;
       border: none;
-      padding: 15px 30px;
-      font-size: 18px;
-      font-weight: bold;
-      border-radius: 25px;
+      border-radius: 15px;
       cursor: pointer;
-      width: 100%;
-      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
-      transition: background-color 0.3s, transform 0.1s;
+      color: white;
+      font-weight: bold;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+      transition: all 0.1s;
+      -webkit-tap-highlight-color: transparent;
     }
-    button:active {
-      transform: scale(0.95);
-      background-color: #43a047;
+    button:active { 
+      transform: translateY(4px); 
+      box-shadow: 0 0px 0px rgba(0,0,0,0.15); 
     }
-    button:disabled {
-      background-color: #a5d6a7;
-      cursor: not-allowed;
+    #btn-water { background-color: #29b6f6; } /* Niebieski */
+    #btn-love { background-color: #ec407a; } /* Różowy */
+
+    #log {
+      margin-top: 30px;
+      font-size: 0.9em;
+      color: #777;
+      min-height: 20px;
+      background: rgba(255,255,255,0.5);
+      padding: 8px 15px;
+      border-radius: 10px;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h2>Nasze Drzewko 💚</h2>
-    
-    <div class="tree" id="treeEmoji">🌱</div>
-    <div class="status" id="statusText">Łączenie z bazą...</div>
-
-    <div class="message-box">
-      <strong>Ostatnia wiadomość:</strong>
-      <span class="message-text" id="messageDisplay">Czekam na wiadomość...</span>
+  <h1>Nasza Roślinka</h1>
+  <p class="subtitle">Dbajcie o nią wspólnie!</p>
+  
+  <div id="plant-container">🌱</div>
+  
+  <div class="stats">
+    <div class="stats-info">
+      <span id="level-text">Ziarenko</span>
+      <span><strong id="score">0</strong> pkt</span>
     </div>
-
-    <input type="text" id="newMessage" placeholder="Napisz coś miłego (opcjonalnie)...">
-    <button id="waterBtn" disabled>Ładowanie... 💧</button>
+    <div class="progress-bar"><div id="progress"></div></div>
   </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-  import { getFirestore, doc, onSnapshot, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+  <div class="buttons">
+    <button id="btn-water">Podlej 💧</button>
+    <button id="btn-love">Daj miłość ❤️</button>
+  </div>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBkJqgyQaxgjAtbwnNEpc7fRcreiQwDet4",
-    authDomain: "graonline-99bbe.firebaseapp.com",
-    projectId: "graonline-99bbe",
-    storageBucket: "graonline-99bbe.firebasestorage.app",
-    messagingSenderId: "528336041283",
-    appId: "1:528336041283:web:e3346bcd3aa5ac8413abf6",
-    measurementId: "G-YDVJRCW12T"
-  };
+  <div id="log">Ładowanie...</div>
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const treeRef = doc(db, "tree", "shared");
+  <script type="module">
+    // Importy Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, doc, onSnapshot, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-  const treeEmoji = document.getElementById('treeEmoji');
-  const statusText = document.getElementById('statusText');
-  const messageDisplay = document.getElementById('messageDisplay');
-  const newMessageInput = document.getElementById('newMessage');
-  const waterBtn = document.getElementById('waterBtn');
+    // Twoja konfiguracja Firebase
+    const firebaseConfig = {
+  apiKey: "AIzaSyD8qaNZKjmenGo0MxL4dI7MYb2khcHSUes",
+  authDomain: "graznatalia-e1b58.firebaseapp.com",
+  projectId: "graznatalia-e1b58",
+  storageBucket: "graznatalia-e1b58.firebasestorage.app",
+  messagingSenderId: "265631462505",
+  appId: "1:265631462505:web:40b3bb8c72908cf8461ef8",
+  measurementId: "G-JWW9JW9TD0"
+    };
 
-  let globalLastWatered = Date.now();
+    // Inicjalizacja
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const plantDocRef = doc(db, "gra", "nasza_roslinka");
 
-  function updateTreeStatus() {
-    const now = Date.now();
-    const hoursPassed = (now - globalLastWatered) / (1000 * 60 * 60);
+    // Elementy interfejsu
+    const plantEl = document.getElementById("plant-container");
+    const scoreEl = document.getElementById("score");
+    const levelTextEl = document.getElementById("level-text");
+    const progressEl = document.getElementById("progress");
+    const logEl = document.getElementById("log");
+    const btnWater = document.getElementById("btn-water");
+    const btnLove = document.getElementById("btn-love");
 
-    if (hoursPassed < 12) {
-      treeEmoji.innerText = "🌳";
-      statusText.innerText = "Drzewko jest szczęśliwe!";
-      statusText.style.color = "#2e7d32";
-    } else if (hoursPassed < 24) {
-      treeEmoji.innerText = "🌿";
-      statusText.innerText = "Drzewko chce pić...";
-      statusText.style.color = "#f57c00";
-    } else {
-      treeEmoji.innerText = "🥀";
-      statusText.innerText = "Drzewko usycha! Ratuj!";
-      statusText.style.color = "#d32f2f";
+    // Fazy rozwoju rośliny (ile punktów potrzeba na daną fazę)
+    const phases = [
+      { min: 0, max: 19, emoji: "🌱", name: "Ziarenko" },
+      { min: 20, max: 49, emoji: "🌿", name: "Kiełek" },
+      { min: 50, max: 99, emoji: "🌷", name: "Piękny Kwiatek" },
+      { min: 100, max: 99999, emoji: "🌳", name: "Wielkie Drzewo" }
+    ];
+
+    // Funkcja sprawdzająca aktualną fazę
+    function getPhase(score) {
+      return phases.find(p => score >= p.min && score <= p.max) || phases[0];
     }
-  }
 
-  // FUNKCJA NASŁUCHUJĄCA (To ona odpowiada za odświeżanie u obu osób)
-  onSnapshot(treeRef, (docSnap) => {
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      console.log("Odebrano dane z bazy:", data); // Debugowanie w konsoli
-      
-      // Aktualizacja wiadomości na ekranie
-      messageDisplay.innerText = data.message || "Brak wiadomości.";
-      globalLastWatered = data.lastWatered || Date.now();
-      updateTreeStatus();
-      
-      waterBtn.disabled = false;
-      waterBtn.innerText = "Podlej drzewko 💧";
-    } else {
-      // Inicjalizacja, jeśli dokument nie istnieje
-      setDoc(treeRef, {
-        message: "Witajcie! Podlejcie mnie 😊",
-        lastWatered: Date.now()
-      });
-    }
-  });
+    // Nasłuchiwanie zmian w bazie (czas rzeczywisty)
+    onSnapshot(plantDocRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const score = data.punkty || 0;
+        
+        // Zaktualizuj tekst punktów i log
+        scoreEl.innerText = score;
+        if(data.ostatniaAkcja) logEl.innerText = data.ostatniaAkcja;
 
-  // AKCJA PODLEWANIA
-  waterBtn.addEventListener('click', async () => {
-    const msg = newMessageInput.value.trim();
-    
-    // Blokujemy przycisk na chwilę wysyłania
-    waterBtn.disabled = true;
-    waterBtn.innerText = "Wysyłanie...";
+        // Efekt odbicia (animacja przy zmianie punktów)
+        plantEl.classList.add("bounce");
+        setTimeout(() => plantEl.classList.remove("bounce"), 300);
 
-    try {
-      // Przygotowujemy dane do aktualizacji
-      const updateData = {
-        lastWatered: Date.now()
-      };
-      
-      // Jeśli użytkownik wpisał nową wiadomość, dodajemy ją do aktualizacji
-      if (msg !== "") {
-        updateData.message = msg;
+        // Ustal fazę i zaktualizuj emoji/tekst
+        const currentPhase = getPhase(score);
+        plantEl.innerText = currentPhase.emoji;
+        levelTextEl.innerText = currentPhase.name;
+
+        // Oblicz pasek postępu do następnego poziomu
+        let percent = 100;
+        if (currentPhase.max !== 99999) {
+            const phaseRange = currentPhase.max - currentPhase.min + 1;
+            const pointsInPhase = score - currentPhase.min;
+            percent = (pointsInPhase / phaseRange) * 100;
+        }
+        progressEl.style.width = percent + "%";
+
+      } else {
+        // Tworzy dokument z punktem startowym, jeśli nie istnieje
+        setDoc(plantDocRef, { punkty: 0, ostatniaAkcja: "Zasadzono nową roślinkę! 🌱" });
       }
+    });
 
-      // Używamy updateDoc, aby nie nadpisać całego dokumentu, tylko wybrane pola
-      await updateDoc(treeRef, updateData);
-      
-      newMessageInput.value = ""; 
-      console.log("Zaktualizowano pomyślnie!");
-    } catch (error) {
-      console.error("Błąd zapisu:", error);
-      alert("Wystąpił błąd zapisu. Upewnij się, że masz włączone reguły zapisu w konsoli Firebase Firestore!");
-      waterBtn.disabled = false;
-      waterBtn.innerText = "Spróbuj ponownie 💧";
+    // Funkcja dodająca punkty do bazy
+    async function addPoints(points, actionName) {
+        // Blokada przycisków na moment, żeby nie klikać za szybko
+        btnWater.disabled = true;
+        btnLove.disabled = true;
+        
+        const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        
+        try {
+            await updateDoc(plantDocRef, { 
+                punkty: increment(points),
+                ostatniaAkcja: `${actionName} (o ${time})`
+            });
+        } catch (error) {
+            console.error("Błąd!", error);
+        }
+        
+        // Odblokowanie po 300ms
+        setTimeout(() => {
+            btnWater.disabled = false;
+            btnLove.disabled = false;
+        }, 300);
     }
-  });
 
-  setInterval(updateTreeStatus, 60000);
-</script>
+    // Przypisanie zdarzeń do przycisków
+    btnWater.addEventListener("click", () => addPoints(1, "Ktoś podlał roślinkę 💧"));
+    btnLove.addEventListener("click", () => addPoints(5, "Roślinka dostała dużo miłości ❤️"));
+  </script>
 </body>
 </html>
