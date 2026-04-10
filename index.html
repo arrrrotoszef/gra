@@ -1,259 +1,81 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Nasz Pengu V5 ❤️</title>
-  <style>
-    :root {
-      --primary: #ff758c;
-      --glass: rgba(255, 255, 255, 0.15);
-    }
-    * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
-    body { 
-      margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column;
-      background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
-      font-family: 'Segoe UI', Roboto, sans-serif; color: #333;
-    }
-    body.night { filter: brightness(0.5) contrast(1.2); background: #1a1a2e; }
-
-    /* UI Glassmorphism */
-    .panel { background: var(--glass); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.3); border-radius: 25px; margin: 10px; padding: 15px; }
-    
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .stat-bar { height: 12px; background: rgba(0,0,0,0.1); border-radius: 6px; overflow: hidden; margin-top: 5px; }
-    .fill { height: 100%; transition: width 0.5s ease; }
-
-    /* PINGWIN SVG ANIMOWANY */
-    .stage { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; }
-    #pengu-svg { width: 280px; height: auto; cursor: pointer; transition: transform 0.2s; }
-    
-    /* Animacja mrugania */
-    @keyframes blink { 0%, 90%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
-    .eye { transform-origin: center; animation: blink 4s infinite; }
-    
-    /* Animacja oddychania */
-    @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
-    .body-group { animation: breathe 3s ease-in-out infinite; transform-origin: bottom center; }
-
-    /* Radosny podskok */
-    .happy-jump { animation: jump 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    @keyframes jump { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-40px) rotate(5deg); } }
-
-    /* Mydło i brud */
-    #dirt-spots { pointer-events: none; transition: opacity 0.5s; }
-    #soap-tool { 
-        position: absolute; width: 80px; height: 50px; background: #ffd1dc; border: 4px solid #ffb6c1; 
-        border-radius: 25px; display: none; z-index: 100; touch-action: none; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
-
-    /* Dolne Menu */
-    .menu { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 10px 20px 30px; }
-    .btn { 
-        background: white; border: none; border-radius: 20px; padding: 12px; font-weight: bold;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center;
-    }
-    .btn:active { transform: scale(0.95); }
-    .btn i { font-style: normal; font-size: 24px; margin-bottom: 5px; }
-
-    /* Sklepy i Modale */
-    .modal { 
-        display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); 
-        z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(5px);
-    }
-    .modal-content { background: white; width: 90%; max-width: 400px; border-radius: 30px; padding: 25px; max-height: 70vh; overflow-y: auto; }
-    .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-    .item-card { border: 2px solid #f0f0f0; border-radius: 20px; padding: 10px; text-align: center; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Pet Pro</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="game-container">
+        <header class="hud">
+            <div class="stat-box">LVL: <span id="lvl">1</span></div>
+            <div class="stat-box">XP: <span id="xp">0</span>/100</div>
+            <div class="currency">
+                <div class="coin">MONETY: <span id="coins">500</span></div>
+                <div class="diamond">DIAMENTY: <span id="diamonds">10</span></div>
+            </div>
+        </header>
 
-<div class="panel stats-grid">
-    <div>
-        <small>🍎 Głód</small>
-        <div class="stat-bar"><div id="h-fill" class="fill" style="background: #ff7675; width: 50%;"></div></div>
+        <main class="game-view">
+            <div id="pet-stage">
+                <div class="pet" id="pet-character">
+                    <div class="pet-body">
+                        <div class="eyes">
+                            <div class="eye left"></div>
+                            <div class="eye right"></div>
+                        </div>
+                        <div class="mouth"></div>
+                    </div>
+                </div>
+                <div id="pet-accessory-slot"></div>
+            </div>
+
+            <div class="status-bars">
+                <div class="bar-container">
+                    <label>GŁÓD</label>
+                    <div class="bar"><div id="hunger-fill" class="fill hunger"></div></div>
+                </div>
+                <div class="bar-container">
+                    <label>ENERGIA</label>
+                    <div class="bar"><div id="energy-fill" class="fill energy"></div></div>
+                </div>
+                <div class="bar-container">
+                    <label>SZCZĘŚCIE</label>
+                    <div class="bar"><div id="happy-fill" class="fill happy"></div></div>
+                </div>
+            </div>
+        </main>
+
+        <aside id="chat-sidebar">
+            <div class="chat-header">DZIEWCZYNA (NPC) - WIĘŹ: <span id="bond-lvl">1</span></div>
+            <div id="chat-messages"></div>
+            <div class="chat-input-area">
+                <button onclick="interactWithGirl()">Rozmawiaj</button>
+            </div>
+        </aside>
+
+        <nav class="actions">
+            <button class="btn feed" onclick="action('feed')">KARM</button>
+            <button class="btn wash" onclick="action('wash')">MYJ</button>
+            <button class="btn play" onclick="action('play')">BAW SIĘ</button>
+            <button class="btn sleep" onclick="action('sleep')">ŚPIJ</button>
+            <button class="btn shop" onclick="toggleShop()">SKLEP</button>
+        </nav>
+
+        <div id="shop-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Sklep i Personalizacja</h2>
+                <div class="shop-items">
+                    <div class="item" onclick="buyItem('hat', 100)">Czapka (100 monet)</div>
+                    <div class="item" onclick="buyItem('glasses', 250)">Okulary (250 monet)</div>
+                    <div class="item" onclick="buyItem('skin_gold', 50, 'diamond')">Złoty kolor (50 diamentów)</div>
+                </div>
+                <button onclick="toggleShop()">Zamknij</button>
+            </div>
+        </div>
     </div>
-    <div>
-        <small>🛁 Czystość</small>
-        <div class="stat-bar"><div id="c-fill" class="fill" style="background: #74b9ff; width: 50%;"></div></div>
-    </div>
-    <div style="grid-column: span 2; text-align: center; font-weight: bold; font-size: 18px; color: #d35400;">
-        Poziom <span id="lvl-txt">1</span> • <span id="coins-txt">100</span> 💰
-    </div>
-</div>
 
-<div class="stage">
-    <div id="soap-tool"></div>
-    <svg id="pengu-svg" viewBox="0 0 200 220" onclick="petPengu()">
-        <g class="body-group">
-            <ellipse cx="75" cy="205" rx="20" ry="10" fill="#f39c12"/>
-            <ellipse cx="125" cy="205" rx="20" ry="10" fill="#f39c12"/>
-            <path d="M40,100 Q40,20 100,20 Q160,20 160,100 L170,180 Q170,210 100,210 Q30,210 30,180 Z" fill="#2d3436"/>
-            <path d="M60,110 Q60,60 100,60 Q140,60 140,110 L150,185 Q150,200 100,200 Q50,200 50,185 Z" fill="white"/>
-            <path d="M35,110 Q10,130 25,170" fill="none" stroke="#2d3436" stroke-width="20" stroke-linecap="round"/>
-            <path d="M165,110 Q190,130 175,170" fill="none" stroke="#2d3436" stroke-width="20" stroke-linecap="round"/>
-            <circle class="eye" cx="80" cy="85" r="8" fill="black"/>
-            <circle class="eye" cx="120" cy="85" r="8" fill="black"/>
-            <circle cx="82" cy="82" r="3" fill="white" opacity="0.6"/>
-            <circle cx="122" cy="82" r="3" fill="white" opacity="0.6"/>
-            <path d="M90,100 L110,100 L100,115 Z" fill="#fdcb6e"/>
-            <g id="dirt-spots" opacity="0">
-                <circle cx="80" cy="150" r="15" fill="#5d4037" opacity="0.6"/>
-                <circle cx="120" cy="170" r="10" fill="#5d4037" opacity="0.5"/>
-            </g>
-            <g id="hat-slot"></g>
-            <g id="shirt-slot"></g>
-        </g>
-    </svg>
-</div>
-
-<div class="menu">
-    <button class="btn" onclick="openShop('food')"><i>🍔</i>Jedzenie</button>
-    <button class="btn" onclick="startWash()"><i>🧼</i>Mycie</button>
-    <button class="btn" onclick="openShop('clothes')"><i>👕</i>Sklep</button>
-    <button class="btn" onclick="toggleSleep()"><i>💤</i>Sen</button>
-</div>
-
-<div id="modal" class="modal">
-    <div class="modal-content">
-        <h2 id="modal-title">Sklep</h2>
-        <div id="modal-body" class="shop-grid"></div>
-        <button class="btn" style="width:100%; margin-top:15px; background:#eee;" onclick="closeModal()">Zamknij</button>
-    </div>
-</div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, doc, onSnapshot, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyD8qaNZKjmenGo0MxL4dI7MYb2khcHSUes",
-        authDomain: "graznatalia-e1b58.firebaseapp.com",
-        projectId: "graznatalia-e1b58"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const petRef = doc(db, "gameData", "pengu_v5_final");
-
-    let state = {
-        hunger: 50, hygiene: 50, coins: 100, level: 1, xp: 0,
-        isSleeping: false, unlocked: [], equipped: { hat: null, shirt: null }
-    };
-
-    // Dane przedmiotów
-    const ITEMS = {
-        food: [
-            { id: 'pizza', name: '🍕 Pizza', cost: 15, val: 30 },
-            { id: 'fish', name: '🐟 Ryba', cost: 5, val: 15 },
-            { id: 'donut', name: '🍩 Donut', cost: 8, val: 20 }
-        ],
-        clothes: [
-            { id: 'hat_top', name: '🎩 Cylinder', cost: 50, type: 'hat', svg: '<rect x="75" y="0" width="50" height="30" fill="black"/><rect x="65" y="25" width="70" height="5" fill="black"/>' },
-            { id: 'shirt_red', name: '👕 Bluza', cost: 80, type: 'shirt', svg: '<path d="M60,110 Q100,100 140,110 L150,180 Q100,190 50,180 Z" fill="#d63031"/>' }
-        ]
-    };
-
-    onSnapshot(petRef, (docSnap) => {
-        if(docSnap.exists()) {
-            state = docSnap.data();
-            updateUI();
-        } else {
-            setDoc(petRef, state);
-        }
-    });
-
-    function updateUI() {
-        document.getElementById('h-fill').style.width = state.hunger + '%';
-        document.getElementById('c-fill').style.width = state.hygiene + '%';
-        document.getElementById('coins-txt').innerText = state.coins;
-        document.getElementById('lvl-txt').innerText = state.level;
-        document.getElementById('dirt-spots').style.opacity = (100 - state.hygiene) / 100;
-        
-        document.body.className = state.isSleeping ? 'night' : '';
-
-        // Render ubrań
-        document.getElementById('hat-slot').innerHTML = state.equipped.hat ? ITEMS.clothes.find(c => c.id === state.equipped.hat).svg : '';
-        document.getElementById('shirt-slot').innerHTML = state.equipped.shirt ? ITEMS.clothes.find(c => c.id === state.equipped.shirt).svg : '';
-    }
-
-    // Funkcje globalne
-    window.openShop = (type) => {
-        const modal = document.getElementById('modal');
-        const body = document.getElementById('modal-body');
-        document.getElementById('modal-title').innerText = type === 'food' ? 'Lodówka' : 'Butik';
-        body.innerHTML = '';
-
-        ITEMS[type].forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'item-card';
-            const isOwned = state.unlocked.includes(item.id);
-            div.innerHTML = `
-                <div>${item.name}</div>
-                <button onclick="buyItem('${type}', '${item.id}')" class="btn" style="width:100%; font-size:12px; margin-top:5px;">
-                    ${isOwned ? 'Załóż' : item.cost + ' 💰'}
-                </button>
-            `;
-            body.appendChild(div);
-        });
-        modal.style.display = 'flex';
-    };
-
-    window.buyItem = async (type, id) => {
-        const item = ITEMS[type].find(i => i.id === id);
-        if (state.unlocked.includes(id)) {
-            // Zakładanie ubrań
-            let equipped = {...state.equipped};
-            equipped[item.type] = equipped[item.type] === id ? null : id;
-            await updateDoc(petRef, { equipped });
-        } else {
-            if (state.coins < item.cost) return alert("Za mało monet!");
-            const updates = { coins: state.coins - item.cost };
-            if (type === 'food') {
-                updates.hunger = Math.min(100, state.hunger + item.val);
-                petPengu();
-            } else {
-                updates.unlocked = [...state.unlocked, id];
-            }
-            await updateDoc(petRef, updates);
-        }
-        closeModal();
-    };
-
-    window.closeModal = () => document.getElementById('modal').style.display = 'none';
-
-    window.petPengu = () => {
-        const svg = document.getElementById('pengu-svg');
-        svg.classList.add('happy-jump');
-        setTimeout(() => svg.classList.remove('happy-jump'), 500);
-    };
-
-    // Mycie interaktywne
-    const soap = document.getElementById('soap-tool');
-    let washing = false;
-    window.startWash = () => { 
-        soap.style.display = 'block'; 
-        alert("Pocieraj pingwina mydłem!"); 
-    };
-
-    soap.onmousedown = soap.ontouchstart = () => washing = true;
-    window.onmousemove = window.ontouchmove = (e) => {
-        if(!washing) return;
-        const x = (e.clientX || e.touches[0].clientX) - 40;
-        const y = (e.clientY || e.touches[0].clientY) - 25;
-        soap.style.left = x + 'px';
-        soap.style.top = y + 'px';
-
-        const rect = document.getElementById('pengu-svg').getBoundingClientRect();
-        if(x > rect.left && x < rect.right && y > rect.top && y < rect.bottom) {
-            if(Math.random() > 0.8) updateDoc(petRef, { hygiene: Math.min(100, state.hygiene + 2) });
-            if(state.hygiene >= 99) soap.style.display = 'none';
-        }
-    };
-    window.onmouseup = window.ontouchend = () => washing = false;
-
-    window.toggleSleep = () => updateDoc(petRef, { isSleeping: !state.isSleeping });
-
-</script>
+    <script type="module" src="game.js"></script>
 </body>
 </html>
