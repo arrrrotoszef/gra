@@ -2,55 +2,366 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nasz Wirtualny Pupil</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nasz Pupil - Edycja Premium</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --p-pink: #ff85a1;
+            --p-purple: #a29bfe;
+            --p-yellow: #ffeaa7;
+            --p-green: #55efc4;
+            --glass: rgba(255, 255, 255, 0.85);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: linear-gradient(135deg, var(--p-purple), var(--p-pink));
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            color: #2d3436;
+        }
+
+        /* Kontener Główny - Styl smartfona */
+        #game-app {
+            width: 380px;
+            height: 700px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-radius: 40px;
+            border: 6px solid white;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Górny panel statystyk */
+        .header {
+            padding: 25px 20px;
+            background: rgba(255,255,255,0.4);
+        }
+
+        .level-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .lvl-badge {
+            background: var(--p-purple);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .currency-row { font-size: 1.1em; }
+
+        .stats-container {
+            display: grid;
+            gap: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        .bar-bg {
+            flex-grow: 1;
+            height: 12px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            width: 80%;
+            transition: width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 6px;
+        }
+
+        .bg-hunger { background: #ff7675; }
+        .bg-energy { background: #fdcb6e; }
+        .bg-happy { background: var(--p-green); }
+
+        /* Scena ze zwierzakiem */
+        .game-scene {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        #pet-world {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .pet-shadow {
+            width: 120px;
+            height: 20px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 50%;
+            margin-top: -10px;
+            animation: shadowScale 4s ease-in-out infinite;
+        }
+
+        /* Dolne Menu */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 20px;
+            background: rgba(255,255,255,0.5);
+        }
+
+        button {
+            border: none;
+            padding: 15px;
+            border-radius: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            color: #636e72;
+            box-shadow: 0 4px 0 #dfe6e9;
+        }
+
+        button:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #dfe6e9;
+        }
+
+        .btn-main { background: var(--p-pink); color: white; box-shadow: 0 4px 0 #d63031; }
+        .btn-alt { background: var(--p-purple); color: white; box-shadow: 0 4px 0 #6c5ce7; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-30px); }
+        }
+
+        @keyframes shadowScale {
+            0%, 100% { transform: scale(1); opacity: 0.2; }
+            50% { transform: scale(0.7); opacity: 0.1; }
+        }
+
+        /* Sklep (Overlay) */
+        #shop-modal {
+            position: absolute;
+            inset: 0;
+            background: var(--glass);
+            z-index: 100;
+            padding: 40px 20px;
+            display: none;
+            flex-direction: column;
+        }
+
+        .shop-header { margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+    </style>
 </head>
 <body>
 
-    <div id="game-container">
-        <div class="stats-bar">
-            <div class="stat"><div class="fill hunger" id="hunger-fill"></div><span>Jedzenie</span></div>
-            <div class="stat"><div class="fill energy" id="energy-fill"></div><span>Energia</span></div>
-            <div class="stat"><div class="fill happy" id="happy-fill"></div><span>Szczęście</span></div>
-        </div>
-
-        <div class="top-info">
-            <div class="level-badge">LVL <span id="level-val">1</span></div>
-            <div class="currency">
-                <span id="coins">500</span> 🪙 | <span id="gems">10</span> 💎
+<div id="game-app">
+    <div class="header">
+        <div class="level-row">
+            <span class="lvl-badge">POZIOM <span id="val-lvl">1</span></span>
+            <div class="currency-row">
+                <span id="val-coins">500</span> 🪙 | <span id="val-gems">5</span> 💎
             </div>
         </div>
-
-        <div class="room" id="room-bg">
-            <div id="pet-container">
-                <svg viewBox="0 0 200 200" class="pet-svg" id="pet-svg">
-                    <circle cx="100" cy="120" r="60" fill="#FFD700" id="pet-body" /> <circle cx="80" cy="100" r="8" fill="black" /> <circle cx="120" cy="100" r="8" fill="black" /> <path d="M 80 140 Q 100 160 120 140" stroke="black" fill="transparent" stroke-width="3" /> <g id="clothing-layer"></g>
-                </svg>
-                <div class="pet-shadow"></div>
+        
+        <div class="stats-container">
+            <div class="stat-item">
+                <span>Głód</span>
+                <div class="bar-bg"><div id="bar-hunger" class="bar-fill bg-hunger"></div></div>
             </div>
-        </div>
-
-        <div class="actions">
-            <button onclick="performAction('feed')" class="btn-action">Karm</button>
-            <button onclick="performAction('wash')" class="btn-action">Myj</button>
-            <button onclick="performAction('play')" class="btn-action">Graj</button>
-            <button onclick="performAction('sleep')" class="btn-action">Śpij</button>
-            <button onclick="toggleShop()" class="btn-action btn-shop">Sklep</button>
+            <div class="stat-item">
+                <span>Energia</span>
+                <div class="bar-bg"><div id="bar-energy" class="bar-fill bg-energy"></div></div>
+            </div>
+            <div class="stat-item">
+                <span>Frajda</span>
+                <div class="bar-bg"><div id="bar-happy" class="bar-fill bg-happy"></div></div>
+            </div>
         </div>
     </div>
 
-    <div id="shop-overlay" class="hidden">
-        <div class="shop-content">
-            <h2>Ekskluzywny Butik</h2>
-            <div class="shop-grid" id="shop-items">
-                </div>
-            <button onclick="toggleShop()">Zamknij</button>
+    <div class="game-scene">
+        <div id="pet-world">
+            <svg viewBox="0 0 200 200" id="pet-svg">
+                <defs>
+                    <radialGradient id="grad1" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" style="stop-color:#ffeaa7;" />
+                        <stop offset="100%" style="stop-color:#fab1a0;" />
+                    </radialGradient>
+                </defs>
+                <path d="M40,120 Q40,40 100,40 Q160,40 160,120 Q160,180 100,180 Q40,180 40,120" fill="url(#grad1)" />
+                <g id="eyes">
+                    <circle cx="75" cy="100" r="12" fill="white" />
+                    <circle id="eye-l" cx="75" cy="100" r="5" fill="#2d3436" />
+                    <circle cx="125" cy="100" r="12" fill="white" />
+                    <circle id="eye-r" cx="125" cy="100" r="5" fill="#2d3436" />
+                </g>
+                <path d="M85,140 Q100,155 115,140" stroke="#2d3436" stroke-width="4" fill="none" stroke-linecap="round" />
+                <g id="clothing-slots"></g>
+            </svg>
         </div>
+        <div class="pet-shadow"></div>
     </div>
 
-    <script src="game.js"></script>
+    <div class="actions-grid">
+        <button class="btn-main" onclick="handleAction('feed')">KARMIENIE</button>
+        <button class="btn-main" onclick="handleAction('play')">ZABAWA</button>
+        <button class="btn-alt" onclick="handleAction('sleep')">SEN</button>
+        <button class="btn-alt" onclick="toggleShop()">SKLEP</button>
+    </div>
+
+    <div id="shop-modal">
+        <div class="shop-header"><h2>Szafa Pupila</h2></div>
+        <div style="flex-grow: 1; display: grid; gap: 10px;" id="shop-items-list">
+            </div>
+        <button onclick="toggleShop()">WRÓĆ DO POKOJU</button>
+    </div>
+</div>
+
+<script>
+    // TWOJE DANE FIREBASE
+    const firebaseConfig = {
+        apiKey: "AIzaSyD8qaNZKjmenGo0MxL4dI7MYb2khcHSUes",
+        authDomain: "graznatalia-e1b58.firebaseapp.com",
+        projectId: "graznatalia-e1b58",
+        storageBucket: "graznatalia-e1b58.firebasestorage.app",
+        messagingSenderId: "265631462505",
+        appId: "1:265631462505:web:40b3bb8c72908cf8461ef8"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const petDoc = db.collection("pet_game").doc("global_pet");
+
+    let state = {
+        hunger: 80, energy: 90, happy: 70, 
+        coins: 100, level: 1, xp: 0, outfit: 'none'
+    };
+
+    // Synchronizacja Real-time
+    petDoc.onSnapshot(doc => {
+        if (doc.exists) {
+            state = doc.data();
+            refreshUI();
+        } else {
+            petDoc.set(state);
+        }
+    });
+
+    function refreshUI() {
+        document.getElementById('bar-hunger').style.width = state.hunger + '%';
+        document.getElementById('bar-energy').style.width = state.energy + '%';
+        document.getElementById('bar-happy').style.width = state.happy + '%';
+        document.getElementById('val-coins').innerText = state.coins;
+        document.getElementById('val-lvl').innerText = state.level;
+
+        // Obsługa ubrań
+        const slots = document.getElementById('clothing-slots');
+        if(state.outfit === 'sunglasses') {
+            slots.innerHTML = '<rect x="60" y="90" width="80" height="15" rx="5" fill="black" opacity="0.8"/>';
+        } else if(state.outfit === 'crown') {
+            slots.innerHTML = '<path d="M70,45 L85,20 L100,40 L115,20 L130,45 Z" fill="#f1c40f" stroke="#d35400"/>';
+        } else {
+            slots.innerHTML = '';
+        }
+    }
+
+    async function handleAction(type) {
+        let update = {};
+        if(type === 'feed') {
+            update.hunger = Math.min(100, state.hunger + 15);
+            update.xp = state.xp + 10;
+        }
+        if(type === 'play') {
+            update.happy = Math.min(100, state.happy + 20);
+            update.energy = Math.max(0, state.energy - 10);
+            update.coins = state.coins + 5;
+            update.xp = state.xp + 15;
+        }
+        if(type === 'sleep') {
+            update.energy = 100;
+            update.hunger = Math.max(0, state.hunger - 5);
+        }
+
+        // Level up logic
+        if((state.xp + (update.xp || 0)) >= state.level * 100) {
+            update.level = state.level + 1;
+            update.xp = 0;
+            alert("POZIOM W GÓRĘ! 🏆");
+        }
+
+        await petDoc.update(update);
+    }
+
+    function toggleShop() {
+        const modal = document.getElementById('shop-modal');
+        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+        renderShop();
+    }
+
+    function renderShop() {
+        const items = [
+            { id: 'sunglasses', name: 'Fajne Bryle', price: 50 },
+            { id: 'crown', name: 'Złota Korona', price: 200 },
+            { id: 'none', name: 'Zdejmij wszystko', price: 0 }
+        ];
+        const container = document.getElementById('shop-items-list');
+        container.innerHTML = items.map(i => `
+            <button onclick="buy('${i.id}', ${i.price})" style="display:flex; justify-content:space-between">
+                <span>${i.name}</span>
+                <span>${i.price} 🪙</span>
+            </button>
+        `).join('');
+    }
+
+    async function buy(id, price) {
+        if(state.coins >= price) {
+            await petDoc.update({ 
+                outfit: id, 
+                coins: state.coins - price 
+            });
+            alert("Zmieniono styl!");
+        } else {
+            alert("Bieda! Idź się pobawić, żeby zarobić.");
+        }
+    }
+
+    // Naturalny spadek potrzeb (tylko jeden klient na raz powinien to robić w idealnym świecie, 
+    // ale tutaj dla uproszczenia oba mogą)
+    setInterval(() => {
+        petDoc.update({
+            hunger: Math.max(0, state.hunger - 0.5),
+            happy: Math.max(0, state.happy - 0.3)
+        });
+    }, 10000);
+
+</script>
 </body>
 </html>
