@@ -1,146 +1,118 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-// Firebase Config
+// Konfiguracja Firebase (używamy Twoich danych)
 const firebaseConfig = {
     apiKey: "AIzaSyD8qaNZKjmenGo0MxL4dI7MYb2khcHSUes",
     authDomain: "graznatalia-e1b58.firebaseapp.com",
     projectId: "graznatalia-e1b58",
     storageBucket: "graznatalia-e1b58.firebasestorage.app",
     messagingSenderId: "265631462505",
-    appId: "1:265631462505:web:40b3bb8c72908cf8461ef8",
-    measurementId: "G-JWW9JW9TD0"
+    appId: "1:265631462505:web:40b3bb8c72908cf8461ef8"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const petRef = db.collection("pet").doc("shared-state");
 
-// Game State
-let pet = {
-    stats: { hunger: 100, energy: 100, happy: 100 },
-    lvl: 1,
-    xp: 0,
+// Stan początkowy
+let petState = {
+    hunger: 100,
+    energy: 100,
+    happy: 100,
     coins: 500,
-    diamonds: 10,
-    bond: 1,
-    inventory: []
+    gems: 10,
+    level: 1,
+    xp: 0,
+    outfit: 'none'
 };
 
-// Core Loop
-function updateUI() {
-    document.getElementById('hunger-fill').style.width = pet.stats.hunger + '%';
-    document.getElementById('energy-fill').style.width = pet.stats.energy + '%';
-    document.getElementById('happy-fill').style.width = pet.stats.happy + '%';
-    document.getElementById('lvl').innerText = pet.lvl;
-    document.getElementById('xp').innerText = pet.xp;
-    document.getElementById('coins').innerText = pet.coins;
-    document.getElementById('diamonds').innerText = pet.diamonds;
-    document.getElementById('bond-lvl').innerText = pet.bond;
-}
-
-// Actions
-window.action = (type) => {
-    switch(type) {
-        case 'feed':
-            if(pet.stats.hunger < 100) {
-                pet.stats.hunger = Math.min(100, pet.stats.hunger + 20);
-                gainXP(10);
-                addMessage("Mniam! Pyszne jedzenie.");
-            }
-            break;
-        case 'play':
-            if(pet.stats.energy > 20) {
-                pet.stats.happy = Math.min(100, pet.stats.happy + 30);
-                pet.stats.energy -= 15;
-                pet.coins += 20; // Nagroda za zabawę
-                gainXP(15);
-            }
-            break;
-        case 'sleep':
-            pet.stats.energy = 100;
-            addMessage("Zzz... Zwierzak odpoczywa.");
-            saveData();
-            break;
-    }
-    updateUI();
-};
-
-function gainXP(amount) {
-    pet.xp += amount;
-    if(pet.xp >= 100) {
-        pet.lvl++;
-        pet.xp = 0;
-        pet.diamonds += 1;
-        alert("LEVEL UP! Masz teraz poziom " + pet.lvl);
-    }
-}
-
-// Chat NPC Logic
-window.interactWithGirl = () => {
-    const messages = [
-        "Cześć! Jak się miewa Twój pupil?",
-        "Wygląda na to, że świetnie się nim opiekujesz.",
-        "Wiedziałeś, że diamenty można zdobyć za awansowanie?",
-        "Mój ulubiony kolor to złoty, może go kupisz?"
-    ];
-    const rand = messages[Math.floor(Math.random() * messages.length)];
-    pet.bond += 0.1;
-    addMessage("Dziewczyna: " + rand);
-    updateUI();
-};
-
-function addMessage(txt) {
-    const chat = document.getElementById('chat-messages');
-    const div = document.createElement('div');
-    div.className = 'msg';
-    div.innerText = txt;
-    chat.prepend(div);
-}
-
-// Shop
-window.toggleShop = () => {
-    document.getElementById('shop-modal').classList.toggle('hidden');
-};
-
-window.buyItem = (id, cost, currency = 'coins') => {
-    if(pet[currency] >= cost) {
-        pet[currency] -= cost;
-        pet.inventory.push(id);
-        alert("Kupiono: " + id);
+// Słuchaj zmian w bazie (Real-time!)
+petRef.onSnapshot((doc) => {
+    if (doc.exists) {
+        petState = doc.data();
         updateUI();
-        saveData();
     } else {
-        alert("Brak środków!");
+        // Inicjalizacja jeśli baza jest pusta
+        petRef.set(petState);
     }
-};
+});
 
-// Database Persistence
-async function saveData() {
-    try {
-        await setDoc(doc(db, "users", "player_1"), pet);
-        console.log("Dane zapisane!");
-    } catch (e) {
-        console.error("Błąd zapisu: ", e);
+function updateUI() {
+    document.getElementById('hunger-fill').style.width = petState.hunger + "%";
+    document.getElementById('energy-fill').style.width = petState.energy + "%";
+    document.getElementById('happy-fill').style.width = petState.happy + "%";
+    document.getElementById('coins').innerText = petState.coins;
+    document.getElementById('level-val').innerText = petState.level;
+    
+    // Renderowanie ubrań
+    const layer = document.getElementById('clothing-layer');
+    if(petState.outfit === 'sunglasses') {
+        layer.innerHTML = '<rect x="70" y="95" width="60" height="10" fill="black" />';
+    } else if(petState.outfit === 'hat') {
+        layer.innerHTML = '<path d="M 60 70 L 140 70 L 100 30 Z" fill="red" />';
+    } else {
+        layer.innerHTML = '';
     }
 }
 
-async function loadData() {
-    const docRef = doc(db, "users", "player_1");
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-        pet = docSnap.data();
-        updateUI();
+// Akcje
+async function performAction(type) {
+    let update = {};
+    if (type === 'feed') {
+        update.hunger = Math.min(100, petState.hunger + 20);
+        update.xp = petState.xp + 5;
+    }
+    if (type === 'play') {
+        update.happy = Math.min(100, petState.happy + 25);
+        update.energy = Math.max(0, petState.energy - 15);
+        update.coins = petState.coins + 10;
+        update.xp = petState.xp + 10;
+    }
+    
+    // System Levelowania
+    if (petState.xp >= petState.level * 100) {
+        update.level = petState.level + 1;
+        update.xp = 0;
+        alert("LEVEL UP! Odblokowano nowe przedmioty!");
+    }
+
+    await petRef.update(update);
+}
+
+function toggleShop() {
+    document.getElementById('shop-overlay').classList.toggle('hidden');
+    renderShop();
+}
+
+function renderShop() {
+    const items = [
+        { id: 'sunglasses', name: 'Okulary', price: 100, type: 'coins' },
+        { id: 'hat', name: 'Czapka Maga', price: 250, type: 'coins' }
+    ];
+    
+    const container = document.getElementById('shop-items');
+    container.innerHTML = items.map(item => `
+        <div class="shop-item">
+            <p>${item.name}</p>
+            <button onclick="buyItem('${item.id}', ${item.price})">${item.price} 🪙</button>
+        </div>
+    `).join('');
+}
+
+async function buyItem(id, price) {
+    if (petState.coins >= price) {
+        await petRef.update({
+            coins: petState.coins - price,
+            outfit: id
+        });
+        alert("Kupiono!");
+    } else {
+        alert("Brak kasy!");
     }
 }
 
-// Stats Decay (Autonoma)
+// Spadek statystyk w czasie
 setInterval(() => {
-    pet.stats.hunger = Math.max(0, pet.stats.hunger - 0.5);
-    pet.stats.happy = Math.max(0, pet.stats.happy - 0.3);
-    updateUI();
-}, 5000);
-
-// Init
-window.onload = () => {
-    loadData();
-};
+    petRef.update({
+        hunger: Math.max(0, petState.hunger - 1),
+        energy: Math.max(0, petState.energy - 0.5)
+    });
+}, 15000); // co 15 sekund
