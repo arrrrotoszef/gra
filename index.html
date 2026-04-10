@@ -3,79 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virtual Pet Pro</title>
+    <title>Nasz Wirtualny Pupil</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
+
     <div id="game-container">
-        <header class="hud">
-            <div class="stat-box">LVL: <span id="lvl">1</span></div>
-            <div class="stat-box">XP: <span id="xp">0</span>/100</div>
+        <div class="stats-bar">
+            <div class="stat"><div class="fill hunger" id="hunger-fill"></div><span>Jedzenie</span></div>
+            <div class="stat"><div class="fill energy" id="energy-fill"></div><span>Energia</span></div>
+            <div class="stat"><div class="fill happy" id="happy-fill"></div><span>Szczęście</span></div>
+        </div>
+
+        <div class="top-info">
+            <div class="level-badge">LVL <span id="level-val">1</span></div>
             <div class="currency">
-                <div class="coin">MONETY: <span id="coins">500</span></div>
-                <div class="diamond">DIAMENTY: <span id="diamonds">10</span></div>
+                <span id="coins">500</span> 🪙 | <span id="gems">10</span> 💎
             </div>
-        </header>
+        </div>
 
-        <main class="game-view">
-            <div id="pet-stage">
-                <div class="pet" id="pet-character">
-                    <div class="pet-body">
-                        <div class="eyes">
-                            <div class="eye left"></div>
-                            <div class="eye right"></div>
-                        </div>
-                        <div class="mouth"></div>
-                    </div>
-                </div>
-                <div id="pet-accessory-slot"></div>
+        <div class="room" id="room-bg">
+            <div id="pet-container">
+                <svg viewBox="0 0 200 200" class="pet-svg" id="pet-svg">
+                    <circle cx="100" cy="120" r="60" fill="#FFD700" id="pet-body" /> <circle cx="80" cy="100" r="8" fill="black" /> <circle cx="120" cy="100" r="8" fill="black" /> <path d="M 80 140 Q 100 160 120 140" stroke="black" fill="transparent" stroke-width="3" /> <g id="clothing-layer"></g>
+                </svg>
+                <div class="pet-shadow"></div>
             </div>
+        </div>
 
-            <div class="status-bars">
-                <div class="bar-container">
-                    <label>GŁÓD</label>
-                    <div class="bar"><div id="hunger-fill" class="fill hunger"></div></div>
-                </div>
-                <div class="bar-container">
-                    <label>ENERGIA</label>
-                    <div class="bar"><div id="energy-fill" class="fill energy"></div></div>
-                </div>
-                <div class="bar-container">
-                    <label>SZCZĘŚCIE</label>
-                    <div class="bar"><div id="happy-fill" class="fill happy"></div></div>
-                </div>
-            </div>
-        </main>
-
-        <aside id="chat-sidebar">
-            <div class="chat-header">DZIEWCZYNA (NPC) - WIĘŹ: <span id="bond-lvl">1</span></div>
-            <div id="chat-messages"></div>
-            <div class="chat-input-area">
-                <button onclick="interactWithGirl()">Rozmawiaj</button>
-            </div>
-        </aside>
-
-        <nav class="actions">
-            <button class="btn feed" onclick="action('feed')">KARM</button>
-            <button class="btn wash" onclick="action('wash')">MYJ</button>
-            <button class="btn play" onclick="action('play')">BAW SIĘ</button>
-            <button class="btn sleep" onclick="action('sleep')">ŚPIJ</button>
-            <button class="btn shop" onclick="toggleShop()">SKLEP</button>
-        </nav>
-
-        <div id="shop-modal" class="modal hidden">
-            <div class="modal-content">
-                <h2>Sklep i Personalizacja</h2>
-                <div class="shop-items">
-                    <div class="item" onclick="buyItem('hat', 100)">Czapka (100 monet)</div>
-                    <div class="item" onclick="buyItem('glasses', 250)">Okulary (250 monet)</div>
-                    <div class="item" onclick="buyItem('skin_gold', 50, 'diamond')">Złoty kolor (50 diamentów)</div>
-                </div>
-                <button onclick="toggleShop()">Zamknij</button>
-            </div>
+        <div class="actions">
+            <button onclick="performAction('feed')" class="btn-action">Karm</button>
+            <button onclick="performAction('wash')" class="btn-action">Myj</button>
+            <button onclick="performAction('play')" class="btn-action">Graj</button>
+            <button onclick="performAction('sleep')" class="btn-action">Śpij</button>
+            <button onclick="toggleShop()" class="btn-action btn-shop">Sklep</button>
         </div>
     </div>
 
-    <script type="module" src="game.js"></script>
+    <div id="shop-overlay" class="hidden">
+        <div class="shop-content">
+            <h2>Ekskluzywny Butik</h2>
+            <div class="shop-grid" id="shop-items">
+                </div>
+            <button onclick="toggleShop()">Zamknij</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
 </body>
 </html>
