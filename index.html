@@ -3,213 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nasz Słodki Pingwinek 3D</title>
+    <title>Penguin Universe: Forever Together</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
-
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
         :root {
-            --glass: rgba(255, 255, 255, 0.2);
-            --glass-heavy: rgba(255, 255, 255, 0.8);
-            --accent: #6c5ce7;
+            --p-main: #6c5ce7; --p-sec: #a29bfe; --p-accent: #ff7675;
+            --p-white: #ffffff; --p-dark: #2d3436; --glass: rgba(255,255,255,0.15);
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            font-family: 'Montserrat', sans-serif; background: #000; overflow: hidden; 
         }
 
-        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; background: #2d3436; }
-
-        /* TŁA GRY */
-        #main-bg {
-            position: fixed; inset: 0; z-index: -1;
-            transition: 1s ease;
-            background: linear-gradient(180deg, #74b9ff 0%, #a29bfe 100%);
+        /* DYNAMICZNE TŁA */
+        #world-bg {
+            position: fixed; inset: 0; z-index: 1; transition: 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(180deg, #0984e3 0%, #74b9ff 100%);
         }
-        .bg-arctic { background: linear-gradient(180deg, #dff9fb 0%, #c7ecee 100%) !important; }
-        .bg-forest { background: linear-gradient(180deg, #55efc4 0%, #00b894 100%) !important; }
-        .bg-space { background: radial-gradient(circle, #2d3436 0%, #000000 100%) !important; }
+        .bg-space { background: radial-gradient(circle at center, #2d3436 0%, #000 100%) !important; }
+        .bg-sunset { background: linear-gradient(180deg, #ff7675 0%, #fdcb6e 100%) !important; }
+        .bg-cyber { background: linear-gradient(180deg, #6c5ce7 0%, #000 100%) !important; }
 
-        /* EKRAN STARTOWY */
-        #login-screen {
-            position: fixed; inset: 0; background: var(--accent); z-index: 1000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;
+        /* UI SYSTEM */
+        #app-container {
+            position: relative; z-index: 10; width: 100%; max-width: 500px; height: 100%;
+            margin: 0 auto; display: flex; flex-direction: column; 
+            background: rgba(255,255,255,0.05); backdrop-filter: blur(5px);
         }
 
-        /* KONTENER GŁÓWNY */
-        #app {
-            width: 100%; max-width: 450px; height: 100vh; margin: 0 auto;
-            display: flex; flex-direction: column; position: relative;
+        /* LOGIN SCREEN */
+        #setup-screen {
+            position: absolute; inset: 0; z-index: 1000; background: var(--p-main);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center; color: white;
+        }
+        .input-group { width: 100%; margin-bottom: 15px; }
+        .input-group input { 
+            width: 100%; padding: 15px; border-radius: 15px; border: none; 
+            font-size: 16px; font-weight: 700; color: var(--p-dark);
         }
 
-        /* HEADER */
-        .glass-panel {
-            background: var(--glass); backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(255,255,255,0.3); padding: 20px;
+        /* HUD */
+        .hud { padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .hud-card { 
+            background: var(--glass); backdrop-filter: blur(10px); border-radius: 20px; 
+            padding: 15px; border: 1px solid rgba(255,255,255,0.2); color: white;
+        }
+        .stat-bar { height: 10px; background: rgba(0,0,0,0.2); border-radius: 5px; margin-top: 8px; overflow: hidden; }
+        .stat-fill { height: 100%; width: 50%; transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        /* PENGUIN STAGE */
+        .stage { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+        #pet-svg { width: 320px; height: 320px; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.4)); cursor: pointer; }
+        
+        /* ACTIONS & NAVIGATION */
+        .bottom-nav { 
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; 
+            background: rgba(255,255,255,0.9); border-radius: 35px 35px 0 0;
+        }
+        .nav-item { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            border: none; background: transparent; cursor: pointer; transition: 0.3s;
+        }
+        .nav-item:active { transform: scale(0.9); }
+        .nav-icon { width: 50px; height: 50px; background: #eee; border-radius: 15px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+
+        /* OVERLAYS */
+        .overlay {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 75%;
+            background: white; border-radius: 40px 40px 0 0; z-index: 500;
+            transform: translateY(100%); transition: 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            padding: 30px; display: flex; flex-direction: column;
+        }
+        .overlay.active { transform: translateY(0); }
+        .scroll-area { flex-grow: 1; overflow-y: auto; padding-bottom: 40px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .item-card { 
+            background: #f1f2f6; border-radius: 20px; padding: 15px; position: relative;
+            border: 3px solid transparent; transition: 0.3s;
+        }
+        .item-card.owned { border-color: var(--p-main); }
+
+        /* MINI GAMES CANVAS */
+        #game-engine { 
+            position: absolute; inset: 0; background: white; z-index: 2000; display: none;
+            flex-direction: column;
         }
 
-        .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
-        .stat-box { background: rgba(0,0,0,0.1); border-radius: 12px; height: 8px; overflow: hidden; }
-        .stat-fill { height: 100%; transition: 0.5s; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        /* ANIMATIONS */
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        .float-anim { animation: float 4s ease-in-out infinite; }
+        @keyframes blink { 0%, 90%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0); } }
+        .eye-anim { animation: blink 5s infinite; transform-origin: center; }
 
-        /* PINGWINEK 3D */
-        .pet-stage {
-            flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        /* ACHIEVEMENT TOAST */
+        #toast {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            background: var(--p-dark); color: white; padding: 15px 30px; border-radius: 30px;
+            z-index: 3000; transition: 0.5s; font-weight: 800; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-
-        #penguin-svg {
-            width: 280px; height: 280px;
-            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.3));
-            animation: breathe 3s ease-in-out infinite;
-        }
-
-        @keyframes breathe {
-            0%, 100% { transform: scale(1) translateY(0); }
-            50% { transform: scale(1.03) translateY(-10px); }
-        }
-
-        /* MODALE I PRZYCISKI */
-        .bottom-nav {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
-            padding: 20px; background: var(--glass-heavy); border-radius: 30px 30px 0 0;
-        }
-
-        .btn {
-            border: none; padding: 12px; border-radius: 15px; font-weight: 800;
-            cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        .btn-action { background: white; color: var(--accent); }
-        .btn-action:hover { transform: translateY(-5px); background: var(--accent); color: white; }
-
-        /* LISTY PRZEDMIOTÓW */
-        .menu-overlay {
-            position: absolute; bottom: 0; left: 0; right: 0; height: 60%;
-            background: white; border-radius: 30px 30px 0 0; z-index: 500;
-            transform: translateY(100%); transition: 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-            padding: 25px; overflow-y: auto;
-        }
-        .menu-overlay.active { transform: translateY(0); }
-
-        .item-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
-        .card { 
-            background: #f8f9fa; border-radius: 20px; padding: 15px; text-align: center;
-            border: 2px solid transparent; cursor: pointer;
-        }
-        .card:hover { border-color: var(--accent); }
-
-        input { padding: 15px; border-radius: 10px; border: none; width: 80%; margin: 10px; font-size: 16px; }
-
     </style>
 </head>
 <body>
 
-<div id="main-bg"></div>
+<div id="world-bg"></div>
+<div id="toast">Osiągnięcie! 🏆</div>
 
-<div id="login-screen">
-    <h1 style="font-weight: 800;">Nasz Pingwinek 🐧</h1>
-    <input type="text" id="in-name1" placeholder="Twoje imię...">
-    <input type="text" id="in-name2" placeholder="Imię dziewczyny...">
-    <input type="text" id="in-petname" placeholder="Jak nazwiemy pingwina?">
-    <button class="btn" style="background:white; color:var(--accent); padding:15px 40px;" onclick="saveProfile()">START</button>
+<div id="setup-screen">
+    <h1 style="font-size: 32px; font-weight: 900; margin-bottom: 30px;">🐧 PENGUIN<br>UNIVERSE</h1>
+    <div class="input-group"><input type="text" id="setup-p1" placeholder="Twoje imię"></div>
+    <div class="input-group"><input type="text" id="setup-p2" placeholder="Imię Twojej dziewczyny"></div>
+    <div class="input-group"><input type="text" id="setup-pet" placeholder="Imię Pingwinka"></div>
+    <button class="nav-item" onclick="initGame()" style="background:white; padding:15px 50px; border-radius:20px; font-weight:900; color:var(--p-main); margin-top:20px;">ROZPOCZNIJ PRZYGODĘ</button>
 </div>
 
-<div id="app">
-    <div class="glass-panel">
-        <div style="display:flex; justify-content: space-between; align-items: center;">
-            <div>
-                <small id="ui-players" style="opacity: 0.8;"></small>
-                <h2 id="ui-petname" style="margin:0; font-weight: 800;">Bąbel</h2>
+<div id="app-container">
+    <div class="hud">
+        <div class="hud-card">
+            <small id="hud-players">Nasz Pingwinek</small>
+            <h2 id="hud-pet-name" style="margin:5px 0; font-size:24px;">Bąbel</h2>
+            <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:800;">
+                <span>LVL <span id="ui-lvl">1</span></span>
+                <span>XP <span id="ui-xp">0</span>/100</span>
             </div>
-            <div style="text-align: right;">
-                <span style="font-size: 20px;">🪙 <span id="ui-coins">0</span></span><br>
-                <small>LVL <span id="ui-lvl">1</span></small>
-            </div>
+            <div class="stat-bar"><div id="bar-xp" class="stat-fill" style="background:var(--p-sec); width:0%;"></div></div>
         </div>
-        <div class="stats-bar">
-            <div class="stat-box"><div id="bar-hunger" class="stat-fill" style="background:#ff7675;"></div></div>
-            <div class="stat-box"><div id="bar-energy" class="stat-fill" style="background:#fdcb6e;"></div></div>
-            <div class="stat-box"><div id="bar-happy" class="stat-fill" style="background:#55efc4;"></div></div>
+        <div class="hud-card" style="text-align: right;">
+            <div style="font-size:20px; font-weight:900; color:#f1c40f;">🪙 <span id="ui-coins">0</span></div>
+            <div style="font-size:16px; font-weight:900; color:#00d2d3; margin-top:5px;">💎 <span id="ui-gems">0</span></div>
+            <div style="margin-top:10px; font-size:11px; text-transform:uppercase; font-weight:900; color:rgba(255,255,255,0.6)">Misja: <span id="ui-mission">Nakarm go!</span></div>
         </div>
     </div>
 
-    <div class="pet-stage">
-        <svg id="penguin-svg" viewBox="0 0 200 200">
-            <defs>
-                <radialGradient id="bodyGrad" cx="50%" cy="40%" r="50%">
-                    <stop offset="0%" style="stop-color:#4b4b4b" />
-                    <stop offset="100%" style="stop-color:#1e272e" />
-                </radialGradient>
-                <radialGradient id="bellyGrad" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" style="stop-color:#ffffff" />
-                    <stop offset="100%" style="stop-color:#f1f2f6" />
-                </radialGradient>
-            </defs>
-            
-            <ellipse cx="100" cy="185" rx="50" ry="10" fill="rgba(0,0,0,0.2)" />
+    <div class="hud" style="padding-top:0;">
+        <div class="hud-card" style="grid-column: span 2; display:flex; justify-content:space-around; padding:10px;">
+            <div style="text-align:center;"><small>GŁÓD</small><div class="stat-bar" style="width:80px;"><div id="bar-hunger" class="stat-fill" style="background:#ff7675;"></div></div></div>
+            <div style="text-align:center;"><small>ENERGIA</small><div class="stat-bar" style="width:80px;"><div id="bar-energy" class="stat-fill" style="background:#fdcb6e;"></div></div></div>
+            <div style="text-align:center;"><small>SZCZĘŚCIE</small><div class="stat-bar" style="width:80px;"><div id="bar-happy" class="stat-fill" style="background:#55efc4;"></div></div></div>
+        </div>
+    </div>
 
-            <ellipse cx="45" cy="120" rx="15" ry="35" fill="#1e272e" transform="rotate(15 45 120)" />
-            <ellipse cx="155" cy="120" rx="15" ry="35" fill="#1e272e" transform="rotate(-15 155 120)" />
+    <div class="stage">
+        <div class="float-anim">
+            <svg id="pet-svg" viewBox="0 0 200 200" onclick="petInteraction()">
+                <defs>
+                    <radialGradient id="bodyG" cx="50%" cy="30%" r="60%">
+                        <stop offset="0%" style="stop-color:#353b48" />
+                        <stop offset="100%" style="stop-color:#000" />
+                    </radialGradient>
+                    <radialGradient id="bellyG" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" style="stop-color:#fff" />
+                        <stop offset="100%" style="stop-color:#dcdde1" />
+                    </radialGradient>
+                    <filter id="f1" x="0" y="0"><feGaussianBlur in="SourceGraphic" stdDeviation="2" /></filter>
+                </defs>
+                
+                <ellipse cx="100" cy="185" rx="55" ry="10" fill="rgba(0,0,0,0.3)" /> <path id="wing-l" d="M40,110 Q15,110 20,150 Q30,160 45,140" fill="#1e272e" />
+                <path id="wing-r" d="M160,110 Q185,110 180,150 Q170,160 155,140" fill="#1e272e" />
 
-            <path d="M50,120 Q50,40 100,40 Q150,40 150,120 Q150,180 100,180 Q50,180 50,120" fill="url(#bodyGrad)" />
-            
-            <path d="M65,130 Q65,80 100,80 Q135,80 135,130 Q135,170 100,170 Q65,170 65,130" fill="url(#bellyGrad)" />
+                <path d="M50,120 Q50,35 100,35 Q150,35 150,120 Q150,185 100,185 Q50,185 50,120" fill="url(#bodyG)" stroke="#000" stroke-width="2" />
+                
+                <path d="M65,135 Q65,85 100,85 Q135,85 135,135 Q135,175 100,175 Q65,175 65,135" fill="url(#bellyG)" />
 
-            <g id="eyes">
-                <circle cx="80" cy="90" r="8" fill="#2d3436" />
-                <circle cx="78" cy="88" r="3" fill="white" /> <circle cx="120" cy="90" r="8" fill="#2d3436" />
-                <circle cx="118" cy="88" r="3" fill="white" />
-            </g>
+                <g class="eye-anim">
+                    <circle cx="82" cy="95" r="9" fill="#2f3640" />
+                    <circle cx="79" cy="92" r="3" fill="white" />
+                    <circle cx="118" cy="95" r="9" fill="#2f3640" />
+                    <circle cx="115" cy="92" r="3" fill="white" />
+                </g>
+                <path d="M90,110 L110,110 L100,125 Z" fill="#fbc531" />
+                <path d="M92,135 Q100,145 108,135" fill="none" stroke="#2d3436" stroke-width="2" stroke-linecap="round" />
 
-            <path d="M90,105 L110,105 L100,120 Z" fill="#ffa502" />
-            <path d="M90,105 Q100,102 110,105" fill="#e67e22" />
+                <ellipse cx="80" cy="182" rx="15" ry="7" fill="#e67e22" />
+                <ellipse cx="120" cy="182" rx="15" ry="7" fill="#e67e22" />
 
-            <ellipse cx="80" cy="178" rx="12" ry="6" fill="#ffa502" />
-            <ellipse cx="120" cy="178" rx="12" ry="6" fill="#ffa502" />
-
-            <g id="layer-hat"></g>
-            <g id="layer-neck"></g>
-            <g id="layer-eyes"></g>
-        </svg>
+                <g id="layer-hat"></g>
+                <g id="layer-eyes"></g>
+                <g id="layer-neck"></g>
+            </svg>
+        </div>
     </div>
 
     <div class="bottom-nav">
-        <button class="btn btn-action" onclick="toggleMenu('food')">JEŚĆ</button>
-        <button class="btn btn-action" onclick="toggleMenu('clothes')">STYL</button>
-        <button class="btn btn-action" onclick="toggleMenu('bgs')">ŚWIAT</button>
-        <button class="btn btn-action" style="background:var(--accent); color:white" onclick="toggleMenu('games')">GRY</button>
+        <button class="nav-item" onclick="openOverlay('food')"><div class="nav-icon">🍔</div><span>JEDZENIE</span></button>
+        <button class="nav-item" onclick="openOverlay('wardrobe')"><div class="nav-icon">👕</div><span>STYL</span></button>
+        <button class="nav-item" onclick="openOverlay('games')"><div class="nav-icon">🎮</div><span>GRY</span></button>
+        <button class="nav-item" onclick="openOverlay('shop')"><div class="nav-icon">💎</div><span>SKLEP</span></button>
     </div>
 
-    <div id="m-food" class="menu-overlay">
-        <h3>🛒 Restauracja</h3>
-        <div class="item-grid" id="list-food"></div>
-        <button class="btn btn-action" style="width:100%; margin-top:20px" onclick="toggleMenu()">ZAMKNIJ</button>
+    <div id="ov-food" class="overlay">
+        <h2>Restauracja Gourmet</h2>
+        <div class="scroll-area"><div class="grid" id="grid-food"></div></div>
+        <button class="nav-item" onclick="closeOverlays()" style="background:var(--p-main); color:white; padding:15px; border-radius:15px; width:100%;">POWRÓT</button>
     </div>
 
-    <div id="m-clothes" class="menu-overlay">
-        <h3>👗 Butik PRO</h3>
-        <div class="item-grid" id="list-clothes"></div>
-        <button class="btn btn-action" style="width:100%; margin-top:20px" onclick="toggleMenu()">ZAMKNIJ</button>
+    <div id="ov-wardrobe" class="overlay">
+        <h2>Królewska Garderoba</h2>
+        <div class="scroll-area"><div class="grid" id="grid-wardrobe"></div></div>
+        <button class="nav-item" onclick="closeOverlays()" style="background:var(--p-main); color:white; padding:15px; border-radius:15px; width:100%;">POWRÓT</button>
     </div>
 
-    <div id="m-bgs" class="menu-overlay">
-        <h3>🌍 Zmień Świat</h3>
-        <div class="item-grid" id="list-bgs"></div>
-        <button class="btn btn-action" style="width:100%; margin-top:20px" onclick="toggleMenu()">ZAMKNIJ</button>
-    </div>
-
-    <div id="m-games" class="menu-overlay">
-        <h3>🎮 Mini Gry (Zarabiaj!)</h3>
-        <div class="item-grid">
-            <div class="card" onclick="alert('Gra 1: Zbieranie rybek')">🐟 Rybki</div>
-            <div class="card" onclick="alert('Gra 2: Skok przez krę')">🧊 Lodowiec</div>
-            <div class="card" onclick="alert('Gra 3: Refleks')">⚡ Piorun</div>
-            <div class="card" onclick="alert('Gra 4: Quiz')">❓ Wiedza</div>
-            <div class="card" onclick="alert('Gra 5: Ping-Pong')">🏓 Pong</div>
+    <div id="ov-games" class="overlay">
+        <h2>Centrum Rozrywki</h2>
+        <div class="scroll-area">
+            <div class="item-card" style="margin-bottom:10px;" onclick="initMiniGame('catcher')"><h3>🍎 Łowca Owoców</h3><p>Łap jedzenie spadające z nieba!</p></div>
+            <div class="item-card" style="margin-bottom:10px;" onclick="initMiniGame('memory')"><h3>🧠 Pamięć Polarnej</h3><p>Znajdź pary i trenuj mózg.</p></div>
+            <div class="item-card" style="margin-bottom:10px;" onclick="initMiniGame('clicker')"><h3>⚡ Szybki Dziób</h3><p>Klikaj ile sił w palcach!</p></div>
+            <div class="item-card" style="margin-bottom:10px;" onclick="initMiniGame('quiz')"><h3>📚 Geniusz Arktyki</h3><p>Odpowiedz na trudne pytania.</p></div>
+            <div class="item-card" style="margin-bottom:10px;" onclick="initMiniGame('reflex')"><h3>🎯 Refleks Ninja</h3><p>Kliknij w idealnym momencie.</p></div>
         </div>
+        <button class="nav-item" onclick="closeOverlays()" style="background:var(--p-main); color:white; padding:15px; border-radius:15px; width:100%;">POWRÓT</button>
+    </div>
+
+    <div id="ov-shop" class="overlay">
+        <h2>Sklep Premium</h2>
+        <div class="scroll-area">
+            <h3>Tła Świata</h3>
+            <div class="grid" id="grid-bgs"></div>
+            <h3 style="margin-top:20px;">Pakiety Walut</h3>
+            <div class="grid">
+                <div class="item-card" onclick="addCurrency('gems', 10)">10 Diamentów<br><b>FREE AD</b></div>
+                <div class="item-card" onclick="addCurrency('coins', 1000)">1000 Monet<br><b>10 💎</b></div>
+            </div>
+        </div>
+        <button class="nav-item" onclick="closeOverlays()" style="background:var(--p-main); color:white; padding:15px; border-radius:15px; width:100%;">POWRÓT</button>
+    </div>
+</div>
+
+<div id="game-engine">
+    <div id="ge-header" style="padding:20px; display:flex; justify-content:space-between; align-items:center; background:#eee;">
+        <h2 id="ge-title">Gra</h2>
+        <div id="ge-score" style="font-size:24px; font-weight:900;">0</div>
+    </div>
+    <div id="ge-stage" style="flex-grow:1; position:relative; overflow:hidden; background:#222;"></div>
+    <div id="ge-controls" style="padding:20px;">
+        <button id="ge-exit" style="width:100%; padding:20px; background:var(--p-accent); color:white; border:none; border-radius:20px; font-weight:900;">ZAKOŃCZ I ODBIERZ NAGRODĘ</button>
     </div>
 </div>
 
 <script>
-// --- FIREBASE ---
+/** * KONFIGURACJA FIREBASE
+ * Używamy Twoich danych dostępowych.
+ */
 const firebaseConfig = {
     apiKey: "AIzaSyD8qaNZKjmenGo0MxL4dI7MYb2khcHSUes",
     authDomain: "graznatalia-e1b58.firebaseapp.com",
@@ -218,118 +255,313 @@ const firebaseConfig = {
     messagingSenderId: "265631462505",
     appId: "1:265631462505:web:40b3bb8c72908cf8461ef8"
 };
+
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-const docRef = db.collection("pingwin_pro").doc("shared_save");
+const savePath = db.collection("universe").doc("global_save");
 
+// --- SYSTEM DANYCH ---
 let state = {
-    hunger: 100, energy: 100, happy: 100, coins: 1000, lvl: 1, xp: 0,
-    p1: "Gracz 1", p2: "Gracz 2", petName: "Bąbel",
-    bg: 'default',
-    outfit: { hat: '', neck: '', eyes: '' }
+    p1: "", p2: "", petName: "Bąbel",
+    coins: 500, gems: 10, lvl: 1, xp: 0,
+    hunger: 100, energy: 100, happy: 100,
+    inventory: [], outfit: { hat: '', eyes: '', neck: '' },
+    bg: 'default', mission: 'Nakarm pingwinka',
+    lastUpdate: Date.now()
 };
 
-// --- START I PROFILE ---
-function saveProfile() {
-    const p1 = document.getElementById('in-name1').value || "On";
-    const p2 = document.getElementById('in-name2').value || "Ona";
-    const pn = document.getElementById('in-petname').value || "Pingwinek";
-    
-    state.p1 = p1; state.p2 = p2; state.petName = pn;
-    docRef.set(state).then(() => {
-        document.getElementById('login-screen').style.display = 'none';
-    });
-}
-
-// --- SYNCHRONIZACJA ---
-docRef.onSnapshot(doc => {
-    if(doc.exists) {
-        state = doc.data();
-        updateUI();
-        document.getElementById('login-screen').style.display = 'none';
-    }
-});
-
-function updateUI() {
-    document.getElementById('bar-hunger').style.width = state.hunger + '%';
-    document.getElementById('bar-energy').style.width = state.energy + '%';
-    document.getElementById('bar-happy').style.width = state.happy + '%';
-    document.getElementById('ui-coins').innerText = state.coins;
-    document.getElementById('ui-lvl').innerText = state.lvl;
-    document.getElementById('ui-petname').innerText = state.petName;
-    document.getElementById('ui-players').innerText = `${state.p1} ❤️ ${state.p2}`;
-
-    // Tło
-    const bg = document.getElementById('main-bg');
-    bg.className = '';
-    if(state.bg !== 'default') bg.classList.add('bg-' + state.bg);
-
-    // Ubrania
-    document.getElementById('layer-hat').innerHTML = state.outfit.hat || '';
-    document.getElementById('layer-neck').innerHTML = state.outfit.neck || '';
-    document.getElementById('layer-eyes').innerHTML = state.outfit.eyes || '';
-}
-
-// --- SKLEPY ---
+// --- DATA DEFINITIONS ---
 const ITEMS = {
     food: [
-        {n: 'Rybka', c: 10, v: 15}, {n: 'Krewetka', c: 25, v: 30}, {n: 'Lody', c: 50, v: 50}
+        { id: 'f1', n: 'Śledź', c: 10, v: 10, icon: '🐟' }, { id: 'f2', n: 'Krewetka', c: 25, v: 25, icon: '🦐' },
+        { id: 'f3', n: 'Sushi SET', c: 100, v: 60, icon: '🍱' }, { id: 'f4', n: 'Lodowy Tort', c: 250, v: 100, icon: '🎂' },
+        { id: 'f5', n: 'Pizza', c: 40, v: 30, icon: '🍕' }, { id: 'f6', n: 'Burger', c: 50, v: 40, icon: '🍔' },
+        { id: 'f7', n: 'Arbuz', c: 15, v: 15, icon: '🍉' }, { id: 'f8', n: 'Pączek', c: 20, v: 12, icon: '🍩' }
     ],
     clothes: [
-        {id: 'crown', n: 'Złota Korona', c: 500, l: 'hat', svg: '<path d="M70,45 L85,15 L100,40 L115,15 L130,45 Z" fill="#f1c40f" filter="drop-shadow(0 2px 2px rgba(0,0,0,0.3))"/>'},
-        {id: 'tie', n: 'Czerwona Mucha', c: 150, l: 'neck', svg: '<path d="M85,145 L115,145 L100,135 Z" fill="#e74c3c"/>'},
-        {id: 'cool', n: 'Okulary VIP', c: 300, l: 'eyes', svg: '<rect x="65" y="85" width="70" height="12" rx="3" fill="black" opacity="0.9"/>'}
+        { id: 'c1', n: 'Złota Korona', c: 500, l: 'hat', svg: '<path d="M70,45 L85,20 L100,45 L115,20 L130,45 Z" fill="#f1c40f" stroke="#d35400" stroke-width="2"/>' },
+        { id: 'c2', n: 'Okulary VIP', c: 200, l: 'eyes', svg: '<rect x="65" y="88" width="70" height="15" rx="5" fill="black" opacity="0.8"/><path d="M65,95 L135,95" stroke="white" stroke-width="1" opacity="0.3"/>' },
+        { id: 'c3', n: 'Czerwona Mucha', c: 150, l: 'neck', svg: '<path d="M85,145 L115,145 L100,130 Z" fill="#e74c3c"/><circle cx="100" cy="140" r="4" fill="#c0392b"/>' },
+        { id: 'c4', n: 'Czapka Maga', c: 400, l: 'hat', svg: '<path d="M60,50 L140,50 L100,0 Z" fill="#341f97"/><circle cx="100" cy="5" r="5" fill="white"/>' },
+        { id: 'c5', n: 'Monokl', c: 300, l: 'eyes', svg: '<circle cx="118" cy="95" r="10" fill="none" stroke="#f1c40f" stroke-width="2"/>' }
     ],
     bgs: [
-        {id: 'arctic', n: 'Arktyka', c: 200}, {id: 'forest', n: 'Las', c: 400}, {id: 'space', n: 'Kosmos', c: 1000}
+        { id: 'default', n: 'Arktyka', c: 0 }, { id: 'sunset', n: 'Zachód Słońca', c: 300 },
+        { id: 'space', n: 'Głęboki Kosmos', c: 1000 }, { id: 'cyber', n: 'Neon City', c: 750 }
     ]
 };
 
-function renderLists() {
-    document.getElementById('list-food').innerHTML = ITEMS.food.map(i => `<div class="card" onclick="buyFood(${i.v}, ${i.c})">${i.n}<br><b>${i.c} 🪙</b></div>`).join('');
-    document.getElementById('list-clothes').innerHTML = ITEMS.clothes.map(i => `<div class="card" onclick="buyCloth('${i.id}')">${i.n}<br><b>${i.c} 🪙</b></div>`).join('') + `<div class="card" onclick="buyCloth('none')">Zdejmij</div>`;
-    document.getElementById('list-bgs').innerHTML = ITEMS.bgs.map(i => `<div class="card" onclick="buyBg('${i.id}', ${i.c})">${i.n}<br><b>${i.c} 🪙</b></div>`).join('');
+// --- CORE ENGINE ---
+function initGame() {
+    const p1 = document.getElementById('setup-p1').value;
+    const p2 = document.getElementById('setup-p2').value;
+    const pet = document.getElementById('setup-pet').value;
+    
+    if(!p1 || !p2 || !pet) return alert("Wpisz wszystkie imiona!");
+    
+    state.p1 = p1; state.p2 = p2; state.petName = pet;
+    savePath.set(state).then(() => {
+        document.getElementById('setup-screen').style.display = 'none';
+    });
 }
 
-async function buyFood(v, c) {
-    if(state.coins >= c) {
-        await docRef.update({ hunger: Math.min(100, state.hunger + v), coins: state.coins - c });
+savePath.onSnapshot(doc => {
+    if(doc.exists) {
+        state = doc.data();
+        renderUI();
+        document.getElementById('setup-screen').style.display = 'none';
+    }
+});
+
+function renderUI() {
+    // Stats
+    document.getElementById('ui-coins').innerText = Math.floor(state.coins);
+    document.getElementById('ui-gems').innerText = state.gems;
+    document.getElementById('ui-lvl').innerText = state.lvl;
+    document.getElementById('ui-xp').innerText = state.xp;
+    document.getElementById('ui-mission').innerText = state.mission;
+    document.getElementById('hud-pet-name').innerText = state.petName;
+    document.getElementById('hud-players').innerText = `${state.p1} ❤️ ${state.p2}`;
+
+    document.getElementById('bar-xp').style.width = state.xp + '%';
+    document.getElementById('bar-hunger').style.width = state.hunger + '%';
+    document.getElementById('bar-energy').style.width = state.energy + '%';
+    document.getElementById('bar-happy').style.width = state.happy + '%';
+
+    // Bg
+    const bg = document.getElementById('world-bg');
+    bg.className = '';
+    if(state.bg !== 'default') bg.classList.add('bg-' + state.bg);
+
+    // Outfit
+    document.getElementById('layer-hat').innerHTML = state.outfit.hat;
+    document.getElementById('layer-eyes').innerHTML = state.outfit.eyes;
+    document.getElementById('layer-neck').innerHTML = state.outfit.neck;
+}
+
+// --- LOGIKA INTERAKCJI ---
+function openOverlay(type) {
+    document.querySelectorAll('.overlay').forEach(o => o.classList.remove('active'));
+    document.getElementById('ov-' + type).classList.add('active');
+    
+    if(type === 'food') {
+        const grid = document.getElementById('grid-food');
+        grid.innerHTML = ITEMS.food.map(i => `
+            <div class="item-card" onclick="buyFood('${i.id}')">
+                <div style="font-size:30px;">${i.icon}</div>
+                <b>${i.n}</b><br>
+                <small>${i.c} 🪙 (+${i.v} HP)</small>
+            </div>
+        `).join('');
+    }
+    if(type === 'wardrobe') {
+        const grid = document.getElementById('grid-wardrobe');
+        grid.innerHTML = ITEMS.clothes.map(i => `
+            <div class="item-card ${state.inventory.includes(i.id) ? 'owned' : ''}" onclick="manageCloth('${i.id}')">
+                <div style="height:40px; overflow:hidden;">${i.svg.replace(/L/g, ' l')}</div>
+                <b>${i.n}</b><br>
+                <small>${state.inventory.includes(i.id) ? 'ZAŁÓŻ' : i.c + ' 🪙'}</small>
+            </div>
+        `).join('') + `<div class="item-card" onclick="manageCloth('none')">WYCZYŚĆ</div>`;
+    }
+    if(type === 'shop') {
+        const grid = document.getElementById('grid-bgs');
+        grid.innerHTML = ITEMS.bgs.map(i => `
+            <div class="item-card" onclick="buyBg('${i.id}')">
+                <b>${i.n}</b><br><small>${i.c} 🪙</small>
+            </div>
+        `).join('');
     }
 }
 
-async function buyCloth(id) {
+function closeOverlays() {
+    document.querySelectorAll('.overlay').forEach(o => o.classList.remove('active'));
+}
+
+async function buyFood(id) {
+    const item = ITEMS.food.find(x => x.id === id);
+    if(state.coins >= item.c) {
+        await savePath.update({
+            coins: state.coins - item.c,
+            hunger: Math.min(100, state.hunger + item.v),
+            xp: state.xp + 5
+        });
+        checkLevel();
+    }
+}
+
+async function manageCloth(id) {
     if(id === 'none') {
-        await docRef.update({ outfit: {hat:'', neck:'', eyes:''} });
-        return;
+        return savePath.update({ outfit: { hat: '', eyes: '', neck: '' } });
     }
     const item = ITEMS.clothes.find(x => x.id === id);
+    if(state.inventory.includes(id)) {
+        let newOutfit = {...state.outfit};
+        newOutfit[item.l] = item.svg;
+        await savePath.update({ outfit: newOutfit });
+    } else if(state.coins >= item.c) {
+        await savePath.update({
+            coins: state.coins - item.c,
+            inventory: [...state.inventory, id]
+        });
+        showToast("Nowy styl! 👔");
+    }
+}
+
+async function buyBg(id) {
+    const item = ITEMS.bgs.find(x => x.id === id);
     if(state.coins >= item.c) {
-        let o = {...state.outfit}; o[item.l] = item.svg;
-        await docRef.update({ outfit: o, coins: state.coins - item.c });
+        await savePath.update({ bg: id, coins: state.coins - item.c });
+        showToast("Świat się zmienił! 🌍");
     }
 }
 
-async function buyBg(id, c) {
-    if(state.coins >= c) {
-        await docRef.update({ bg: id, coins: state.coins - c });
+function checkLevel() {
+    if(state.xp >= 100) {
+        savePath.update({ lvl: state.lvl + 1, xp: 0, gems: state.gems + 5 });
+        showToast("LEVEL UP! +5 💎");
     }
 }
 
-function toggleMenu(m) {
-    document.querySelectorAll('.menu-overlay').forEach(el => el.classList.remove('active'));
-    if(m) {
-        document.getElementById('m-' + m).classList.add('active');
-        renderLists();
-    }
+function showToast(txt) {
+    const t = document.getElementById('toast');
+    t.innerText = txt;
+    t.style.top = "30px";
+    setTimeout(() => t.style.top = "-100px", 3000);
 }
 
-// Spadek statystyk co minutę
-setInterval(() => {
-    docRef.update({
-        hunger: Math.max(0, state.hunger - 1),
-        energy: Math.max(0, state.energy - 1)
+function petInteraction() {
+    savePath.update({ 
+        happy: Math.min(100, state.happy + 5),
+        xp: state.xp + 1
     });
-}, 60000);
+    const svg = document.getElementById('pet-svg');
+    svg.style.transform = "scale(1.1) rotate(5deg)";
+    setTimeout(() => svg.style.transform = "", 200);
+}
+
+// --- MINI GAMES SYSTEM ---
+let gameInterval;
+let score = 0;
+
+function initMiniGame(type) {
+    document.getElementById('game-engine').style.display = 'flex';
+    const stage = document.getElementById('ge-stage');
+    stage.innerHTML = '';
+    score = 0;
+    document.getElementById('ge-score').innerText = 0;
+    
+    if(type === 'clicker') {
+        const btn = document.createElement('div');
+        btn.style = "width:150px; height:150px; background:white; border-radius:50%; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:30px; cursor:pointer;";
+        btn.innerText = "KLIKAJ!";
+        btn.onclick = () => { score++; document.getElementById('ge-score').innerText = score; btn.style.transform = "translate(-50%,-50%) scale(0.9)"; setTimeout(()=>btn.style.transform="translate(-50%,-50%) scale(1)", 50); };
+        stage.appendChild(btn);
+    }
+    
+    if(type === 'catcher') {
+        const paddle = document.createElement('div');
+        paddle.style = "width:80px; height:20px; background:white; position:absolute; bottom:20px; left:50%; transform:translateX(-50%); border-radius:10px;";
+        stage.appendChild(paddle);
+        
+        stage.ontouchmove = (e) => {
+            let x = e.touches[0].clientX;
+            paddle.style.left = x + "px";
+        };
+
+        gameInterval = setInterval(() => {
+            const item = document.createElement('div');
+            item.innerHTML = "🍎";
+            item.style = `position:absolute; top:-50px; left:${Math.random()*90}%; font-size:30px; transition: 3s linear;`;
+            stage.appendChild(item);
+            setTimeout(() => item.style.top = "100%", 50);
+            
+            const check = setInterval(() => {
+                const iR = item.getBoundingClientRect();
+                const pR = paddle.getBoundingClientRect();
+                if(iR.bottom > pR.top && iR.left < pR.right && iR.right > pR.left) {
+                    score += 10; document.getElementById('ge-score').innerText = score;
+                    item.remove(); clearInterval(check);
+                }
+            }, 50);
+        }, 1000);
+    }
+
+    if(type === 'quiz') {
+        const q = ["2 + 2 * 2 = ?", "Z czego jest lód?", "Czy pingwiny latają?"];
+        const a = ["6", "Wody", "Nie"];
+        let idx = 0;
+        function nextQ() {
+            stage.innerHTML = `<h2 style="color:white; text-align:center; padding:20px;">${q[idx]}</h2>`;
+            const inp = document.createElement('input');
+            inp.style = "display:block; margin:20px auto; padding:10px;";
+            const b = document.createElement('button');
+            b.innerText = "OK"; b.style="width:100%; padding:10px;";
+            b.onclick = () => {
+                if(inp.value.toLowerCase() === a[idx].toLowerCase()) { score += 50; }
+                idx++; if(idx < q.length) nextQ(); else alert("Koniec pytań!");
+                document.getElementById('ge-score').innerText = score;
+            };
+            stage.appendChild(inp); stage.appendChild(b);
+        }
+        nextQ();
+    }
+
+    if(type === 'reflex') {
+        stage.innerHTML = "<h1 style='color:white; text-align:center; margin-top:50%;'>KLIKNIJ GDY ZIELONE!</h1>";
+        function loop() {
+            stage.style.background = "#222";
+            setTimeout(() => {
+                stage.style.background = "#2ecc71";
+                const start = Date.now();
+                stage.onclick = () => {
+                    const diff = Date.now() - start;
+                    score += Math.max(0, 500 - diff);
+                    document.getElementById('ge-score').innerText = score;
+                    stage.onclick = null;
+                    loop();
+                };
+            }, Math.random() * 3000 + 1000);
+        }
+        loop();
+    }
+
+    if(type === 'memory') {
+        stage.style.display = "grid"; stage.style.gridTemplateColumns = "repeat(2, 1fr)";
+        const icons = ["🧊", "🧊", "🐟", "🐟", "⭐", "⭐"];
+        icons.sort(() => Math.random() - 0.5).forEach(icon => {
+            const card = document.createElement('div');
+            card.style = "height:100px; background:#444; margin:10px; display:flex; align-items:center; justify-content:center; font-size:40px; color:transparent; cursor:pointer;";
+            card.innerText = icon;
+            card.onclick = () => { card.style.color = "white"; score += 5; document.getElementById('ge-score').innerText = score; };
+            stage.appendChild(card);
+        });
+    }
+}
+
+document.getElementById('ge-exit').onclick = () => {
+    clearInterval(gameInterval);
+    document.getElementById('game-engine').style.display = 'none';
+    savePath.update({
+        coins: state.coins + score,
+        happy: Math.min(100, state.happy + 20),
+        xp: state.xp + Math.floor(score/5)
+    });
+    showToast(`Zarobiono ${score} 🪙!`);
+    checkLevel();
+};
+
+// --- AUTO-SYSTEMS ---
+setInterval(() => {
+    if(state.p1) {
+        savePath.update({
+            hunger: Math.max(0, state.hunger - 0.5),
+            energy: Math.max(0, state.energy - 0.3),
+            happy: Math.max(0, state.happy - 0.2)
+        });
+    }
+}, 30000);
+
 </script>
 </body>
 </html>
