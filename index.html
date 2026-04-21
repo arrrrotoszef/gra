@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Vinted Pro | Aro & Polak</title>
+    <title>Vinted Elite | Aro & Polak</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -11,67 +11,78 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-        body { font-family: 'Inter', sans-serif; background: #000; color: white; min-height: 100vh; }
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .btn-gradient { background: linear-gradient(90deg, #22c55e, #16a34a); }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #050505; color: white; min-height: 100vh; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .btn-green { background: linear-gradient(135deg, #22c55e 0%, #15803d 100%); box-shadow: 0 10px 20px -10px rgba(34, 197, 94, 0.5); }
+        .chart-container { position: relative; height: 180px; width: 100%; }
     </style>
 </head>
-<body class="pb-10">
+<body class="pb-10 px-4">
 
-    <div id="app" class="max-w-md mx-auto p-4">
+    <div id="app" class="max-w-md mx-auto">
         
-        <div class="flex justify-between items-center mb-6 pt-4">
-            <h1 class="text-2xl font-black text-green-500">VINTED PRO</h1>
-            <div class="text-[10px] bg-red-500 px-2 py-1 rounded-full font-bold" v-if="error">{{ error }}</div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3 mb-6">
-            <div class="glass p-4 rounded-2xl">
-                <p class="text-[10px] text-gray-400 uppercase font-bold">Zysk Miesiąc</p>
-                <p class="text-xl font-black">{{ monthlyProfit }} zł</p>
+        <header class="flex justify-between items-center py-6 animate__animated animate__fadeIn">
+            <div>
+                <p class="text-[10px] font-bold text-green-500 uppercase tracking-[0.2em]">Business Tracker</p>
+                <h1 class="text-2xl font-black italic tracking-tighter">ARO <span class="text-gray-500">&</span> POLAK</h1>
             </div>
-            <div class="glass p-4 rounded-2xl border-l-2 border-blue-500">
-                <p class="text-[10px] text-gray-400 uppercase font-bold text-blue-400">Dla każdego</p>
-                <p class="text-xl font-black">{{ (monthlyProfit / 2).toFixed(2) }} zł</p>
-            </div>
-        </div>
+            <div class="bg-white/10 p-2 rounded-xl text-xs font-mono" v-if="loading">SYNCING...</div>
+        </header>
 
-        <div class="glass p-5 rounded-3xl mb-8 animate__animated animate__fadeIn">
-            <h2 class="text-sm font-bold mb-4 uppercase tracking-widest text-green-400">Dodaj Sprzedaż</h2>
-            <div class="space-y-3">
-                <input v-model="newItem.name" type="text" placeholder="Nazwa itemu" class="w-full bg-white/5 p-4 rounded-xl outline-none border border-white/10 focus:border-green-500">
-                <div class="flex gap-2">
-                    <input v-model.number="newItem.buy" type="number" placeholder="Kupno" class="w-1/2 bg-white/5 p-4 rounded-xl outline-none border border-white/10">
-                    <input v-model.number="newItem.sell" type="number" placeholder="Sprzedaż" class="w-1/2 bg-white/5 p-4 rounded-xl outline-none border border-white/10">
-                </div>
-                <button @click="saveToFirebase" :disabled="loading" class="btn-gradient w-full py-4 rounded-xl font-bold uppercase transition-all active:scale-95 disabled:opacity-50">
-                    {{ loading ? 'Łączenie z bazą...' : 'Zapisz Item' }}
-                </button>
+        <div class="glass rounded-[2rem] p-6 mb-6 animate__animated animate__zoomIn">
+            <h3 class="text-[10px] font-bold text-gray-500 uppercase mb-4 tracking-widest text-center">Trend Zysku (Ostatnie deale)</h3>
+            <div class="chart-container">
+                <canvas id="mainChart"></canvas>
             </div>
         </div>
 
-        <div class="space-y-3">
-            <h3 class="text-xs font-bold text-gray-500 uppercase px-2">Historia Transakcji</h3>
-            <div v-for="item in sales" :key="item.id" class="glass p-4 rounded-2xl flex justify-between items-center animate__animated animate__fadeInUp">
-                <div>
-                    <p class="font-bold text-sm text-white">{{ item.name }}</p>
-                    <p class="text-[10px] text-gray-500">{{ item.date }}</p>
+        <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="glass p-5 rounded-3xl animate__animated animate__fadeInLeft">
+                <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Zysk (Msc)</p>
+                <p class="text-2xl font-extrabold text-white">{{ monthlyProfit }}<span class="text-xs text-green-500 ml-1">zł</span></p>
+            </div>
+            <div class="glass p-5 rounded-3xl animate__animated animate__fadeInRight" style="border-bottom: 2px solid #3b82f6;">
+                <p class="text-[10px] text-blue-400 uppercase font-bold mb-1">Dla każdego</p>
+                <p class="text-2xl font-extrabold text-white">{{ (monthlyProfit / 2).toFixed(0) }}<span class="text-xs text-blue-400 ml-1">zł</span></p>
+            </div>
+        </div>
+
+        <div class="glass p-6 rounded-[2rem] mb-10 shadow-2xl animate__animated animate__fadeInUp">
+            <div class="flex gap-3 mb-4">
+                <input v-model="newItem.name" type="text" placeholder="Nazwa itemu..." class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-green-500 text-sm">
+            </div>
+            <div class="flex gap-3 mb-4">
+                <input v-model.number="newItem.buy" type="number" placeholder="Kupno" class="w-1/2 bg-white/5 border border-white/10 p-4 rounded-2xl outline-none text-sm text-center">
+                <input v-model.number="newItem.sell" type="number" placeholder="Sprzedaż" class="w-1/2 bg-white/5 border border-white/10 p-4 rounded-2xl outline-none text-sm text-center">
+            </div>
+            <button @click="saveToFirebase" :disabled="loading" class="btn-green w-full py-4 rounded-2xl font-black text-white uppercase tracking-widest active:scale-95 transition-all">
+                DODAJ DO BAZY
+            </button>
+        </div>
+
+        <div class="space-y-4">
+            <p class="text-[10px] font-bold text-gray-600 uppercase tracking-[0.2em] px-2">Ostatnie Transakcje</p>
+            <div v-for="item in sales" :key="item.id" class="glass p-5 rounded-3xl flex justify-between items-center animate__animated animate__fadeInUp">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center mr-4 text-lg">📦</div>
+                    <div>
+                        <p class="font-bold text-sm">{{ item.name }}</p>
+                        <p class="text-[10px] text-gray-500">{{ item.date }}</p>
+                    </div>
                 </div>
                 <div class="text-right">
-                    <p class="text-green-400 font-black">+{{ (item.sell - item.buy).toFixed(2) }} zł</p>
-                    <p class="text-[9px] text-gray-500">Kupno: {{ item.buy }} | Marża: {{ (((item.sell - item.buy) / item.buy) * 100).toFixed(0) }}%</p>
+                    <p class="text-green-500 font-black">+{{ (item.sell - item.buy).toFixed(0) }} zł</p>
+                    <p class="text-[9px] bg-white/5 px-2 py-1 rounded-md text-gray-400 mt-1">Marża: {{ (((item.sell - item.buy) / item.buy) * 100).toFixed(0) }}%</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script type="module">
-        // Poprawione importy pod przeglądarkę
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Twoja konfiguracja
         const firebaseConfig = {
             apiKey: "AIzaSyCR4fwPjTKduaI56l61sj1dz7o1560JY5w",
             authDomain: "arek-918ae.firebaseapp.com",
@@ -82,8 +93,8 @@
             measurementId: "G-L9FEK2526Y"
         };
 
-        const firebaseApp = initializeApp(firebaseConfig);
-        const db = getFirestore(firebaseApp);
+        const fApp = initializeApp(firebaseConfig);
+        const db = getFirestore(fApp);
         const salesCol = collection(db, 'sales');
 
         const { createApp } = Vue;
@@ -94,7 +105,7 @@
                     newItem: { name: '', buy: null, sell: null },
                     sales: [],
                     loading: false,
-                    error: null
+                    chart: null
                 }
             },
             computed: {
@@ -102,7 +113,7 @@
                     const now = new Date();
                     return this.sales
                         .filter(s => s.rawDate && s.rawDate.getMonth() === now.getMonth())
-                        .reduce((sum, s) => sum + (s.sell - s.buy), 0).toFixed(2);
+                        .reduce((sum, s) => sum + (s.sell - s.buy), 0).toFixed(0);
                 }
             },
             methods: {
@@ -117,34 +128,54 @@
                             createdAt: new Date()
                         });
                         this.newItem = { name: '', buy: null, sell: null };
-                        this.error = null;
-                    } catch (e) {
-                        this.error = "Brak dostępu do bazy!";
-                        console.error(e);
-                    }
+                    } catch (e) { alert("Błąd! Sprawdź Rules w Firebase."); }
                     this.loading = false;
+                },
+                updateChart() {
+                    if (!this.chart) return;
+                    const lastData = [...this.sales].reverse().slice(-10);
+                    this.chart.data.labels = lastData.map(s => s.name.substring(0, 8));
+                    this.chart.data.datasets[0].data = lastData.map(s => s.sell - s.buy);
+                    this.chart.update();
                 }
             },
             mounted() {
-                // Pobieranie danych w czasie rzeczywistym
-                try {
-                    const q = query(salesCol, orderBy('createdAt', 'desc'), limit(50));
-                    onSnapshot(q, (snapshot) => {
-                        this.sales = snapshot.docs.map(doc => {
-                            const data = doc.data();
-                            return {
-                                id: doc.id,
-                                ...data,
-                                rawDate: data.createdAt?.toDate(),
-                                date: data.createdAt?.toDate().toLocaleDateString('pl-PL') || '...'
-                            };
-                        });
-                    }, (err) => {
-                        this.error = "Błąd Firebase: Sprawdź Rules!";
-                    });
-                } catch (e) {
-                    this.error = "Inicjalizacja nieudana";
-                }
+                const ctx = document.getElementById('mainChart').getContext('2d');
+                this.chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            data: [],
+                            borderColor: '#22c55e',
+                            borderWidth: 4,
+                            tension: 0.4,
+                            fill: true,
+                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                            pointRadius: 0
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { 
+                            y: { display: false }, 
+                            x: { ticks: { color: '#444', font: { size: 8 } }, grid: { display: false } }
+                        }
+                    }
+                });
+
+                const q = query(salesCol, orderBy('createdAt', 'desc'), limit(30));
+                onSnapshot(q, (snapshot) => {
+                    this.sales = snapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data(),
+                        rawDate: doc.data().createdAt?.toDate(),
+                        date: doc.data().createdAt?.toDate().toLocaleDateString('pl-PL') || '...'
+                    }));
+                    this.updateChart();
+                });
             }
         }).mount('#app');
     </script>
