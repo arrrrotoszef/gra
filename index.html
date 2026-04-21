@@ -15,6 +15,7 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #050505; color: white; min-height: 100vh; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .btn-green { background: linear-gradient(135deg, #22c55e 0%, #15803d 100%); box-shadow: 0 10px 20px -10px rgba(34, 197, 94, 0.5); }
+        /* Naprawiona wysokość kontenera wykresu */
         .chart-container { position: relative; height: 180px; width: 100%; }
     </style>
 </head>
@@ -33,7 +34,7 @@
         <div class="glass rounded-[2rem] p-6 mb-6 animate__animated animate__zoomIn">
             <h3 class="text-[10px] font-bold text-gray-500 uppercase mb-4 tracking-widest text-center">Trend Zysku (Ostatnie deale)</h3>
             <div class="chart-container">
-                <canvas id="mainChart"></canvas>
+                <canvas id="mainChart" ref="mainChart"></canvas>
             </div>
         </div>
 
@@ -73,7 +74,7 @@
                 </div>
                 <div class="text-right">
                     <p class="text-green-500 font-black">+{{ (item.sell - item.buy).toFixed(0) }} zł</p>
-                    <p class="text-[9px] bg-white/5 px-2 py-1 rounded-md text-gray-400 mt-1">Marża: {{ (((item.sell - item.buy) / item.buy) * 100).toFixed(0) }}%</p>
+                    <p class="text-[9px] bg-white/5 px-2 py-1 rounded-md text-gray-400 mt-1">Marża: {{ item.buy > 0 ? (((item.sell - item.buy) / item.buy) * 100).toFixed(0) : 0 }}%</p>
                 </div>
             </div>
         </div>
@@ -97,7 +98,7 @@
         const db = getFirestore(fApp);
         const salesCol = collection(db, 'sales');
 
-        const { createApp } = Vue;
+        const { createApp, nextTick } = Vue;
 
         createApp({
             data() {
@@ -111,9 +112,10 @@
             computed: {
                 monthlyProfit() {
                     const now = new Date();
-                    return this.sales
+                    const profit = this.sales
                         .filter(s => s.rawDate && s.rawDate.getMonth() === now.getMonth())
-                        .reduce((sum, s) => sum + (s.sell - s.buy), 0).toFixed(0);
+                        .reduce((sum, s) => sum + (s.sell - s.buy), 0);
+                    return profit.toFixed(0);
                 }
             },
             methods: {
@@ -128,52 +130,70 @@
                             createdAt: new Date()
                         });
                         this.newItem = { name: '', buy: null, sell: null };
-                    } catch (e) { alert("Błąd! Sprawdź Rules w Firebase."); }
+                    } catch (e) { 
+                        console.error(e);
+                        alert("Błąd! Sprawdź Rules w Firebase."); 
+                    }
                     this.loading = false;
                 },
+                initChart() {
+                    const ctx = document.getElementById('mainChart');
+                    if (!ctx) return;
+
+                    this.chart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: [],
+                            datasets: [{
+                                data: [],
+                                borderColor: '#22c55e',
+                                borderWidth: 3,
+                                tension: 0.4,
+                                fill: true,
+                                backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                                pointRadius: 3,
+                                pointBackgroundColor: '#22c55e'
+                            }]
+                        },
+                        options: { 
+                            responsive: true, 
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: { 
+                                y: { display: false, beginAtZero: true }, 
+                                x: { ticks: { color: '#555', font: { size: 9 } }, grid: { display: false } }
+                            }
+                        }
+                    });
+                },
                 updateChart() {
-                    if (!this.chart) return;
-                    const lastData = [...this.sales].reverse().slice(-10);
-                    this.chart.data.labels = lastData.map(s => s.name.substring(0, 8));
+                    if (!this.chart || this.sales.length === 0) return;
+                    
+                    // Pokazujemy 7 ostatnich transakcji w kolejności chronologicznej
+                    const lastData = [...this.sales].reverse().slice(-7);
+                    
+                    this.chart.data.labels = lastData.map(s => s.name.substring(0, 6));
                     this.chart.data.datasets[0].data = lastData.map(s => s.sell - s.buy);
                     this.chart.update();
                 }
             },
-            mounted() {
-                const ctx = document.getElementById('mainChart').getContext('2d');
-                this.chart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: [],
-                        datasets: [{
-                            data: [],
-                            borderColor: '#22c55e',
-                            borderWidth: 4,
-                            tension: 0.4,
-                            fill: true,
-                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                            pointRadius: 0
-                        }]
-                    },
-                    options: { 
-                        responsive: true, 
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { 
-                            y: { display: false }, 
-                            x: { ticks: { color: '#444', font: { size: 8 } }, grid: { display: false } }
-                        }
-                    }
-                });
+            async mounted() {
+                // Poczekaj na wyrenderowanie DOM
+                await nextTick();
+                this.initChart();
 
                 const q = query(salesCol, orderBy('createdAt', 'desc'), limit(30));
                 onSnapshot(q, (snapshot) => {
-                    this.sales = snapshot.docs.map(doc => ({
-                        id: doc.id,
-                        ...doc.data(),
-                        rawDate: doc.data().createdAt?.toDate(),
-                        date: doc.data().createdAt?.toDate().toLocaleDateString('pl-PL') || '...'
-                    }));
+                    this.sales = snapshot.docs.map(doc => {
+                        const data = doc.data();
+                        return {
+                            id: doc.id,
+                            ...data,
+                            rawDate: data.createdAt?.toDate(),
+                            date: data.createdAt?.toDate().toLocaleDateString('pl-PL', {day: 'numeric', month: 'short'}) || '...'
+                        };
+                    });
+                    // Aktualizuj wykres za każdym razem, gdy przyjdą nowe dane
                     this.updateChart();
                 });
             }
