@@ -2,102 +2,127 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Vinted Business Tracker - Aro & Polak</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vinted Business | Aro & Polak</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+    </style>
 </head>
-<body class="bg-gray-900 text-white p-5">
-    <div id="app" class="max-w-4xl mx-auto">
-        <h1 class="text-3xl font-bold mb-8 text-center text-green-400">📈 Panel Zysków: Aro & Polak</h1>
+<body class="bg-black text-gray-100 min-h-screen pb-20">
 
-        <div class="bg-gray-800 p-6 rounded-xl shadow-lg mb-8 border border-gray-700">
-            <h2 class="text-xl mb-4 font-semibold">Dodaj nowy item</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <input v-model="newItem.name" type="text" placeholder="Nazwa przedmiotu" class="bg-gray-700 p-2 rounded">
-                <input v-model.number="newItem.buy" type="number" placeholder="Cena zakupu (PLN)" class="bg-gray-700 p-2 rounded">
-                <input v-model.number="newItem.sell" type="number" placeholder="Cena sprzedaży (PLN)" class="bg-gray-700 p-2 rounded">
-            </div>
-            <button @click="addItem" class="mt-4 w-full bg-green-600 hover:bg-green-500 text-white font-bold py-2 rounded transition">
-                DODAJ DO BAZY
-            </button>
-        </div>
+    <div id="app" class="p-4">
+        <header class="mb-6 pt-4">
+            <h1 class="text-2xl font-black text-green-500 uppercase tracking-wider">Aro & Polak Biznes</h1>
+            <p class="text-gray-400 text-sm">Vinted Tracker v1.0</p>
+        </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div class="bg-blue-900 p-4 rounded-lg text-center">
-                <p class="text-sm">Łączny Zysk</p>
-                <p class="text-2xl font-bold">{{ totalProfit }} PLN</p>
+        <div class="grid grid-cols-2 gap-3 mb-6">
+            <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl">
+                <p class="text-xs text-gray-400 uppercase">Łączny Zysk</p>
+                <p class="text-xl font-bold text-green-400">{{ totalProfit }} zł</p>
             </div>
-            <div class="bg-purple-900 p-4 rounded-lg text-center">
-                <p class="text-sm">Dla każdego (50/50)</p>
-                <p class="text-2xl font-bold">{{ totalProfit / 2 }} PLN</p>
-            </div>
-            <div class="bg-green-900 p-4 rounded-lg text-center">
-                <p class="text-sm">Średnia Marża</p>
-                <p class="text-2xl font-bold">{{ avgMargin }}%</p>
+            <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl">
+                <p class="text-xs text-gray-400 uppercase">Na głowę</p>
+                <p class="text-xl font-bold text-blue-400">{{ (totalProfit / 2).toFixed(2) }} zł</p>
             </div>
         </div>
 
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="border-b border-gray-600 text-gray-400">
-                        <th class="p-3">Data</th>
-                        <th class="p-3">Przedmiot</th>
-                        <th class="p-3">Kupno</th>
-                        <th class="p-3">Sprzedaż</th>
-                        <th class="p-3 text-green-400">Zysk</th>
-                        <th class="p-3">Marża</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="sale in sales" :key="sale.id" class="border-b border-gray-800 hover:bg-gray-800">
-                        <td class="p-3 text-sm">{{ sale.date }}</td>
-                        <td class="p-3 font-medium">{{ sale.name }}</td>
-                        <td class="p-3 text-red-400">{{ sale.buy }} PLN</td>
-                        <td class="p-3 text-blue-400">{{ sale.sell }} PLN</td>
-                        <td class="p-3 font-bold text-green-400">{{ sale.sell - sale.buy }} PLN</td>
-                        <td class="p-3 text-xs">{{ (((sale.sell - sale.buy) / sale.buy) * 100).toFixed(1) }}%</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl mb-8 shadow-2xl">
+            <h2 class="text-lg font-bold mb-4">Nowy Item</h2>
+            <div class="space-y-3">
+                <input v-model="newItem.name" type="text" placeholder="Co kupiłeś?" class="w-full bg-gray-800 border-none p-4 rounded-xl focus:ring-2 focus:ring-green-500 outline-none text-white">
+                <div class="flex gap-2">
+                    <input v-model.number="newItem.buy" type="number" placeholder="Kupno" class="w-1/2 bg-gray-800 border-none p-4 rounded-xl outline-none">
+                    <input v-model.number="newItem.sell" type="number" placeholder="Sprzedaż" class="w-1/2 bg-gray-800 border-none p-4 rounded-xl outline-none">
+                </div>
+                <button @click="saveToFirebase" :disabled="loading" class="w-full bg-green-600 active:bg-green-700 py-4 rounded-xl font-bold uppercase mt-2 shadow-lg disabled:opacity-50">
+                    {{ loading ? 'Zapisywanie...' : 'Dodaj do bazy' }}
+                </button>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <h2 class="text-gray-400 font-bold uppercase text-sm tracking-widest px-1">Ostatnie Akcje</h2>
+            
+            <div v-for="item in sales" :key="item.id" class="bg-gray-900 border-l-4 border-green-500 p-4 rounded-r-xl flex justify-between items-center shadow-sm">
+                <div>
+                    <p class="font-bold text-white">{{ item.name }}</p>
+                    <p class="text-xs text-gray-500">{{ item.date }}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-green-400 font-bold">+{{ item.sell - item.buy }} zł</p>
+                    <p class="text-[10px] text-gray-500">Marża: {{ (((item.sell - item.buy) / item.buy) * 100).toFixed(0) }}%</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script>
-        const { createApp } = Vue
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCR4fwPjTKduaI56l61sj1dz7o1560JY5w",
+            authDomain: "arek-918ae.firebaseapp.com",
+            projectId: "arek-918ae",
+            storageBucket: "arek-918ae.firebasestorage.app",
+            messagingSenderId: "661615275552",
+            appId: "1:661615275552:web:8ec18d85d7b4c0e6c05645",
+            measurementId: "G-L9FEK2526Y"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const salesCol = collection(db, 'sales');
+
+        const { createApp } = Vue;
+
         createApp({
             data() {
                 return {
                     newItem: { name: '', buy: null, sell: null },
-                    sales: [] // Tu będą dane pobrane z Firebase
+                    sales: [],
+                    loading: false
                 }
             },
             computed: {
                 totalProfit() {
-                    return this.sales.reduce((sum, s) => sum + (s.sell - s.buy), 0)
-                },
-                avgMargin() {
-                    if (this.sales.length === 0) return 0
-                    const totalMargin = this.sales.reduce((sum, s) => sum + (((s.sell - s.buy) / s.buy) * 100), 0)
-                    return (totalMargin / this.sales.length).toFixed(1)
+                    return this.sales.reduce((sum, s) => sum + (s.sell - s.buy), 0).toFixed(2);
                 }
             },
             methods: {
-                addItem() {
-                    if(!this.newItem.name || !this.newItem.buy || !this.newItem.sell) return;
-                    
-                    const sale = {
-                        ...this.newItem,
-                        date: new Date().toLocaleDateString(),
-                        id: Date.now()
+                async saveToFirebase() {
+                    if(!this.newItem.name || this.newItem.buy == null) return;
+                    this.loading = true;
+                    try {
+                        await addDoc(salesCol, {
+                            name: this.newItem.name,
+                            buy: this.newItem.buy,
+                            sell: this.newItem.sell,
+                            createdAt: new Date()
+                        });
+                        this.newItem = { name: '', buy: null, sell: null };
+                    } catch (e) {
+                        alert("Błąd zapisu!");
                     }
-                    
-                    // Logika wysyłania do Firebase (Firestore addDoc)
-                    this.sales.unshift(sale)
-                    this.newItem = { name: '', buy: null, sell: null }
+                    this.loading = false;
                 }
+            },
+            mounted() {
+                // Automatyczne odświeżanie danych na żywo
+                const q = query(salesCol, orderBy('createdAt', 'desc'));
+                onSnapshot(q, (snapshot) => {
+                    this.sales = snapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data(),
+                        date: doc.data().createdAt?.toDate().toLocaleDateString() || 'Brak daty'
+                    }));
+                });
             }
-        }).mount('#app')
+        }).mount('#app');
     </script>
 </body>
 </html>
