@@ -3,66 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Vinted Business | Aro & Polak</title>
+    <title>Urząd Skarbowy :D</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: radial-gradient(circle at top right, #1e293b, #000000);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, #4ade80, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-gradient {
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+        }
+
+        input { transition: all 0.3s ease; }
+        input:focus { transform: scale(1.02); }
     </style>
 </head>
-<body class="bg-black text-gray-100 min-h-screen pb-20">
+<body class="pb-10">
 
-    <div id="app" class="p-4">
-        <header class="mb-6 pt-4">
-            <h1 class="text-2xl font-black text-green-500 uppercase tracking-wider">Aro & Polak Biznes</h1>
-            <p class="text-gray-400 text-sm">Vinted Tracker v1.0</p>
-        </header>
-
-        <div class="grid grid-cols-2 gap-3 mb-6">
-            <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl">
-                <p class="text-xs text-gray-400 uppercase">Łączny Zysk</p>
-                <p class="text-xl font-bold text-green-400">{{ totalProfit }} zł</p>
+    <div id="app" class="max-w-md mx-auto p-4">
+        
+        <div class="flex justify-between items-center mb-8 pt-4 animate__animated animate__fadeInDown">
+            <div>
+                <h1 class="text-3xl font-extrabold tracking-tighter gradient-text">VINTED PRO</h1>
+                <p class="text-gray-500 text-xs font-bold tracking-widest uppercase">Dashboard: Aro & Polak</p>
             </div>
-            <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl">
-                <p class="text-xs text-gray-400 uppercase">Na głowę</p>
-                <p class="text-xl font-bold text-blue-400">{{ (totalProfit / 2).toFixed(2) }} zł</p>
+            <div class="h-10 w-10 rounded-full bg-gradient-to-tr from-green-400 to-blue-500 flex items-center justify-center font-bold">
+                AP
             </div>
         </div>
 
-        <div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl mb-8 shadow-2xl">
-            <h2 class="text-lg font-bold mb-4">Nowy Item</h2>
-            <div class="space-y-3">
-                <input v-model="newItem.name" type="text" placeholder="Co kupiłeś?" class="w-full bg-gray-800 border-none p-4 rounded-xl focus:ring-2 focus:ring-green-500 outline-none text-white">
-                <div class="flex gap-2">
-                    <input v-model.number="newItem.buy" type="number" placeholder="Kupno" class="w-1/2 bg-gray-800 border-none p-4 rounded-xl outline-none">
-                    <input v-model.number="newItem.sell" type="number" placeholder="Sprzedaż" class="w-1/2 bg-gray-800 border-none p-4 rounded-xl outline-none">
+        <div class="glass rounded-3xl p-4 mb-6 animate__animated animate__fadeIn">
+            <h3 class="text-xs font-bold text-gray-400 mb-4 uppercase tracking-widest text-center">Zyski w tym miesiącu</h3>
+            <canvas id="profitChart" height="150"></canvas>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="glass p-5 rounded-3xl animate__animated animate__fadeInLeft">
+                <p class="text-[10px] text-gray-400 uppercase font-bold mb-1">Miesięczny Zysk</p>
+                <p class="text-2xl font-black text-white">{{ monthlyProfit }}<span class="text-sm text-green-500 ml-1">zł</span></p>
+            </div>
+            <div class="glass p-5 rounded-3xl animate__animated animate__fadeInRight">
+                <p class="text-[10px] text-gray-400 uppercase font-bold mb-1">Dla każdego</p>
+                <p class="text-2xl font-black text-blue-400">{{ (monthlyProfit / 2).toFixed(0) }}<span class="text-sm ml-1 text-blue-300">zł</span></p>
+            </div>
+        </div>
+
+        <div class="glass p-6 rounded-3xl mb-10 animate__animated animate__fadeInUp">
+            <div class="flex items-center mb-4">
+                <div class="bg-green-500 w-1 h-6 rounded-full mr-3"></div>
+                <h2 class="text-lg font-bold">Nowy Łup</h2>
+            </div>
+            
+            <div class="space-y-4">
+                <input v-model="newItem.name" type="text" placeholder="Nazwa przedmiotu..." 
+                    class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-green-500">
+                
+                <div class="flex gap-3">
+                    <div class="relative w-1/2">
+                        <span class="absolute left-4 top-4 text-gray-500 text-sm">Kup:</span>
+                        <input v-model.number="newItem.buy" type="number" class="w-full bg-white/5 border border-white/10 p-4 pl-12 rounded-2xl outline-none">
+                    </div>
+                    <div class="relative w-1/2">
+                        <span class="absolute left-4 top-4 text-gray-500 text-sm">Sells:</span>
+                        <input v-model.number="newItem.sell" type="number" class="w-full bg-white/5 border border-white/10 p-4 pl-14 rounded-2xl outline-none">
+                    </div>
                 </div>
-                <button @click="saveToFirebase" :disabled="loading" class="w-full bg-green-600 active:bg-green-700 py-4 rounded-xl font-bold uppercase mt-2 shadow-lg disabled:opacity-50">
-                    {{ loading ? 'Zapisywanie...' : 'Dodaj do bazy' }}
+                
+                <button @click="saveToFirebase" :disabled="loading" class="btn-gradient w-full py-4 rounded-2xl font-black text-white uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all">
+                    {{ loading ? 'Dodawanie...' : 'Zatwierdź Transakcję' }}
                 </button>
             </div>
         </div>
 
-        <div class="space-y-4">
-            <h2 class="text-gray-400 font-bold uppercase text-sm tracking-widest px-1">Ostatnie Akcje</h2>
-            
-            <div v-for="item in sales" :key="item.id" class="bg-gray-900 border-l-4 border-green-500 p-4 rounded-r-xl flex justify-between items-center shadow-sm">
-                <div>
-                    <p class="font-bold text-white">{{ item.name }}</p>
-                    <p class="text-xs text-gray-500">{{ item.date }}</p>
+        <div class="space-y-3">
+            <div class="flex justify-between items-center px-2 mb-2">
+                <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest">Ostatnia Historia</h2>
+                <span class="text-[10px] bg-white/10 px-2 py-1 rounded-full uppercase tracking-tighter">{{ sales.length }} transakcji</span>
+            </div>
+
+            <div v-for="(item, index) in sales" :key="item.id" 
+                class="glass p-4 rounded-2xl flex justify-between items-center animate__animated animate__fadeInUp"
+                :style="{ animationDelay: (index * 0.1) + 's' }">
+                <div class="flex items-center">
+                    <div class="h-10 w-10 bg-white/5 rounded-xl flex items-center justify-center mr-4">
+                        📦
+                    </div>
+                    <div>
+                        <p class="font-bold text-sm">{{ item.name }}</p>
+                        <p class="text-[10px] text-gray-500 font-medium tracking-tight">{{ item.date }}</p>
+                    </div>
                 </div>
                 <div class="text-right">
-                    <p class="text-green-400 font-bold">+{{ item.sell - item.buy }} zł</p>
-                    <p class="text-[10px] text-gray-500">Marża: {{ (((item.sell - item.buy) / item.buy) * 100).toFixed(0) }}%</p>
+                    <p class="text-green-400 font-black">+{{ (item.sell - item.buy).toFixed(2) }} zł</p>
+                    <div class="flex items-center justify-end">
+                        <span class="text-[9px] text-gray-400">ROI: </span>
+                        <span class="text-[10px] font-bold text-blue-400 ml-1">{{ (((item.sell - item.buy) / item.buy) * 100).toFixed(0) }}%</span>
+                    </div>
                 </div>
             </div>
         </div>
+
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCR4fwPjTKduaI56l61sj1dz7o1560JY5w",
@@ -85,17 +153,21 @@
                 return {
                     newItem: { name: '', buy: null, sell: null },
                     sales: [],
-                    loading: false
+                    loading: false,
+                    chart: null
                 }
             },
             computed: {
-                totalProfit() {
-                    return this.sales.reduce((sum, s) => sum + (s.sell - s.buy), 0).toFixed(2);
+                monthlyProfit() {
+                    const now = new Date();
+                    return this.sales
+                        .filter(s => s.rawDate && s.rawDate.getMonth() === now.getMonth())
+                        .reduce((sum, s) => sum + (s.sell - s.buy), 0);
                 }
             },
             methods: {
                 async saveToFirebase() {
-                    if(!this.newItem.name || this.newItem.buy == null) return;
+                    if(!this.newItem.name || this.newItem.buy == null || this.newItem.sell == null) return;
                     this.loading = true;
                     try {
                         await addDoc(salesCol, {
@@ -106,20 +178,58 @@
                         });
                         this.newItem = { name: '', buy: null, sell: null };
                     } catch (e) {
-                        alert("Błąd zapisu!");
+                        console.error(e);
                     }
                     this.loading = false;
+                },
+                initChart() {
+                    const ctx = document.getElementById('profitChart').getContext('2d');
+                    this.chart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: [],
+                            datasets: [{
+                                label: 'Zysk',
+                                data: [],
+                                borderColor: '#4ade80',
+                                backgroundColor: 'rgba(74, 222, 128, 0.1)',
+                                fill: true,
+                                tension: 0.4,
+                                borderWidth: 3,
+                                pointRadius: 0
+                            }]
+                        },
+                        options: {
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                y: { display: false },
+                                x: { grid: { display: false }, ticks: { color: '#666', font: { size: 10 } } }
+                            }
+                        }
+                    });
+                },
+                updateChart() {
+                    if (!this.chart) return;
+                    const last7 = [...this.sales].reverse().slice(-7);
+                    this.chart.data.labels = last7.map(s => s.name.substring(0, 5));
+                    this.chart.data.datasets[0].data = last7.map(s => s.sell - s.buy);
+                    this.chart.update();
                 }
             },
             mounted() {
-                // Automatyczne odświeżanie danych na żywo
-                const q = query(salesCol, orderBy('createdAt', 'desc'));
+                this.initChart();
+                const q = query(salesCol, orderBy('createdAt', 'desc'), limit(20));
                 onSnapshot(q, (snapshot) => {
-                    this.sales = snapshot.docs.map(doc => ({
-                        id: doc.id,
-                        ...doc.data(),
-                        date: doc.data().createdAt?.toDate().toLocaleDateString() || 'Brak daty'
-                    }));
+                    this.sales = snapshot.docs.map(doc => {
+                        const data = doc.data();
+                        return {
+                            id: doc.id,
+                            ...data,
+                            rawDate: data.createdAt?.toDate(),
+                            date: data.createdAt?.toDate().toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' }) || '...'
+                        };
+                    });
+                    this.updateChart();
                 });
             }
         }).mount('#app');
