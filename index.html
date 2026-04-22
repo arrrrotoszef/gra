@@ -21,60 +21,59 @@
 <body class="pb-10 px-4">
 
     <div id="app" class="max-w-md mx-auto">
-        <header class="flex justify-between items-center py-6">
+        <header class="flex justify-between items-center py-6 animate__animated animate__fadeIn">
             <div>
                 <p class="text-[10px] font-bold text-green-500 uppercase tracking-[0.2em]">Business Tracker</p>
                 <h1 class="text-2xl font-black italic tracking-tighter">ARO <span class="text-gray-500">&</span> POLAK</h1>
             </div>
-            <div v-if="loading" class="text-[10px] font-mono text-green-400 animate-pulse">SYNCING...</div>
+            <div v-if="loading" class="text-[10px] font-mono text-green-400 animate-pulse bg-white/5 px-3 py-1 rounded-full">SYNCING...</div>
         </header>
 
-        <div class="glass rounded-[2rem] p-6 mb-6 animate__animated animate__fadeIn">
-            <h3 class="text-[10px] font-bold text-gray-400 uppercase mb-4 tracking-widest text-center">Trend Sprzedaży</h3>
+        <div class="glass rounded-[2rem] p-6 mb-6 animate__animated animate__zoomIn">
+            <h3 class="text-[10px] font-bold text-gray-400 uppercase mb-4 tracking-widest text-center">Trend Sprzedaży (Ostatnie 7)</h3>
             <div class="chart-container">
                 <canvas id="mainChart"></canvas>
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4 mb-8">
-            <div class="glass p-5 rounded-3xl border-b-2 border-green-500">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="glass p-5 rounded-3xl border-l-2 border-green-500 animate__animated animate__fadeInLeft">
                 <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Suma (Msc)</p>
                 <p class="text-2xl font-extrabold text-white">{{ totalMonthly }}<span class="text-xs text-green-500 ml-1">zł</span></p>
             </div>
-            <div class="glass p-5 rounded-3xl border-b-2 border-blue-500">
+            <div class="glass p-5 rounded-3xl border-l-2 border-blue-400 animate__animated animate__fadeInRight">
                 <p class="text-[10px] text-blue-400 uppercase font-bold mb-1">Sztuk (Msc)</p>
                 <p class="text-2xl font-extrabold text-white">{{ monthlyCount }}<span class="text-xs text-blue-400 ml-1">szt</span></p>
             </div>
         </div>
 
+        <div class="glass p-5 rounded-3xl mb-8 text-center border-b-2 border-blue-500 animate__animated animate__fadeInUp">
+            <p class="text-[10px] text-blue-400 uppercase font-bold mb-1">DLA KAŻDEGO (PODZIAŁ 50/50)</p>
+            <p class="text-3xl font-black text-white">{{ (totalMonthly / 2).toFixed(0) }}<span class="text-sm text-blue-400 ml-1">zł</span></p>
+        </div>
+
         <div class="glass p-6 rounded-[2rem] mb-10 shadow-2xl">
             <div class="space-y-4">
-                <div>
-                    <label class="text-[10px] text-gray-500 ml-2 uppercase font-bold">Nazwa przedmiotu</label>
-                    <input v-model="newItem.name" type="text" placeholder="np. Bluza Nike" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-green-500">
-                </div>
-                <div>
-                    <label class="text-[10px] text-gray-500 ml-2 uppercase font-bold">Kwota sprzedaży</label>
-                    <input v-model.number="newItem.price" type="number" placeholder="0" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-green-500 text-xl font-bold">
-                </div>
+                <input v-model="newItem.name" type="text" placeholder="Nazwa przedmiotu..." class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-green-500 text-sm">
+                <input v-model.number="newItem.price" type="number" placeholder="Cena sprzedaży" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-green-500 text-xl font-bold text-center">
                 <button @click="saveToFirebase" :disabled="loading || !newItem.name || !newItem.price" class="btn-green w-full py-4 rounded-2xl font-black text-white uppercase tracking-widest active:scale-95 transition-all">
-                    DODAJ SPRZEDAŻ
+                    DODAJ DO BAZY
                 </button>
             </div>
         </div>
 
         <div class="space-y-4">
-            <p class="text-[10px] font-bold text-gray-600 uppercase tracking-widest px-2 text-center">Ostatnio sprzedane</p>
+            <p class="text-[10px] font-bold text-gray-600 uppercase tracking-widest px-2 text-center">Ostatnie transakcje</p>
             <div v-for="item in sales" :key="item.id" class="glass p-5 rounded-3xl flex justify-between items-center animate__animated animate__fadeInUp">
                 <div class="flex items-center">
-                    <div class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center mr-4 text-lg">📦</div>
+                    <div class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center mr-4">📈</div>
                     <div>
                         <p class="font-bold text-sm">{{ item.name }}</p>
                         <p class="text-[10px] text-gray-500">{{ item.date }}</p>
                     </div>
                 </div>
-                <div class="text-right">
-                    <p class="text-green-400 font-black text-lg">{{ item.price }} zł</p>
+                <div class="text-right font-black text-green-400">
+                    {{ item.price }} zł
                 </div>
             </div>
         </div>
@@ -109,15 +108,20 @@
                 }
             },
             computed: {
-                currentMonthSales() {
-                    const now = new Date();
-                    return this.sales.filter(s => s.rawDate && s.rawDate.getMonth() === now.getMonth());
-                },
                 totalMonthly() {
-                    return this.currentMonthSales.reduce((sum, s) => sum + Number(s.price), 0).toFixed(0);
+                    const now = new Date();
+                    const filtered = this.sales.filter(s => {
+                        const sDate = s.rawDate;
+                        return sDate && sDate.getMonth() === now.getMonth() && sDate.getFullYear() === now.getFullYear();
+                    });
+                    return filtered.reduce((sum, s) => sum + Number(s.price), 0);
                 },
                 monthlyCount() {
-                    return this.currentMonthSales.length;
+                    const now = new Date();
+                    return this.sales.filter(s => {
+                        const sDate = s.rawDate;
+                        return sDate && sDate.getMonth() === now.getMonth();
+                    }).length;
                 }
             },
             methods: {
@@ -131,13 +135,15 @@
                         });
                         this.newItem = { name: '', price: null };
                     } catch (e) {
-                        console.error(e);
+                        console.error("Błąd zapisu:", e);
                     } finally {
                         this.loading = false;
                     }
                 },
                 initChart() {
                     const ctx = document.getElementById('mainChart').getContext('2d');
+                    if (this.chart) this.chart.destroy(); // Czyścimy stary wykres jeśli istnieje
+
                     this.chart = new Chart(ctx, {
                         type: 'line',
                         data: {
@@ -149,7 +155,8 @@
                                 fill: true,
                                 tension: 0.4,
                                 borderWidth: 3,
-                                pointRadius: 4
+                                pointRadius: 4,
+                                pointBackgroundColor: '#22c55e'
                             }]
                         },
                         options: {
@@ -158,29 +165,41 @@
                             plugins: { legend: { display: false } },
                             scales: { 
                                 x: { ticks: { color: '#555', font: { size: 9 } }, grid: { display: false } },
-                                y: { display: false }
+                                y: { display: false, beginAtZero: true }
                             }
                         }
                     });
                 },
                 updateChart() {
                     if (!this.chart || this.sales.length === 0) return;
+                    
+                    // Bierzemy ostatnie 7 transakcji, ale odwracamy kolejność do wykresu (od najstarszej)
                     const last7 = [...this.sales].slice(0, 7).reverse();
-                    this.chart.data.labels = last7.map(s => s.name.substring(0, 8));
+                    
+                    this.chart.data.labels = last7.map(s => s.name.substring(0, 6));
                     this.chart.data.datasets[0].data = last7.map(s => s.price);
                     this.chart.update();
                 }
             },
             mounted() {
                 this.initChart();
+                
                 const q = query(salesCol, orderBy('createdAt', 'desc'), limit(50));
                 onSnapshot(q, (snapshot) => {
                     this.sales = snapshot.docs.map(doc => {
                         const data = doc.data();
                         const d = data.createdAt?.toDate() || new Date();
-                        return { id: doc.id, ...data, rawDate: d, date: d.toLocaleDateString('pl-PL', {day: 'numeric', month: 'short'}) };
+                        return { 
+                            id: doc.id, 
+                            ...data, 
+                            rawDate: d, 
+                            date: d.toLocaleDateString('pl-PL', {day: 'numeric', month: 'short'}) 
+                        };
                     });
-                    this.updateChart();
+                    // Aktualizujemy wykres po każdym pobraniu danych
+                    this.$nextTick(() => {
+                        this.updateChart();
+                    });
                 });
             }
         }).mount('#app');
