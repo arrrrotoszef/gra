@@ -21,56 +21,55 @@
 <body class="pb-10 px-4">
 
     <div id="app" class="max-w-md mx-auto">
-        
         <header class="flex justify-between items-center py-6 animate__animated animate__fadeIn">
             <div>
                 <p class="text-[10px] font-bold text-green-500 uppercase tracking-[0.2em]">Business Tracker</p>
                 <h1 class="text-2xl font-black italic tracking-tighter">ARO <span class="text-gray-500">&</span> POLAK</h1>
             </div>
-            <div class="bg-white/10 p-2 rounded-xl text-xs font-mono" v-if="loading">SYNCING...</div>
+            <div v-if="loading" class="bg-white/10 p-2 rounded-xl text-[10px] font-mono animate-pulse">SYNCING...</div>
         </header>
 
         <div class="glass rounded-[2rem] p-6 mb-6 animate__animated animate__zoomIn">
-            <h3 class="text-[10px] font-bold text-gray-500 uppercase mb-4 tracking-widest text-center">Trend Zysku (Ostatnie deale)</h3>
+            <h3 class="text-[10px] font-bold text-gray-400 uppercase mb-4 tracking-widest text-center">Trend Zysku (Ostatnie 7)</h3>
             <div class="chart-container">
                 <canvas id="mainChart"></canvas>
             </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4 mb-4">
-            <div class="glass p-5 rounded-3xl animate__animated animate__fadeInLeft">
+            <div class="glass p-5 rounded-3xl">
                 <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Zysk (Msc)</p>
                 <p class="text-2xl font-extrabold text-white">{{ monthlyProfit }}<span class="text-xs text-green-500 ml-1">zł</span></p>
             </div>
-            <div class="glass p-5 rounded-3xl animate__animated animate__fadeInRight">
+            <div class="glass p-5 rounded-3xl">
                 <p class="text-[10px] text-blue-400 uppercase font-bold mb-1">Sztuk (Msc)</p>
                 <p class="text-2xl font-extrabold text-white">{{ monthlyCount }}<span class="text-xs text-blue-400 ml-1">szt</span></p>
             </div>
         </div>
 
-        <div class="glass p-5 rounded-3xl mb-8 animate__animated animate__fadeInUp text-center" style="border-bottom: 2px solid #3b82f6;">
-            <p class="text-[10px] text-blue-400 uppercase font-bold mb-1">Dla każdego na rękę</p>
+        <div class="glass p-5 rounded-3xl mb-8 text-center" style="border-bottom: 2px solid #3b82f6;">
+            <p class="text-[10px] text-blue-400 uppercase font-bold mb-1">Dla każdego (Pół)</p>
             <p class="text-2xl font-extrabold text-white">{{ (monthlyProfit / 2).toFixed(0) }}<span class="text-xs text-blue-400 ml-1">zł</span></p>
         </div>
 
-        <div class="glass p-6 rounded-[2rem] mb-10 shadow-2xl animate__animated animate__fadeInUp">
-            <div class="flex gap-3 mb-4">
-                <input v-model="newItem.name" type="text" placeholder="Nazwa itemu..." class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-green-500 text-sm">
+        <div class="glass p-6 rounded-[2rem] mb-10 shadow-2xl">
+            <div class="space-y-4">
+                <input v-model="newItem.name" type="text" placeholder="Nazwa przedmiotu..." class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-green-500 text-sm">
+                <div class="flex gap-3">
+                    <input v-model.number="newItem.buy" type="number" placeholder="Kupno" class="w-1/2 bg-white/5 border border-white/10 p-4 rounded-2xl outline-none text-center">
+                    <input v-model.number="newItem.sell" type="number" placeholder="Sprzedaż" class="w-1/2 bg-white/5 border border-white/10 p-4 rounded-2xl outline-none text-center">
+                </div>
+                <button @click="saveToFirebase" :disabled="loading" class="btn-green w-full py-4 rounded-2xl font-black text-white uppercase tracking-widest active:scale-95 transition-all">
+                    DODAJ DO BAZY
+                </button>
             </div>
-            <div class="flex gap-3 mb-4">
-                <input v-model.number="newItem.buy" type="number" placeholder="Kupno" class="w-1/2 bg-white/5 border border-white/10 p-4 rounded-2xl outline-none text-sm text-center">
-                <input v-model.number="newItem.sell" type="number" placeholder="Sprzedaż" class="w-1/2 bg-white/5 border border-white/10 p-4 rounded-2xl outline-none text-sm text-center">
-            </div>
-            <button @click="saveToFirebase" :disabled="loading" class="btn-green w-full py-4 rounded-2xl font-black text-white uppercase tracking-widest active:scale-95 transition-all">
-                DODAJ DO BAZY
-            </button>
         </div>
 
         <div class="space-y-4">
-            <p class="text-[10px] font-bold text-gray-600 uppercase tracking-[0.2em] px-2">Ostatnie Transakcje</p>
-            <div v-for="item in sales" :key="item.id" class="glass p-5 rounded-3xl flex justify-between items-center animate__animated animate__fadeInUp">
+            <p class="text-[10px] font-bold text-gray-600 uppercase tracking-widest px-2">Historia sprzedaży</p>
+            <div v-for="item in sales" :key="item.id" class="glass p-5 rounded-3xl flex justify-between items-center">
                 <div class="flex items-center">
-                    <div class="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center mr-4 text-lg">📦</div>
+                    <div class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center mr-4 text-lg">📦</div>
                     <div>
                         <p class="font-bold text-sm">{{ item.name }}</p>
                         <p class="text-[10px] text-gray-500">{{ item.date }}</p>
@@ -78,7 +77,6 @@
                 </div>
                 <div class="text-right">
                     <p class="text-green-500 font-black">+{{ (item.sell - item.buy).toFixed(0) }} zł</p>
-                    <p class="text-[9px] bg-white/5 px-2 py-1 rounded-md text-gray-400 mt-1">Marża: {{ item.buy > 0 ? (((item.sell - item.buy) / item.buy) * 100).toFixed(0) : 0 }}%</p>
                 </div>
             </div>
         </div>
@@ -94,8 +92,7 @@
             projectId: "arek-918ae",
             storageBucket: "arek-918ae.firebasestorage.app",
             messagingSenderId: "661615275552",
-            appId: "1:661615275552:web:8ec18d85d7b4c0e6c05645",
-            measurementId: "G-L9FEK2526Y"
+            appId: "1:661615275552:web:8ec18d85d7b4c0e6c05645"
         };
 
         const fApp = initializeApp(firebaseConfig);
@@ -114,26 +111,20 @@
                 }
             },
             computed: {
-                // Filtruje itemy z obecnego miesiąca
-                currentMonthSales() {
+                monthlySales() {
                     const now = new Date();
-                    return this.sales.filter(s => {
-                        return s.rawDate && 
-                               s.rawDate.getMonth() === now.getMonth() && 
-                               s.rawDate.getFullYear() === now.getFullYear();
-                    });
+                    return this.sales.filter(s => s.rawDate && s.rawDate.getMonth() === now.getMonth());
                 },
                 monthlyProfit() {
-                    const profit = this.currentMonthSales.reduce((sum, s) => sum + (s.sell - s.buy), 0);
-                    return profit.toFixed(0);
+                    return this.monthlySales.reduce((sum, s) => sum + (s.sell - s.buy), 0).toFixed(0);
                 },
                 monthlyCount() {
-                    return this.currentMonthSales.length;
+                    return this.monthlySales.length;
                 }
             },
             methods: {
                 async saveToFirebase() {
-                    if(!this.newItem.name || this.newItem.buy == null) return;
+                    if(!this.newItem.name || this.newItem.buy === null) return;
                     this.loading = true;
                     try {
                         await addDoc(salesCol, {
@@ -143,11 +134,11 @@
                             createdAt: new Date()
                         });
                         this.newItem = { name: '', buy: null, sell: null };
-                    } catch (e) { 
-                        console.error(e);
-                        alert("Błąd bazy danych!"); 
+                    } catch (e) {
+                        alert("Błąd zapisu! Sprawdź Rules w Firebase.");
+                    } finally {
+                        this.loading = false;
                     }
-                    this.loading = false;
                 },
                 initChart() {
                     const ctx = document.getElementById('mainChart').getContext('2d');
@@ -158,60 +149,49 @@
                             datasets: [{
                                 data: [],
                                 borderColor: '#22c55e',
-                                borderWidth: 3,
-                                tension: 0.4,
-                                fill: true,
                                 backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                                pointRadius: 4,
-                                pointBackgroundColor: '#22c55e'
+                                fill: true,
+                                tension: 0.4,
+                                borderWidth: 3,
+                                pointRadius: 4
                             }]
                         },
-                        options: { 
-                            responsive: true, 
+                        options: {
+                            responsive: true,
                             maintainAspectRatio: false,
                             plugins: { legend: { display: false } },
                             scales: { 
-                                y: { display: false, beginAtZero: true }, 
-                                x: { ticks: { color: '#555', font: { size: 9 } }, grid: { display: false } }
+                                x: { ticks: { color: '#555', font: { size: 9 } }, grid: { display: false } },
+                                y: { display: false }
                             }
                         }
                     });
                 },
                 updateChart() {
                     if (!this.chart || this.sales.length === 0) return;
-                    
-                    // Bierzemy 7 ostatnich transakcji i odwracamy, żeby szły od najstarszej do najnowszej na wykresie
-                    const lastData = [...this.sales].slice(0, 7).reverse();
-                    
-                    this.chart.data.labels = lastData.map(s => s.name.substring(0, 8));
-                    this.chart.data.datasets[0].data = lastData.map(s => s.sell - s.buy);
+                    const last7 = [...this.sales].slice(0, 7).reverse();
+                    this.chart.data.labels = last7.map(s => s.name.substring(0, 6));
+                    this.chart.data.datasets[0].data = last7.map(s => s.sell - s.buy);
                     this.chart.update();
-                }
-            },
-            watch: {
-                // Reaguj na zmiany w danych i odświeżaj wykres
-                sales: {
-                    handler() {
-                        this.updateChart();
-                    },
-                    deep: true
                 }
             },
             mounted() {
                 this.initChart();
-
-                const q = query(salesCol, orderBy('createdAt', 'desc'), limit(30));
+                const q = query(salesCol, orderBy('createdAt', 'desc'), limit(50));
+                
+                // Real-time listener: gdy Ty dodasz, ziomek od razu widzi
                 onSnapshot(q, (snapshot) => {
                     this.sales = snapshot.docs.map(doc => {
                         const data = doc.data();
-                        const dateObj = data.createdAt?.toDate() || new Date();
+                        const d = data.createdAt?.toDate() || new Date();
                         return {
                             id: doc.id,
                             ...data,
-                            rawDate: dateObj,
-                            date: dateObj.toLocaleDateString('pl-PL', {day: 'numeric', month: 'short'})
+                            rawDate: d,
+                            date: d.toLocaleDateString('pl-PL', {day: 'numeric', month: 'short'})
                         };
                     });
+                    this.updateChart();
                 });
             }
         }).mount('#app');
