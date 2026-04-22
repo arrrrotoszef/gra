@@ -15,7 +15,6 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #050505; color: white; min-height: 100vh; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .btn-green { background: linear-gradient(135deg, #22c55e 0%, #15803d 100%); box-shadow: 0 10px 20px -10px rgba(34, 197, 94, 0.5); }
-        /* Naprawiona wysokość kontenera wykresu */
         .chart-container { position: relative; height: 180px; width: 100%; }
     </style>
 </head>
@@ -34,19 +33,24 @@
         <div class="glass rounded-[2rem] p-6 mb-6 animate__animated animate__zoomIn">
             <h3 class="text-[10px] font-bold text-gray-500 uppercase mb-4 tracking-widest text-center">Trend Zysku (Ostatnie deale)</h3>
             <div class="chart-container">
-                <canvas id="mainChart" ref="mainChart"></canvas>
+                <canvas id="mainChart"></canvas>
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4 mb-8">
+        <div class="grid grid-cols-2 gap-4 mb-4">
             <div class="glass p-5 rounded-3xl animate__animated animate__fadeInLeft">
                 <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Zysk (Msc)</p>
                 <p class="text-2xl font-extrabold text-white">{{ monthlyProfit }}<span class="text-xs text-green-500 ml-1">zł</span></p>
             </div>
-            <div class="glass p-5 rounded-3xl animate__animated animate__fadeInRight" style="border-bottom: 2px solid #3b82f6;">
-                <p class="text-[10px] text-blue-400 uppercase font-bold mb-1">Dla każdego</p>
-                <p class="text-2xl font-extrabold text-white">{{ (monthlyProfit / 2).toFixed(0) }}<span class="text-xs text-blue-400 ml-1">zł</span></p>
+            <div class="glass p-5 rounded-3xl animate__animated animate__fadeInRight">
+                <p class="text-[10px] text-blue-400 uppercase font-bold mb-1">Sztuk (Msc)</p>
+                <p class="text-2xl font-extrabold text-white">{{ monthlyCount }}<span class="text-xs text-blue-400 ml-1">szt</span></p>
             </div>
+        </div>
+
+        <div class="glass p-5 rounded-3xl mb-8 animate__animated animate__fadeInUp text-center" style="border-bottom: 2px solid #3b82f6;">
+            <p class="text-[10px] text-blue-400 uppercase font-bold mb-1">Dla każdego na rękę</p>
+            <p class="text-2xl font-extrabold text-white">{{ (monthlyProfit / 2).toFixed(0) }}<span class="text-xs text-blue-400 ml-1">zł</span></p>
         </div>
 
         <div class="glass p-6 rounded-[2rem] mb-10 shadow-2xl animate__animated animate__fadeInUp">
@@ -98,7 +102,7 @@
         const db = getFirestore(fApp);
         const salesCol = collection(db, 'sales');
 
-        const { createApp, nextTick } = Vue;
+        const { createApp } = Vue;
 
         createApp({
             data() {
@@ -110,12 +114,21 @@
                 }
             },
             computed: {
-                monthlyProfit() {
+                // Filtruje itemy z obecnego miesiąca
+                currentMonthSales() {
                     const now = new Date();
-                    const profit = this.sales
-                        .filter(s => s.rawDate && s.rawDate.getMonth() === now.getMonth())
-                        .reduce((sum, s) => sum + (s.sell - s.buy), 0);
+                    return this.sales.filter(s => {
+                        return s.rawDate && 
+                               s.rawDate.getMonth() === now.getMonth() && 
+                               s.rawDate.getFullYear() === now.getFullYear();
+                    });
+                },
+                monthlyProfit() {
+                    const profit = this.currentMonthSales.reduce((sum, s) => sum + (s.sell - s.buy), 0);
                     return profit.toFixed(0);
+                },
+                monthlyCount() {
+                    return this.currentMonthSales.length;
                 }
             },
             methods: {
@@ -132,14 +145,12 @@
                         this.newItem = { name: '', buy: null, sell: null };
                     } catch (e) { 
                         console.error(e);
-                        alert("Błąd! Sprawdź Rules w Firebase."); 
+                        alert("Błąd bazy danych!"); 
                     }
                     this.loading = false;
                 },
                 initChart() {
-                    const ctx = document.getElementById('mainChart');
-                    if (!ctx) return;
-
+                    const ctx = document.getElementById('mainChart').getContext('2d');
                     this.chart = new Chart(ctx, {
                         type: 'line',
                         data: {
@@ -151,7 +162,7 @@
                                 tension: 0.4,
                                 fill: true,
                                 backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                                pointRadius: 3,
+                                pointRadius: 4,
                                 pointBackgroundColor: '#22c55e'
                             }]
                         },
@@ -169,32 +180,38 @@
                 updateChart() {
                     if (!this.chart || this.sales.length === 0) return;
                     
-                    // Pokazujemy 7 ostatnich transakcji w kolejności chronologicznej
-                    const lastData = [...this.sales].reverse().slice(-7);
+                    // Bierzemy 7 ostatnich transakcji i odwracamy, żeby szły od najstarszej do najnowszej na wykresie
+                    const lastData = [...this.sales].slice(0, 7).reverse();
                     
-                    this.chart.data.labels = lastData.map(s => s.name.substring(0, 6));
+                    this.chart.data.labels = lastData.map(s => s.name.substring(0, 8));
                     this.chart.data.datasets[0].data = lastData.map(s => s.sell - s.buy);
                     this.chart.update();
                 }
             },
-            async mounted() {
-                // Poczekaj na wyrenderowanie DOM
-                await nextTick();
+            watch: {
+                // Reaguj na zmiany w danych i odświeżaj wykres
+                sales: {
+                    handler() {
+                        this.updateChart();
+                    },
+                    deep: true
+                }
+            },
+            mounted() {
                 this.initChart();
 
                 const q = query(salesCol, orderBy('createdAt', 'desc'), limit(30));
                 onSnapshot(q, (snapshot) => {
                     this.sales = snapshot.docs.map(doc => {
                         const data = doc.data();
+                        const dateObj = data.createdAt?.toDate() || new Date();
                         return {
                             id: doc.id,
                             ...data,
-                            rawDate: data.createdAt?.toDate(),
-                            date: data.createdAt?.toDate().toLocaleDateString('pl-PL', {day: 'numeric', month: 'short'}) || '...'
+                            rawDate: dateObj,
+                            date: dateObj.toLocaleDateString('pl-PL', {day: 'numeric', month: 'short'})
                         };
                     });
-                    // Aktualizuj wykres za każdym razem, gdy przyjdą nowe dane
-                    this.updateChart();
                 });
             }
         }).mount('#app');
